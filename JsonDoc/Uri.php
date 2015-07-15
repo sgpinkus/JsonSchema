@@ -3,8 +3,8 @@ namespace JsonDoc;
 
 /**
  * Encapsulates a valid URI. Suprised PHP has no such class.
- * Note parse_url() parses URLs not URIs but it works.
- * @todo This is a stub for an eventual higher quality implementation.
+ * Note parse_url() parses URLs not URIs but it ~works. Only works with absolute file paths though.
+ * @todo Not really a URI. This is a stub for an eventual higher quality implementation.
  */
 class Uri
 {
@@ -14,23 +14,17 @@ class Uri
    * Init.
    */
   public function __construct($uri) {
+    $uri = preg_replace("/#$/", "# ", $uri); // "#" does not parse.
     $parse = parse_url($uri);
-    if(!$parse) {
-      throw new UriException("Could not parse URI.");
+    if(isset($parse['fragment']) && $parse['fragment'] == " "){
+      $parse['fragment'] = "";
     }
-    $this->parts = $parse;
-  }
-
-  public function __get($part) {
-    return $this->get($part);
-  }
-
-  public function __set($part, $value) {
-    return $this->set($part, $value);
-  }
-
-  public function __unset($part) {
-    return $this->clear($part);
+    if(!$parse) {
+      throw new UriException("Could not parse URI '$uri'");
+    }
+    foreach($parse as $part => $value) {
+      $this->set($part, $value);
+    }
   }
 
   /**
@@ -49,7 +43,15 @@ class Uri
     if(!in_array($part, $allow)) {
       throw new UriException("Can't set $part.");
     }
-    $this->parts[$part] = $value;
+    switch($part) {
+      case 'path': {
+        $this->parts['path'] = preg_replace("#\/+#", "/", $value);
+        break;
+      }
+      default: {
+        $this->parts[$part] = $value;
+      }
+    }
   }
 
   /**
@@ -68,6 +70,18 @@ class Uri
     unset($this->parts[$part]);
   }
 
+  public function __get($part) {
+    return $this->get($part);
+  }
+
+  public function __set($part, $value) {
+    return $this->set($part, $value);
+  }
+
+  public function __unset($part) {
+    return $this->clear($part);
+  }
+
   /**
    * Returns true iff this URI is an absolute URI.
    * According to RFC3986 only the scheme need be defined for a URI to be absolute.
@@ -84,17 +98,18 @@ class Uri
   }
 
   /**
-   * Return a URI that is this URI rebase against $base, an absolute Base URI.
+   * Return a URI that is this URI rebased against $base, an absolute Base URI.
+   * If this URI is an absolute URI a copy of this URI is returned.
    * Always use the reference's fragment. Replace the base's query only if path is non empty.
    * @see https://tools.ietf.org/html/rfc3986#section-5.2.
    */
-  public function base(Uri $base) {
+  public function baseOn(Uri $base) {
     $uri = null;
     if($base->isRelativeUri()) {
       throw new UriException("Can't base $this against $base. Invalid base URI");
     }
     if($this->isAbsoluteUri()) {
-      throw new UriException("Can't base $this against $base. Invalid target URI"); # Maybe should return $this.
+      $uri = clone $this;
     }
     else {
       $uri = clone $base;
@@ -115,6 +130,13 @@ class Uri
       $uri->set('fragment', $this->get('fragment'));
     }
     return $uri;
+  }
+
+  /**
+   * Same as baseOn() but the other way around.
+   */
+  public function resolveRelativeUriOn(Uri $uri) {
+    return $uri->baseOn($this);
   }
 
   /**

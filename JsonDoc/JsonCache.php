@@ -3,15 +3,16 @@ namespace JsonDoc;
 use JsonDoc\Exception\JsonDecodeException;
 use JsonDoc\Exception\ResourceNotFoundException;
 require_once 'JsonLoader.php';
+require_once 'JsonRef.php';
 require_once 'Uri.php';
 require_once 'Exception/JsonDecodeException.php';
 require_once 'Exception/ResourceNotFoundException.php';
 
 /**
  * Instances of this class maintain a cache of dereferenced JSON documents and provide access to those documents.
- * Basically its a cache of deserialized, dereferenced JSON docs keyed by the domain part of absolute URIs.
- * Supports retrieving aprt of a doc by JSON Pointer, but the fragment part of loaded URI is ignored.
- * Actually loading raw data from remote (or local) sources pointed at by URIS is delegated to JsonLoader.
+ * Basically its a cache of deserialized, dereferenced JSON docs keyed by the scheme+domain+path part of absolute URIs.
+ * Supports retrieving part of a doc by JSON Pointer. Note however, the fragment part of loaded URIs is ignored.
+ * Actually loading raw data from remote (or local) sources pointed at by URIs is delegated to JsonLoader.
  */
 class JsonCache
 {
@@ -37,16 +38,7 @@ class JsonCache
     if(isset($this->cache[$keyUri.''])) {
       return $this->cache[$keyUri.''];
     }
-
-    $doc = $this->loader->load($keyUri);
-    $doc = json_decode($doc);
-    if($doc == null) {
-      throw new JsonDecodeException(json_last_error());
-    }
-
-    self::dereference($doc);
-    $this->cache[$keyUri.''] = $doc;
-    return $doc;
+    return $this->_get($uri);
   }
 
   /**
@@ -70,19 +62,19 @@ class JsonCache
       throw new ResourceNotFoundException();
     }
 
-    return self::_pointer($this->cache[$keyUri], $pointer);
+    return self::getPointer($this->cache[$keyUri], $pointer);
   }
 
   /**
-   * Travers JSON document structure to find pointer reference. Return by reference.
+   * Traverse a JSON document data structure to find pointer reference.
    * @input $doc Decoded JSON data structure.
    * @input $pointer String JSON Pointer. Example "/x/y/0/z".
+   * @return reference to the pointed to value. Note return by *reference*.
    */
-  public static function &_pointer($doc, $pointer) {
+  public static function &getPointer($doc, $pointer) {
     $parts = explode("/", $pointer);
     $currentPointer = "";
     $doc= &$doc;
-    var_dump($parts);
 
     foreach($parts as $part) {
       if($part == "") {
@@ -117,9 +109,113 @@ class JsonCache
   }
 
   /**
-   * Remove all Json References ($ref) from the document.
+   * Internal function called by get().
+   * load() and deRef() must be called in sequence. They are coupled by a queue of refs that load() builds, deRef() uses.
    */
-  public static function dereference($doc) {
+  private function _get(Uri $uri) {
+    $queue = new JsonRefPriorityQueue();
+    $doc = $this->load($uri, $queue);
+    $this->deRef($queue);
+    $this->cache[$keyUri.''] = $doc;
+    return $doc;
+  }
+
+  /**
+   * Fully load un-dereferenced JSON Documents at given URI.
+   * Collect all refs that need to to be resolved into a priority queue.
+   * Before we begin dereferencing we make sure all required JSON doc resources that are refered to are loaded by callig this method recursively.
+   * This method is only called by _get(), and itself.
+   * @see _get()
+   */
+  private function load(Uri $uri, JsonRefPriorityQueue $queue) {
+    $tempRefs = [];
+    $keyUri = self::normalizeKeyUri($uri);
+
+    if(isset($this->cache[$keyUri.''])) {
+      return $this->cache[$keyUri.''];
+    }
+
+    $doc = $this->loader->load($keyUri);
+    $doc = json_decode($doc);
+    if($doc == null) {
+      throw new JsonDecodeException(json_last_error());
+    }
+    self::queueAllRefs($doc, $queue, $keyUri);
+    $this->cache[$keyUri.''] = $doc;
+
+    // Now we have to make sure all the resources that are refered to are loaded.
+    $resourceUris = [];
+    foreach($queue as $jsonRef) {
+      $resourceUris[] = $jsonRef->getUri();
+    }
+    foreach($resourceUris as $uri) {
+      $this->load($uri, $queue);
+    }
+    self::deRef($queue);
+    return $doc;
+  }
+
+  /**
+   * Find all JSON Refs in a JSON doc and stuff them into a queue for later processing.
+   * Can't use standard recursive iterator here because references iterators don't work together.
+   * Also handles rebasing a base URI based on the value of an 'id' field of objects.
+   * @input $doc a decoded JSON doc.
+   * @input $queue a queue for stuffing found JSON Refs into.
+   * @input $baseUri the current base URI used for resolving relative JSON Ref pointers found.
+   */
+  public static function queueAllRefs($doc, JsonRefPriorityQueue $queue, Uri $baseUri) {
+    defined('DEBUG') && print __METHOD__ . " $baseUri\n";
+    if(is_object($doc) || is_array($doc)) {
+      if(is_object($doc) && isset($doc->id) && is_string($doc->id)) {
+        $baseUri = $baseUri->resolveRelativeUriOn(new Uri($doc->id));
+      }
+      foreach($doc as $k => $v) {
+        defined('DEBUG') && print "\t$k\n";
+        $ref =& self::getRef($doc, $k);
+        if($uri = self::getJsonRefPointer($ref)) {
+          defined('DEBUG') && print "\tFOUND REF $uri\n";
+          $jsonRef = new JsonRef($ref, $baseUri->resolveRelativeUriOn(new Uri($uri)));
+          $queue->insert($jsonRef, $jsonRef);
+        }
+        else if(is_object($ref) || is_array($ref)) {
+          self::queueAllRefs($ref, $queue, $baseUri);
+        }
+      }
+    }
+  }
+
+  /**
+   * Remove all Json References ($ref) from loaded docs, replacing $ref object with PHP references to the pointed to value.
+   * Must be called after all referenced docs are loaded by load().
+   * @see _get().
+   * @input $refs A priority queue of refs that need dereferencing.
+   */
+  private function deRef(JsonRefPriorityQueue $refs) {
+    var_dump($refs);
+  }
+
+  /**
+   * Convenience wrapper to get a reference.
+   */
+  public static function &getRef(&$doc, $k) {
+    if(is_object($doc)) {
+      return $doc->$k;
+    }
+    if(is_array($doc)) {
+      return $doc[$k];
+    }
+  }
+
+  /**
+   * Get the pointer from a JSON Ref.
+   */
+  public static function getJsonRefPointer($o) {
+    $refVar = '$ref';
+    $ref = null;
+    if(is_object($o) && isset($o->$refVar)) {
+      $ref = $o->$refVar;
+    }
+    return $ref;
   }
 
   /**
@@ -133,9 +229,14 @@ class JsonCache
   }
 }
 
+/**
+ * A JsonRef PQueue. Used by JsonCache in dereferencing.
+ */
+class JsonRefPriorityQueue extends \SplPriorityQueue
+{
+  public function compare(JsonRef $a, JsonRef $b) {
+    return $a->compare($b);
+  }
+}
+
 class JsonCacheException extends \Exception {}
-
-
-$c = new JsonCache(new JsonLoader());
-$doc = json_decode(file_get_contents('./tests/data/test.json'));
-var_dump($c::_pointer($doc, ''));

@@ -24,3 +24,6 @@ class MyLoader
 
 $myLoader = new MyLoader(["JsonDoc" => "../"]);
 spl_autoload_register([$myLoader, "load"]);
+
+// Test data files.
+putenv("DATADIR=".dirname(__FILE__) . "/test-data");

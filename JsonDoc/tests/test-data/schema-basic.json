@@ -1,0 +1,15 @@
+{
+  "schemaArray": {
+      "items": { "$ref": "#" }
+  },
+  "positiveInteger": {
+      "type": "integer",
+      "minimum": 0
+  },
+  "positiveIntegerDefault0": {
+      "allOf": [ { "$ref": "#/definitions/positiveInteger" }, { "default": 0 } ]
+  },
+  "simpleTypes": {
+      "enum": [ "array", "boolean", "integer", "null", "number", "object", "string" ]
+  }
+}
