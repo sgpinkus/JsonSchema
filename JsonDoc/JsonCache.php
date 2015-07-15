@@ -2,11 +2,6 @@
 namespace JsonDoc;
 use JsonDoc\Exception\JsonDecodeException;
 use JsonDoc\Exception\ResourceNotFoundException;
-require_once 'JsonLoader.php';
-require_once 'JsonRef.php';
-require_once 'Uri.php';
-require_once 'Exception/JsonDecodeException.php';
-require_once 'Exception/ResourceNotFoundException.php';
 
 /**
  * Instances of this class maintain a cache of dereferenced JSON documents and provide access to those documents.
@@ -163,22 +158,22 @@ class JsonCache
    * @input $queue a queue for stuffing found JSON Refs into.
    * @input $baseUri the current base URI used for resolving relative JSON Ref pointers found.
    */
-  public static function queueAllRefs($doc, JsonRefPriorityQueue $queue, Uri $baseUri) {
+  public static function queueAllRefs(&$doc, JsonRefPriorityQueue $queue, Uri $baseUri) {
     defined('DEBUG') && print __METHOD__ . " $baseUri\n";
     if(is_object($doc) || is_array($doc)) {
       if(is_object($doc) && isset($doc->id) && is_string($doc->id)) {
         $baseUri = $baseUri->resolveRelativeUriOn(new Uri($doc->id));
       }
-      foreach($doc as $k => $v) {
-        defined('DEBUG') && print "\t$k\n";
-        $ref =& self::getRef($doc, $k);
-        if($uri = self::getJsonRefPointer($ref)) {
-          defined('DEBUG') && print "\tFOUND REF $uri\n";
-          $jsonRef = new JsonRef($ref, $baseUri->resolveRelativeUriOn(new Uri($uri)));
+      foreach($doc as $key => &$value) {
+        defined('DEBUG') && print "\t$key\n";
+        if(self::isJsonRef($value)) {
+          $refUri = $baseUri->resolveRelativeUriOn(new Uri(self::getJsonRefPointer($value)));
+          defined('DEBUG') && print "\tFOUND REF $refUri\n";
+          $jsonRef = new JsonRef($value, $refUri);
           $queue->insert($jsonRef, $jsonRef);
         }
-        else if(is_object($ref) || is_array($ref)) {
-          self::queueAllRefs($ref, $queue, $baseUri);
+        else if(is_object($value) || is_array($value)) {
+          self::queueAllRefs($value, $queue, $baseUri);
         }
       }
     }
@@ -195,18 +190,6 @@ class JsonCache
   }
 
   /**
-   * Convenience wrapper to get a reference.
-   */
-  public static function &getRef(&$doc, $k) {
-    if(is_object($doc)) {
-      return $doc->$k;
-    }
-    if(is_array($doc)) {
-      return $doc[$k];
-    }
-  }
-
-  /**
    * Get the pointer from a JSON Ref.
    */
   public static function getJsonRefPointer($o) {
@@ -217,6 +200,11 @@ class JsonCache
     }
     return $ref;
   }
+
+  public static function isJsonRef($o) {
+    return self::getJsonRefPointer($o);
+  }
+
 
   /**
    * Prepare Uri.
@@ -240,3 +228,5 @@ class JsonRefPriorityQueue extends \SplPriorityQueue
 }
 
 class JsonCacheException extends \Exception {}
+require_once 'loader.php';
+$x = new JsonCache(new JsonLoader());
