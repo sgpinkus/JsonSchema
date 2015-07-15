@@ -1,4 +1,7 @@
 <?php
+/**
+ * Convenience loader. Use very optional.
+ */
 
 /**
  * Simple class loader.

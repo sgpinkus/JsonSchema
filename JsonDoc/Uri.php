@@ -100,7 +100,7 @@ class Uri
   /**
    * Return a URI that is this URI rebased against $base, an absolute Base URI.
    * If this URI is an absolute URI a copy of this URI is returned.
-   * Always use the reference's fragment. Replace the base's query only if path is non empty.
+   * Notes: Always use the reference's fragment. Replace the base's query only if path is non empty.
    * @see https://tools.ietf.org/html/rfc3986#section-5.2.
    */
   public function baseOn(Uri $base) {
@@ -114,18 +114,20 @@ class Uri
     else {
       $uri = clone $base;
       $path = $this->get('path');
+      $query = $this->get('query');
       if(empty($path)) {
-        if(!empty($path)) {
-          $uri->set('query', $this->get('query'));
+        if(isset($query)) {
+          $uri->set('query', $query);
         }
       }
       else if(strpos($path, '/') === 0) {
         $uri->set('path', $path);
-        $uri->set('query', $this->get('query'));
+        $uri->set('query', $query);
       }
       else {
-        $uri->set('path',  rtrim($uri->get('path'), '/') . '/' . $path);
-        $uri->set('query', $this->get('query'));
+        $basePath = preg_replace('#/[^/]*$#', "", $uri->get('path'));
+        $uri->set('path',  $basePath . "/" . $path);
+        $uri->set('query', $query);
       }
       $uri->set('fragment', $this->get('fragment'));
     }

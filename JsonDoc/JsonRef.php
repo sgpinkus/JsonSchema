@@ -13,13 +13,14 @@ class JsonRef
   private $priority;
 
   /**
+   * Construct JsonRef. Expect the URI should be absolute.
    * @input $srcRef the varaiable that should be resolved to the pointer.
    * @input $jsonRef a URI. Should be absolute but not enforced.
    */
   public function __construct(&$srcRef, Uri $jsonRef) {
     $this->srcRef =& $srcRef;
     $this->jsonRef = $jsonRef;
-    $this->pointer = $jsonRef->fragment ? preg_replace("#\/+#", "/", $jsonRef->fragment) : "/";
+    $this->pointer = $jsonRef->fragment ? preg_replace("#\/+#", "/", $jsonRef->fragment) : "/"; // Empty pointer replaced with / (same thing).
     $this->priority = -1 * substr_count($this->pointer, "/");
   }
 

@@ -71,7 +71,7 @@ class UriTest extends PHPUnit_Framework_TestCase
   /**
    * Test the baseOn() method which resolves URIs against a Base URI.
    */
-  public function testbaseOn() {
+  public function testBaseOn() {
     $base = new Uri("http://nowhere.com/x/y/z?w=1#/a/b");
     $ref = new Uri("#fraggie");
     $this->assertEquals($ref->baseOn($base).'', "http://nowhere.com/x/y/z?w=1#fraggie");
@@ -80,6 +80,16 @@ class UriTest extends PHPUnit_Framework_TestCase
     $ref = new Uri("/some/abs/path");
     $this->assertEquals($ref->baseOn($base).'', "http://nowhere.com/some/abs/path");
     $ref = new Uri("some/rel/path");
-    $this->assertEquals($ref->baseOn($base).'', "http://nowhere.com/x/y/z/some/rel/path");
+    $this->assertEquals($ref->baseOn($base).'', "http://nowhere.com/x/y/some/rel/path");
+  }
+
+  /**
+   * Test the baseOn() method with relative paths. I think this is right behav.
+   */
+  public function testBaseOnRelativePaths() {
+    $ref = new Uri("some/rel/path");
+    $this->assertEquals($ref->baseOn(new Uri("http://nowhere.com/")).'', "http://nowhere.com/some/rel/path");
+    $this->assertEquals($ref->baseOn(new Uri("http://nowhere.com/x/")).'', "http://nowhere.com/x/some/rel/path");
+    $this->assertEquals($ref->baseOn(new Uri("http://nowhere.com/x")).'', "http://nowhere.com/some/rel/path");
   }
 }
