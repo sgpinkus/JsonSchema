@@ -1,5 +1,5 @@
 # Purpose
-To impelment a full functional JSON Schema implementation in PHP. Of those PHP libs listed at http://json-schema.org https://github.com/justinrainbow/json-schema seemed to be the most full featured. But even this lib only partially implments "$refs" and does not validate the schema its using for validation. There seem to be a number of other open issues with it too.
+To implement a full functional JSON Schema implementation in PHP. Of those PHP libs listed at http://json-schema.org https://github.com/justinrainbow/json-schema seemed to be the most full featured. But even this lib only partially implments "$refs" and does not validate the schema its using for validation. There seem to be a number of other open issues with it too.
 
 # Requirements & Constraints
 
@@ -13,67 +13,22 @@ To impelment a full functional JSON Schema implementation in PHP. Of those PHP l
 # Analysis & Design
 Some things to note about JSON Schema:
 
-  * This is a valid constraint. Its the empty constraint:
+  1. This is a valid constraint. Its the empty constraint:
 
       {}
 
-  * All constraint extend the empty constraint in that all constraints are objects, with additional fields. Example:
+  2. All constraints extend the empty constraint in that all constraints are objects, with additional fields. Example:
 
       {
         "title": "All of nothing",
         "allOf": [{}]
       }
 
-  * Certain constraints are recursive. Example the object, and array type constraints, allOf, anyOf.
+  3. Certain constraints are recursive. Example the object, and array type constraints, allOf, anyOf.
 
-  * A JSON Schema document can be a mix of JSON defined constraints and arbitrary fields. Its kind of strange but that is how it is. The JSON Schema can be nested at depth in a document, it can be beside arbtrary fields and intermixed with them. Example this is a valid object type constraint:
+  4. A JSON Schema document can be a mix of JSON defined constraints and arbitrary fields. Its kind of strange but that is how it is. Valid JSON which can be addressed via JSON Pointer can be nested at arbitrary depth in a document. See http://json-schema.org/latest/json-schema-core.html#anchor7.
 
-    {
-      "type": "object",
-      "required": ["a", "b", "c"],
-      "title": "An alphabet object",
-      "what": "ever",
-      "can": {
-        "put": "what i want here its all legal"
-      }
-    }
-
-  * The top level of a JSON Schema document need not be a (non empty) constraint. Example one could organise ones schema like this:
-
-      {
-        "title": "My App database",
-        "description": "A collection of types used by My App."
-        "content": {
-          "title": "Some content",
-          "allOf": [{"$ref": "content"}]
-          "type": "object",
-          "required": ["title", "author", "creationDate", "modifiedDate", "content", "type"]
-          "properties": {
-            "title": {$ref: "nonEmptyString"},
-            "author": {$ref: "nonEmptyString"},
-            "creationDate": {$ref: "nonEmptyString"},
-            "modifiedDate": {$ref: "nonEmptyString"},
-            "content": {$ref: "nonEmptyString"},
-            "type": {"$ref": "contentType"}
-          }
-        },
-        "nonEmptyString": {"type": "string", "minLength": 1},
-        "contentType": {
-          "enum": ["blog", "page"]
-        }
-        "menuitem": {
-          "type": "object",
-          "required": ["title", "link"]
-        }
-        "menu" : {
-          allOf: [{"$ref": "menuitem"}]
-        }
-      }
-
-    We could nest things even deeper if we'd like, referencing bit of our nested schema from other bits of schema via "JSON Pointer". However, this creates some complexity.
-
-
-  * A given level (by that I mean nesting level in a JSON obect) of a valid JSON Schema represents a single constraint on a single value of the target JSON document, except in the case that the level is a sublevel of some other JSON Schema constraint. This is true even for parts of the json schema doc that are not intended to be constraints - since `{}` is a valid constraint. Example given:
+  5. A given level (by that I mean nesting level in a JSON obect) of a valid JSON Schema represents a single constraint on a single value of the target JSON document, except in the case that the level is a sublevel of some other JSON Schema constraint. This is true even for parts of the json schema doc that are not intended to be constraints - since `{}` is a valid constraint. Example given:
 
       {
         "SomeSchemas" : {
@@ -88,6 +43,9 @@ Some things to note about JSON Schema:
 
     The doc at fragment addresss `#MoreSchemas` is a constraint equivalent to the empty constraint.
 
+  6. We make the assertion that one nesting level n JSON Schema document specifies at most one constraint. For example { "minimum": 2 } does not specify a constraint, because "minimum" is a sub keyword of the type constraint.
+
+
 ## Handling $refs
 Refs ref a value. The entire ref object is replaced by the value.
 
@@ -100,6 +58,16 @@ A fundamental assumption is that we'll be using a syntax tree as the validator. 
 ### Validators
 The following constriants will be represented by classes:
 
+    type
+    enum
+    allOf
+    anyOf
+    oneOf
+    not
+    empty
+
+# -
+
     array
     boolean
     integer
@@ -107,9 +75,3 @@ The following constriants will be represented by classes:
     null
     object
     string
-    enum
-    allOf
-    anyOf
-    oneOf
-    not
-    empty
