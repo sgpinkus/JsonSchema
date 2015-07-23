@@ -12,6 +12,10 @@ class PatternConstraint extends Constraint
   private $pattern;
 
   public function __construct($pattern) {
+    // Test validity. Note no such thing as a compiled regexp in P, but does have a cache.
+    if(@preg_match($pattern, "0") === false) {
+      throw new \BadMethodCallException("Not a valid regular expression.");
+    }
     $this->pattern = $pattern;
   }
 
@@ -19,7 +23,11 @@ class PatternConstraint extends Constraint
    * @override
    */
   public function validate($doc) {
-
+    $valid = true;
+    if(is_string($doc)) {
+      $valid = (bool)preg_match($this->pattern, $doc);
+    }
+    return $valid;
   }
 
   /**
@@ -27,14 +35,17 @@ class PatternConstraint extends Constraint
    * @override
    */
   public static function build($doc, $context = null) {
+    $constraint = null;
+
     if(!is_string($doc)) {
       throw new ConstraintParseException('The value MUST be a string.');
     }
-    error_clear_last();
-    @preg_match($doc, "0");
-    if(error_get_last()) {
+    try {
+     $constraint = new static($doc);
+    }
+    catch(\BadMethodCallException $e) {
       throw new ConstraintParseException('This string SHOULD be a valid regular expression, according to the ECMA 262 regular expression dialect.');
     }
-    return new static($doc);
+    return $constraint;
   }
 }

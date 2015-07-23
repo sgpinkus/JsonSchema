@@ -15,7 +15,14 @@ class EmptyConstraint extends Constraint
     'oneOf' => 'JsonSchema\Constraint\OneOfConstraint',
     'enum' => 'JsonSchema\Constraint\EnumConstraint',
     'type' => 'JsonSchema\Constraint\TypeConstraint',
-    'not' => 'JsonSchema\Constraint\NotConstraint'
+    'not' => 'JsonSchema\Constraint\NotConstraint',
+    'minimum' => 'JsonSchema\Constraint\MinimumConstraint',
+    'maximum' => 'JsonSchema\Constraint\MaximumConstraint',
+    'multipleOf' => 'JsonSchema\Constraint\MultipleOfConstraint',
+    'minLength' => 'JsonSchema\Constraint\MinLengthConstraint',
+    'maxLength' => 'JsonSchema\Constraint\MaxLengthConstraint',
+    'pattern' => 'JsonSchema\Constraint\PatternConstraint',
+    'items' => 'JsonSchema\Constraint\ItemsConstraint',
   ];
   /** All the constraints that are found in the given object. */
   private $childConstraints = [];
@@ -24,7 +31,7 @@ class EmptyConstraint extends Constraint
    * Construct the empty constraint.
    * @input $childConstraints Result of this constraint is these constraints are ANDed together.
    */
-  private function __construct(array $childConstraints) {
+  public function __construct(array $childConstraints) {
     $this->childConstraints = $childConstraints;
   }
 
@@ -43,13 +50,6 @@ class EmptyConstraint extends Constraint
   }
 
   /**
-   * @override
-   */
-  public static function canBuild($doc) {
-    return is_object($doc);
-  }
-
-  /**
    * Build the constraint. Recursively.
    * @input $doc the JSON Schema document structure. This document is marked up.
    * @throws SymbolParseException.
@@ -59,7 +59,7 @@ class EmptyConstraint extends Constraint
     $propertyHit = false;
     $childConstraints = [];
 
-    if(!self::canBuild($doc)) {
+    if(!is_object($doc)) {
       throw new ConstraintParseException();
     }
 
@@ -70,12 +70,12 @@ class EmptyConstraint extends Constraint
       else {
         if(isset(self::$childSymbols[$property])) {
           $symbolClass = self::$childSymbols[$property];
-          $newSymbol = $symbolClass::build($value);
+          $newSymbol = $symbolClass::build($value, $doc);
           $childConstraints[] = $newSymbol;
         }
-        else if(self::canBuild($value)) {
+        else if(is_object($value)) {
           // For every property that is not a valid constraint build more JSON Schema on it.
-          self::build($value);
+          self::build($value, $doc);
         }
       }
     }

@@ -4,9 +4,9 @@ use \JsonSchema\Constraint\EmptyConstraint;
 use \JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
- * Basic tests Uri class.
+ * Basic tests.
  */
-class AllConstraintsTest extends PHPUnit_Framework_TestCase
+class EmptyConstraintTest extends PHPUnit_Framework_TestCase
 {
   private static $basicJson;
   private static $basicRefsJson;
@@ -54,7 +54,7 @@ class AllConstraintsTest extends PHPUnit_Framework_TestCase
 
   /**
    * @expectedException JsonSchema\Constraint\Exception\ConstraintParseException
-   * @dataProvider someOfConstraintDataProvider
+   * @dataProvider exceptionalConstraintDataProvider
    */
   public function testExceptionalConstraint($schemaDoc, $targetDoc, $valid) {
     $schemaDoc = json_decode($schemaDoc);

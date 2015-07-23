@@ -12,7 +12,7 @@ class MaxLengthConstraint extends Constraint
   private $maxLength;
 
   public function __construct($maxLength) {
-    $this->maxLength = $maxLength;
+    $this->maxLength = (int)$maxLength;
   }
 
   /**

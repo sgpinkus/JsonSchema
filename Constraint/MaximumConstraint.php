@@ -43,6 +43,6 @@ class MaximumConstraint extends Constraint
     if(isset($context->exclusiveMaximum) && !is_bool($context->exclusiveMaximum)) {
       throw new ConstraintParseException('The value of "exclusiveMaximum" MUST be a boolean.');
     }
-    return new static($doc, isset($context->exclusiveMaximum));
+    return new static($doc, !empty($context->exclusiveMaximum));
   }
 }

@@ -5,14 +5,14 @@ use JsonSchema\Constraint\Constraint;
 use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
- * The minLength constraint.
+ * The minProperties constraint.
  */
-class MinLengthConstraint extends Constraint
+class MinPropertiesConstraint extends Constraint
 {
-  private $minLength;
+  private $minProperties;
 
-  public function __construct($minLength) {
-    $this->minLength = $minLength;
+  public function __construct($minProperties) {
+    $this->minProperties = (int)$minProperties;
   }
 
   /**
@@ -20,8 +20,8 @@ class MinLengthConstraint extends Constraint
    */
   public function validate($doc) {
     $valid = true;
-    if(is_string($doc)) {
-      $valid = strlen($doc) >= $this->minLength;
+    if(is_object($doc)) {
+      $valid = count((array)$doc) >= $this->minProperties;
     }
     return $valid;
   }

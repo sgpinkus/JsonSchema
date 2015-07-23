@@ -23,11 +23,4 @@ abstract class Constraint
    * @returns Constraint.
    */
   public static abstract function build($doc, $context = null);
-
-  /**
-   * Can we parse the given doc into a symbol.
-   * Not using, don't need this.
-   * @input $doc A JSON schema document data structure.
-   */
-  //public static abstract function canBuild($doc);
 }

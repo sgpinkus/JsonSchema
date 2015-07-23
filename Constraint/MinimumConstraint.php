@@ -42,6 +42,6 @@ class MinimumConstraint extends Constraint
     if(isset($context->exclusiveMinimum) && !is_bool($context->exclusiveMinimum)) {
       throw new ConstraintParseException('The value of "exclusiveMinimum" MUST be a boolean.');
     }
-    return new static($doc, isset($context->exclusiveMinimum));
+    return new static($doc, !empty($context->exclusiveMinimum));
   }
 }

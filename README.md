@@ -95,3 +95,7 @@ The following constriants will be represented by classes:
 
 ## Validator/Generator Class Design
 A JSON Document represents a schema. This schema is parsed into a validator. In this class library, the validator and the code that generates a validator from a JSON document are coupled into the same class. This is somewhat inflexible but its also simple.
+
+Generating a constraint from a part of a JSON schema doc is done via the static method build(). In general this is because construction need not necessarily be from a document. Tempting to KISS and just stick it in the constructor. Currently I have one concrete use case for not putting the parser logic in the constructor. TypeConstraint reuses a OneOfConstraint. But doing it this way we have an issue of duplicating validation logic between the constructor and the build method.
+
+Let build()  containt all document parsing logic in general. Let the constructor handle validation of it's parameters. There is still an issue with this. The constructor validation may occlude the nature of an exception.
