@@ -5,6 +5,7 @@ use JsonSchema\Constraint\Constraint;
 use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
+ * The maximum constraint.
  */
 class MaximumConstraint extends Constraint
 {

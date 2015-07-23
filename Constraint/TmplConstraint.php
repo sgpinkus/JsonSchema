@@ -19,13 +19,10 @@ class TmplConstraint extends Constraint
    * @override
    */
   public static function build($doc, $context = null) {
-    return new self();
+    if(!is_string($doc)) {
+      throw new ConstraintParseException('The value MUST be a string.');
+    }
+    return new static($doc);
   }
-
-  /**
-   * @override
-   */
-  public static function canBuild($doc) {
-    return true;
   }
 }
