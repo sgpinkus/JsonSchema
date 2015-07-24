@@ -1,6 +1,7 @@
 <?php
 namespace JsonDoc;
 use JsonDoc\JsonPointer;
+use JsonDoc\JsonRefPriorityQueue;
 use JsonDoc\Exception\JsonDecodeException;
 use JsonDoc\Exception\ResourceNotFoundException;
 
@@ -200,16 +201,6 @@ class JsonCache implements \IteratorAggregate
     unset($keyUri->query);
     unset($keyUri->fragment);
     return $keyUri;
-  }
-}
-
-/**
- * A JsonRef PQueue. Used by JsonCache in dereferencing.
- */
-class JsonRefPriorityQueue extends \SplPriorityQueue
-{
-  public function compare(JsonRef $a, JsonRef $b) {
-    return $a->compare($b);
   }
 }
 
