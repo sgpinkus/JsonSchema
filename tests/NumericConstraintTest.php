@@ -45,10 +45,20 @@ class NumericConstraintTest extends PHPUnit_Framework_TestCase
   }
 
   /**
+   * Schema that violate JSON Schema syntax.
+   */
+  public function numericInvalidSchemaDataProvider() {
+    return [
+      ['{"minimum": "numeric"}']
+    ];
+  }
+
+  /**
+   * @dataProvider numericInvalidSchemaDataProvider
    * @expectedException \JsonSchema\Constraint\Exception\ConstraintParseException
    */
-  public function testInvalidTypeConstraint() {
-    $schemaDoc = json_decode('{"minimum": "numeric"}');
+  public function testInvalidTypeConstraint($schemaDoc) {
+    $schemaDoc = json_decode($schemaDoc);
     $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

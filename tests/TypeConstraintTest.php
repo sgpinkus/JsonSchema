@@ -68,7 +68,9 @@ class TypeConstraintTest extends PHPUnit_Framework_TestCase
       ['{"type": "object"}', "1.0", false],
       ['{"type": "object"}', "\"1\"", false],
       ['{"type": "object"}', "[]", false],
-      ['{"type": "object"}', "{}", true]
+      ['{"type": "object"}', "{}", true],
+      ['{"type": ["object", "number"]}', "{}", true],
+      ['{"type": ["array", "number"]}', "{}", false]
     ];
   }
 
@@ -83,10 +85,22 @@ class TypeConstraintTest extends PHPUnit_Framework_TestCase
   }
 
   /**
+   * Schema that violate JSON Schema syntax.
+   */
+  public function typeInvalidSchemaDataProvider() {
+    return [
+      ['{"type": "OBJECT"}'],
+      ['{"type": "numeric"}'],
+      ['{"type": ["numeric"]}']
+    ];
+  }
+
+  /**
+   * @dataProvider typeInvalidSchemaDataProvider
    * @expectedException \JsonSchema\Constraint\Exception\ConstraintParseException
    */
-  public function testInvalidTypeConstraint() {
-    $schemaDoc = json_decode('{"type": "numeric"}');
+  public function testInvalidTypeConstraint($schemaDoc) {
+    $schemaDoc = json_decode($schemaDoc);
     $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

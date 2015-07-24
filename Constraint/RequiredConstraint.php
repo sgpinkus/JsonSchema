@@ -21,9 +21,8 @@ class RequiredConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_object($doc)) {
-      $arrayDoc = (array)$doc;
       foreach($this->required as $key) {
-        if(!isset($arrayDoc[$key])) {
+        if(!isset($doc->$key)) {
           $valid = false;
           break;
         }
@@ -42,6 +41,6 @@ class RequiredConstraint extends Constraint
     if(sizeof($doc) < 1) {
       throw new ConstraintParseException('This keyword\'s value MUST be an array.  This array MUST have at least one element.');
     }
-    return static($doc);
+    return new static($doc);
   }
 }

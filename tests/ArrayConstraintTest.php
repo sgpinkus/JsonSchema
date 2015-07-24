@@ -14,10 +14,18 @@ class ArrayConstraintTest extends PHPUnit_Framework_TestCase
   /**
    * Wrapped in an EmptyConstraint, but meh.
    */
-  public function itemsConstraintDataProvider() {
+  public function arrayConstraintDataProvider() {
     return [
-      ['{"items": [{},{},{}], "additionalItems": true}', "[1,2]", false],
-      ['{"items": [{},{},{}], "additionalItems": false}', "[1,2]", false],
+      ['{"minItems": 0}', '[1,2]', true],
+      ['{"minItems": 1}', '[1,2]', true],
+      ['{"minItems": 2}', '[1,2]', true],
+      ['{"minItems": 3}', '[1,2]', false],
+      ['{"maxItems": 2}', '[1,2]', true],
+      ['{"maxItems": 1}', '[1,2]', false],
+      ['{"maxItems": 0}', '[1,2]', false],
+      ['{"maxItems": 0}', '[]', true],
+      ['{"items": [{},{},{}], "additionalItems": true}', "[1,2]", true],
+      ['{"items": [{},{},{}], "additionalItems": false}', "[1,2]", true],
       ['{"items": [{},{},{}], "additionalItems": true}', "[1,2,3]", true],
       ['{"items": [{},{},{}], "additionalItems": true}', "[1,2,3,4]", true],
       ['{"items": [{},{},{}], "additionalItems": false}', "[1,2,3,4]", false],
@@ -32,13 +40,16 @@ class ArrayConstraintTest extends PHPUnit_Framework_TestCase
       ['{"items": [{"minimum": 1}]}', "[1,2,3,0]", true],
       ['{"items": [{"minimum": 1}], "additionalItems": false}', "[1,2,3,0]", false],
       ['{"items": {"minimum": 1}, "additionalItems": true}', "[1,2,3,0]", false],
+      ['{"uniqueItems": false}', "[1,2,3,0]", true],
+      ['{"uniqueItems": true}', "[1,2,3,0]", true],
+      ['{"uniqueItems": true}', "[1,2,3,3]", false]
     ];
   }
 
   /**
-   * @dataProvider itemsConstraintDataProvider
+   * @dataProvider arrayConstraintDataProvider
    */
-  public function testItemsConstraint($schemaDoc, $targetDoc, $valid) {
+  public function testArrayConstraint($schemaDoc, $targetDoc, $valid) {
     $schemaDoc = json_decode($schemaDoc);
     $targetDoc = json_decode($targetDoc);
     $constraint = EmptyConstraint::build($schemaDoc);
@@ -46,10 +57,22 @@ class ArrayConstraintTest extends PHPUnit_Framework_TestCase
   }
 
   /**
+  * Schema that violate JSON Schema syntax.
+  */
+  public function itemsInvalidSchemaDataProvider() {
+    return [
+      ['{"items": "numeric"}'],
+      ['{"items": 2}'],
+      ['{"uniqueItems": "true"}']
+    ];
+  }
+
+  /**
+   * @dataProvider itemsInvalidSchemaDataProvider
    * @expectedException \JsonSchema\Constraint\Exception\ConstraintParseException
    */
-  public function testInvalidTypeConstraint() {
-    $schemaDoc = json_decode('{"items": "numeric"}');
+  public function testInvalidTypeConstraint($schemaDoc) {
+    $schemaDoc = json_decode($schemaDoc);
     $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

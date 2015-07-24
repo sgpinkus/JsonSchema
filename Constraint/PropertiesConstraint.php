@@ -9,7 +9,7 @@ use JsonSchema\Constraint\Exception\ConstraintParseException;
  * Note patternProperties is implemented as a completely separate constraint.
  * @see ItemsConstraint.php. This is ~C&P from properties constraint.
  */
-class ItemsConstraint extends Constraint
+class PropertiesConstraint extends Constraint
 {
   private $properties;
   private $additionalProperties;
@@ -25,26 +25,25 @@ class ItemsConstraint extends Constraint
 
   /**
    * Bit hairy.
+   * Properties only apply if the property is defined on the target.
    * @override
    */
   public function validate($doc) {
     $valid = true;
     if(is_object($doc)) {
       $arrayDoc = (array)$doc;
-      if(sizeof($this->properties) > sizeof($arrayDoc)) {
-        $valid = false;
-      }
-      else if($this->additionalProperties == false && sizeof($this->properties) != sizeof($doc)) {
+      if($this->additionalProperties == false && sizeof($arrayDoc) > sizeof($this->properties)) {
         $valid = false;
       }
       else {
         foreach($this->properties as $i => $constraint) {
-          if(!(isset($arrayDoc[$i]) && $constraint->validate($arrayDoc[$i]))) {
+          if(isset($arrayDoc[$i]) && !$constraint->validate($arrayDoc[$i])) {
             $valid = false;
             break;
           }
         }
       }
+      // All properties not validated by properties must validate against additionalProperties.
       if($valid == true && is_object($this->additionalProperties)) {
         foreach($arrayDoc as $i => $value) {
           if(!(isset($this->properties[$i]) || $this->additionalProperties->validate($arrayDoc[$i]))) {
@@ -66,12 +65,16 @@ class ItemsConstraint extends Constraint
     if(!is_object($doc)) {
       throw new ConstraintParseException('The value MUST be either an object.');
     }
-    if(isset($context->additionalProperties) && !(is_bool($context->additionalProperties) || is_obect($context->additionalProperties))) {
+    if(isset($context->additionalProperties) && !(is_bool($context->additionalProperties) || is_object($context->additionalProperties))) {
        throw new ConstraintParseException('The value of "additionalProperties" MUST be either a boolean or an object.');
     }
     foreach($doc as $key => $value) {
       $constraints[$key] = EmptyConstraint::build($value);
     }
-    return new static($constraints, (isset($context->additionalProperties) ? $context->additionalProperties : true));
+    $additionalProperties = isset($context->additionalProperties) ? $context->additionalProperties : true;
+    if(is_object($additionalProperties)) {
+      $additionalProperties = EmptyConstraint::build($additionalProperties);
+    }
+    return new static($constraints, $additionalProperties);
   }
 }

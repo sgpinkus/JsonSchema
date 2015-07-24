@@ -6,8 +6,8 @@ use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
  * The items constraint.
- * I'm interpreting the spec as saying additionalItems is irrelevant if not items.
- * The only issue is maybe additionalItems = false, + item undef is valid and matches the empty array.
+ * I'm interpreting the spec as saying additionalItems is irrelevant if items is not set.
+ * The only issue is maybe additionalItems = false, + item undefined is valid and matches the empty array.
  * Well, the spec is stupid and I refuse to obey. Update the spec and let maxLength apply to an array.
  */
 class ItemsConstraint extends Constraint
@@ -26,21 +26,21 @@ class ItemsConstraint extends Constraint
 
   /**
    * Bit hairy.
+   * Similarly to the properties constraint, a positional constraint only applies if the position is defined.
+   * Thats a bit strange but pretty sure that is what the spec is saying.
+   * Further more, note additionalItems is only relevant when items is an array.
    * @override
    */
   public function validate($doc) {
     $valid = true;
     if(is_array($doc)) {
       if(is_array($this->items)) {
-        if(sizeof($this->items) > sizeof($doc)) {
-          $valid = false;
-        }
-        else if($this->additionalItems == false && sizeof($this->items) != sizeof($doc)) {
+        if($this->additionalItems == false && sizeof($doc) > sizeof($this->items)) {
           $valid = false;
         }
         else {
           foreach($this->items as $i => $constraint) {
-            if(!$constraint->validate($doc[$i])) {
+            if(isset($doc[$i]) && !$constraint->validate($doc[$i])) {
               $valid = false;
               break;
             }
@@ -56,7 +56,8 @@ class ItemsConstraint extends Constraint
           }
         }
       }
-      else { // items is a single EmptyConstraint that must vlaidate against all.
+      // items is a single EmptyConstraint that must validate against all.
+      else {
         foreach($doc as $value) {
           if(!$this->items->validate($value)) {
             $valid = false;
@@ -88,6 +89,10 @@ class ItemsConstraint extends Constraint
     else {
       $constraints = EmptyConstraint::build($doc);
     }
-    return new static($constraints, (isset($context->additionalItems) ? $context->additionalItems : true));
+    $additionalItems = isset($context->additionalItems) ? $context->additionalItems : true;
+    if(is_object($additionalItems)) {
+      $additionalItems = EmptyConstraint::build($additionalItems);
+    }
+    return new static($constraints, $additionalItems);
   }
 }

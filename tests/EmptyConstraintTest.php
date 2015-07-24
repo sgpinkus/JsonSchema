@@ -41,24 +41,26 @@ class EmptyConstraintTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($constraint->validate($targetDoc), $valid);
   }
 
+  /**
+   * Schema that violate JSON Schema syntax.
+   */
   public function exceptionalConstraintDataProvider() {
     return [
-      ['{"allOf": []}', false, true],
-      ['{"anyOf": []}', false, true],
-      ['{"oneOf": []}', false, true],
-      ['{"not": []}', false, true],
-      ['{"enum": []}', false, true],
-      ['{"type": []}', false, true]
+      ['{"allOf": []}'],
+      ['{"anyOf": []}'],
+      ['{"oneOf": []}'],
+      ['{"not": []}'],
+      ['{"enum": []}'],
+      ['{"type": []}']
     ];
   }
 
   /**
-   * @expectedException JsonSchema\Constraint\Exception\ConstraintParseException
    * @dataProvider exceptionalConstraintDataProvider
+   * @expectedException JsonSchema\Constraint\Exception\ConstraintParseException
    */
-  public function testExceptionalConstraint($schemaDoc, $targetDoc, $valid) {
+  public function testExceptionalConstraint($schemaDoc) {
     $schemaDoc = json_decode($schemaDoc);
-    $targetDoc = json_decode($targetDoc);
     $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

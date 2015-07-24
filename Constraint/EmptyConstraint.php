@@ -22,7 +22,15 @@ class EmptyConstraint extends Constraint
     'minLength' => 'JsonSchema\Constraint\MinLengthConstraint',
     'maxLength' => 'JsonSchema\Constraint\MaxLengthConstraint',
     'pattern' => 'JsonSchema\Constraint\PatternConstraint',
+    'minItems' => 'JsonSchema\Constraint\MinItemsConstraint',
+    'maxItems' => 'JsonSchema\Constraint\MaxItemsConstraint',
     'items' => 'JsonSchema\Constraint\ItemsConstraint',
+    'uniqueItems' => 'JsonSchema\Constraint\UniqueItemsConstraint',
+    'minProperties' => 'JsonSchema\Constraint\MinPropertiesConstraint',
+    'maxProperties' => 'JsonSchema\Constraint\MaxPropertiesConstraint',
+    'required' => 'JsonSchema\Constraint\RequiredConstraint',
+    'properties' => 'JsonSchema\Constraint\PropertiesConstraint',
+    'patternProperties' => 'JsonSchema\Constraint\PatternPropertiesConstraint',
   ];
   /** All the constraints that are found in the given object. */
   private $childConstraints = [];
