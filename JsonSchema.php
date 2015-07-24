@@ -1,6 +1,6 @@
 <?php
 namespace PhpJsonSchema;
-use JsonDoc\JsonDoc;
+use JsonDoc\JsonPointer;
 
 /**
  * Instances of this class hold a valid JSON Schema validator.
@@ -12,15 +12,24 @@ class JsonSchema
   private $rootSymbol;
 
   /**
-   * Construct a validator from a JsonDoc.
-   * Requires a JsonDoc so we can provide pointers to clients of this class.
-   * Note the doc structure underlying the JsonDoc is mutated.
+   * Construct a validator from a JSON document data structure.
+   * Note the $doc structure underlying the JsonDoc is mutated to aid in stuff.
    */
-  public function __construct(JsonDoc $doc) {
+  public function __construct($doc) {
     $this->doc = $doc;
-    $this->rootSymbol = new EmptySymbol($doc->getDoc());
+    $this->rootSymbol = new EmptySymbol($doc);
   }
 
-  public function validate($doc) {
+  /**
+   * Validate $doc against the schema.
+   * @input $doc Mixed the target of validation.
+   * @input $pointer A JSON Pointer pointing into the schema.
+   */
+  public function validate($doc, $pointer = null) {
+    $schema = $this->rootSymbol;
+    if($pointer) {
+      $schema = JsonPointer::getPointer($this->doc, $pointer);
+    }
+    return $schema->validate($doc);
   }
 }

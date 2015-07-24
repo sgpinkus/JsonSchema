@@ -5,6 +5,7 @@ use \JsonDoc\JsonRefPriorityQueue;
 use \JsonDoc\Uri;
 use \JsonDoc\JsonRef;
 use \JsonDoc\JsonLoader;
+use \JsonDoc\JsonPointer;
 
 /**
  * Basic tests Uri class.
@@ -24,11 +25,11 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
    */
   public function testGetPointer() {
     $doc = json_decode(self::$basicJson);
-    $ref =& JsonCache::getPointer($doc,'/a');
+    $ref =& JsonPointer::getPointer($doc,'/a');
     $ref = 67;
     $this->assertEquals($doc->a, 67);
-    $ref =& JsonCache::getPointer($doc,'/b');
-    $ref =& JsonCache::getPointer($doc,'/c');
+    $ref =& JsonPointer::getPointer($doc,'/b');
+    $ref =& JsonPointer::getPointer($doc,'/c');
   }
 
   /**
@@ -36,11 +37,11 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
    */
   public function testGetPointerEmptyRoot() {
     $doc = json_decode(self::$basicJson);
-    $ref = JsonCache::getPointer($doc,'/');
+    $ref = JsonPointer::getPointer($doc,'/');
     $this->assertEquals($doc, $ref);
-    $ref = JsonCache::getPointer($doc,'');
+    $ref = JsonPointer::getPointer($doc,'');
     $this->assertEquals($doc, $ref);
-    $ref = JsonCache::getPointer($doc,'/////');
+    $ref = JsonPointer::getPointer($doc,'/////');
     $this->assertEquals($doc, $ref);
   }
 
@@ -49,11 +50,11 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
    */
   public function testGetEmptyPointer() {
     $doc = json_decode(self::$basicJson);
-    $ref = JsonCache::getPointer($doc,'/');
+    $ref = JsonPointer::getPointer($doc,'/');
     $this->assertEquals($doc, $ref);
-    $ref = JsonCache::getPointer($doc,'');
+    $ref = JsonPointer::getPointer($doc,'');
     $this->assertEquals($doc, $ref);
-    $ref = JsonCache::getPointer($doc,'/////');
+    $ref = JsonPointer::getPointer($doc,'/////');
     $this->assertEquals($doc, $ref);
   }
 
@@ -63,7 +64,7 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
    */
   public function testGetNonPointer() {
     $doc = json_decode(self::$basicJson);
-    $ref = JsonCache::getPointer($doc,'/dne');
+    $ref = JsonPointer::getPointer($doc,'/dne');
   }
 
   /**

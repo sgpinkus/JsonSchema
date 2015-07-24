@@ -1,11 +1,13 @@
 <?php
 namespace JsonDoc;
+use JsonDoc\JsonPointer;
 use JsonDoc\Exception\JsonDecodeException;
 use JsonDoc\Exception\ResourceNotFoundException;
 
 /**
  * Instances of this class maintain a cache of dereferenced JSON documents and provide access to those documents.
  * Basically its a cache of deserialized, dereferenced JSON docs keyed by the scheme+domain+path part of absolute URIs.
+ * Loading JSON that contains JSON refs and dereferencing it are closely coupled. So this class also contains the deref logic.
  * Supports retrieving part of a doc by JSON Pointer. Note however, the fragment part of loaded URIs is ignored.
  * Actually loading raw data from remote (or local) sources pointed at by URIs is delegated to JsonLoader.
  */
@@ -61,7 +63,7 @@ class JsonCache implements \IteratorAggregate
       throw new ResourceNotFoundException("Resource $keyUri not loaded");
     }
 
-    return self::getPointer($this->cache[$keyUri.''], $pointer);
+    return JsonPointer::getPointer($this->cache[$keyUri.''], $pointer);
   }
 
   /**
@@ -69,49 +71,6 @@ class JsonCache implements \IteratorAggregate
    */
   public function getIterator() {
     return new \ArrayIterator($this->cache);
-  }
-
-  /**
-   * Traverse a JSON document data structure to find pointer reference.
-   * @input $doc Decoded JSON data structure.
-   * @input $pointer String JSON Pointer. Example "/x/y/0/z".
-   * @return reference to the pointed to value. Note return by *reference*.
-   */
-  public static function &getPointer($doc, $pointer) {
-    $parts = explode("/", $pointer);
-    $currentPointer = "";
-    $doc= &$doc;
-
-    foreach($parts as $part) {
-      if($part == "") {
-        continue;
-      }
-
-      $part = str_replace('~1', '/', $part);
-      $part = str_replace('~0', '~', $part);
-      $currentPointer .= "/$part";
-
-      if(is_object($doc)) {
-        if(isset($doc->$part)) {
-          $doc = &$doc->$part;
-        }
-        else {
-          throw new ResourceNotFoundException("Could not find $pointer in document. Failed at $currentPointer");
-        }
-      }
-      else if(is_array($doc)) {
-        if(isset($doc[$part])) {
-          $doc = &$doc[$part];
-        }
-        else {
-          throw new ResourceNotFoundException("Could not find $pointer in document. Failed at $currentPointer");
-        }
-      }
-      else {
-        throw new ResourceNotFoundException("Could not find $pointer in document. Failed at $currentPointer. Not traversable");
-      }
-    }
-    return $doc;
   }
 
   /**
@@ -232,7 +191,6 @@ class JsonCache implements \IteratorAggregate
   public static function isJsonRef($o) {
     return self::getJsonRefPointer($o);
   }
-
 
   /**
    * Prepare Uri.

@@ -18,7 +18,7 @@ Two important requirements:
   2. We want to give the user control of loading if for some reason it wants to override behavior. This may be important for security. On the other hand we want thing to be simple so there should be a default loader.
 
 ## Resolution
-Json documents shall be simply resolved and returned to the client. References are lost entirely. The id field cannot be reused after compilation of the document. To account for Requirement 0 we make the JSON document mutable. The applicaton / parser can mark up the document however it pleases to aid what ever the heck its doing.
+Json documents shall be simply resolved and returned to the client. References are lost and replaced entirely with native language references. The id field cannot be reused after compilation of the document. To account for Requirement 0 we make the JSON document mutable. The applicaton / parser can mark up the document however it pleases to aid what ever the heck its doing.
 
 A caveate to this is this. Documents are loaded from external sources, then they are mutated. Before the loaded resource can be usefully made available to the client it needs to be 1. decoded 2. dereferenced. Once its dereferenced there is a complex graph of dependencies between what were independently loaded resources. The whole thing has to be taken as one. The client has to take the whole cache. The given client then goes about mutating bits and pieces of the tree structure as it sees fit so the cache can't (safely) be reused by a separate client.
 

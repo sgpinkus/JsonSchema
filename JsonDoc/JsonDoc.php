@@ -6,7 +6,7 @@ use JsonDoc\JsonLoader;
 use JsonDoc\Uri;
 
 /**
- * A thin facade over JsonCache so client dont have to care about how that works.
+ * A thin facade over JsonCache so clients dont have to care about how that works.
  * @todo iterator.
  */
 class JsonDoc
