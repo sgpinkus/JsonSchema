@@ -26,17 +26,27 @@ class JsonCache implements \IteratorAggregate
 
   /**
    * Get a reference to a deserialized, dereferenced JSON document data structure.
-   * Fragment part is silently ignored.
+   * Fragment part of URIs is silently ignored.
+   * Use the optional $doc parameter if you've already loaded and decoded the document but still need to deref it.
    * @input $uri Uri an absolute URI.
+   * @input $doc Mixed optional JSON document structure.
    * @returns mixed reference to the loaded JSON object data structure.
    * @throws JsonLoaderException, JsonDecodeException, JsonCacheException
    */
-  public function get(Uri $uri) {
+  public function get(Uri $uri, $doc = null) {
     $keyUri = self::normalizeKeyUri($uri);
     if(isset($this->cache[$keyUri.''])) {
       return $this->cache[$keyUri.''];
     }
-    return $this->_get($uri);
+    return $this->_get($uri, $doc);
+  }
+
+  /**
+   * Just deref an existing JSON document data structure.
+   * @see get().
+   */
+  public function deRef(Uri $uri, $doc) {
+    return $this->get($uri, $doc);
   }
 
   /**
@@ -76,27 +86,27 @@ class JsonCache implements \IteratorAggregate
 
   /**
    * Internal function called by get().
-   * load() and deRef() must be called in sequence. They are coupled by a queue of refs that load() builds, deRef() uses.
+   * load() and _deRef() must be called in sequence. They are coupled by a queue of refs that load() builds, _deRef() uses.
    * @input $uri a normalized Uri.
    */
-  private function _get(Uri $uri) {
+  private function _get(Uri $uri, $eDoc = null) {
     $queue = new JsonRefPriorityQueue();
-    $doc = $this->load($uri, $queue);
-    $this->deRef($queue);
+    $doc = $this->load($uri, $queue, true, $eDoc);
+    $this->_deRef($queue);
     return $doc;
   }
 
   /**
    * Fully load un-dereferenced JSON Documents at given URI.
    * Collect all refs that need to to be resolved into a priority queue.
-   * Before we begin dereferencing we make sure all required JSON doc resources that are refered to are loaded by callig this method recursively.
+   * Before we begin dereferencing we make sure all JSON doc resources that are refered to are loaded by calling this method recursively.
    * This method should only be called by _get(), and itself.
    * @input $uri of the resource to load. Must be fully qualified.
    * @input $queue a collection in which to store the refs we find.
    * @input $replaceId bool whether to replace the `id` field with the normalized URI the resource is loaded from.
    * @see _get()
    */
-  private function load(Uri $uri, \SplPriorityQueue $queue, $replaceId = true) {
+  private function load(Uri $uri, \SplPriorityQueue $queue, $replaceId = false, $doc = null) {
     $tempRefs = [];
     $keyUri = self::normalizeKeyUri($uri);
 
@@ -104,19 +114,21 @@ class JsonCache implements \IteratorAggregate
       return $this->cache[$keyUri.''];
     }
 
-    $doc = $this->loader->load($keyUri);
-    $doc = json_decode($doc);
-    if($doc == null) {
-      throw new JsonDecodeException(json_last_error());
+    if($doc === null) {
+      $doc = $this->loader->load($keyUri);
+      $doc = json_decode($doc);
+      if($doc === null) {
+        throw new JsonDecodeException(json_last_error());
+      }
     }
     if(isset($doc->id) && $replaceId) {
-      $doc->id = $keyUri;
+      $doc->id = $keyUri.'';
     }
     self::queueAllRefs($doc, $queue, $keyUri);
     $this->cache[$keyUri.''] = $doc;
 
     // Now we have to make sure all the resources that are refered to are loaded.
-    // But this empties the queue so need to stuff back into another...
+    // But this empties the queue so need to stuff back into another one...
     $stuffingQueue = new JsonRefPriorityQueue();
     $resourceUris = [];
     foreach($queue as $jsonRef) {
@@ -125,16 +137,16 @@ class JsonCache implements \IteratorAggregate
     }
 
     foreach($resourceUris as $uri) {
-      $this->load($uri, $queue);
+      $this->load($uri, $queue, false);
     }
 
-    $this->deRef($stuffingQueue);
+    $this->_deRef($stuffingQueue);
     return $doc;
   }
 
   /**
    * Find all JSON Refs in a JSON doc and stuff them into a queue for later processing.
-   * Can't use standard recursive iterator here because references iterators don't work together.
+   * Can't use standard recursive iterator here because references + iterators don't work together.
    * Also handles rebasing a base URI based on the value of an 'id' field of objects.
    * @input $doc a decoded JSON doc.
    * @input $queue a queue for stuffing found JSON Refs into.
@@ -163,12 +175,13 @@ class JsonCache implements \IteratorAggregate
 
   /**
    * Remove all Json References ($ref) from loaded docs, replacing $ref object with PHP references to the pointed to value.
+   * There are a two special cases; refs to refs and refs to refs that are circular.
    * Must be called after all referenced docs are loaded by load().
    * @see _get().
    * @input $refs A priority queue of refs that need dereferencing.
    * @todo Handel circular refs and ref to a ref. Should be easy.
    */
-  private function deRef(\SplPriorityQueue $refs) {
+  private function _deRef(\SplPriorityQueue $refs) {
     $ref = null;
     while(!$refs->isEmpty()) {
       $jsonRef = $refs->extract();

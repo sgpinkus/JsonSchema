@@ -3,7 +3,7 @@ namespace JsonDoc;
 
 /**
  * Stores a PHP src variable reference and a pointer it is to be resolved to.
- * Tightly related to the algorithm for dereferencing a JSON Doc.
+ * Tightly related to the algorithm for dereferencing a JSON Doc. Only used there.
  */
 class JsonRef
 {

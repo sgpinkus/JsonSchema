@@ -1,0 +1,6 @@
+{
+  "A": { "$ref": "#", "comment": "This is not circular" },
+  "B": { "$ref": "#/C" },
+  "C": { "$ref": "#/D" },
+  "D": { "$ref": "#/A", "comment": "This is circular" }
+}

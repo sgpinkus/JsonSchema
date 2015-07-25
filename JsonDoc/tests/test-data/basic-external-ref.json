@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "comment": "Example of schema refering to another schema",
+  "comment": "Example of schema refering to an external schema",
   "required": ["title", "content", "dateCreated", "author"],
   "properties": {
     "author": {
