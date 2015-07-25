@@ -1,5 +1,7 @@
 {
   "A": { "$ref": "#" },
   "B": [ { "$ref": "#/C" }, 1, 2, 3 ],
-  "C": "C-Value"
+  "C1": [ { "$ref": "#/D" }, 1, 2, 3 ],
+  "C": {"Value": "C-Value", "SomeRef": { "$ref": "#"}},
+  "D": {"Value": "D-Value"}
 }

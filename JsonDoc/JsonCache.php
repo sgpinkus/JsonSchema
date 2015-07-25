@@ -4,6 +4,7 @@ use JsonDoc\JsonPointer;
 use JsonDoc\JsonRefPriorityQueue;
 use JsonDoc\Exception\JsonDecodeException;
 use JsonDoc\Exception\ResourceNotFoundException;
+use JsonDoc\Exception\JsonReferenceException;
 
 /**
  * Instances of this class maintain a cache of dereferenced JSON documents and provide access to those documents.
@@ -152,7 +153,7 @@ class JsonCache implements \IteratorAggregate
    * @input $queue a queue for stuffing found JSON Refs into.
    * @input $baseUri the current base URI used for resolving relative JSON Ref pointers found.
    */
-  public static function queueAllRefs(&$doc, \SplPriorityQueue $queue, Uri $baseUri) {
+  public static function queueAllRefs(&$doc, \SplPriorityQueue $queue, Uri $baseUri, $depth = 0) {
     defined('DEBUG') && print __METHOD__ . " $baseUri\n";
     if(is_object($doc) || is_array($doc)) {
       if(is_object($doc) && isset($doc->id) && is_string($doc->id)) {
@@ -163,11 +164,11 @@ class JsonCache implements \IteratorAggregate
         if(self::isJsonRef($value)) {
           $refUri = $baseUri->resolveRelativeUriOn(new Uri(self::getJsonRefPointer($value)));
           defined('DEBUG') && print "\tFOUND REF $refUri\n";
-          $jsonRef = new JsonRef($value, $refUri);
+          $jsonRef = new JsonRef($value, $refUri, -1*$depth);
           $queue->insert($jsonRef, $jsonRef);
         }
         else if(is_object($value) || is_array($value)) {
-          self::queueAllRefs($value, $queue, $baseUri);
+          self::queueAllRefs($value, $queue, $baseUri, $depth+1);
         }
       }
     }
@@ -175,7 +176,8 @@ class JsonCache implements \IteratorAggregate
 
   /**
    * Remove all Json References ($ref) from loaded docs, replacing $ref object with PHP references to the pointed to value.
-   * There are a two special cases; refs to refs and refs to refs that are circular.
+   * There are a three special cases to consider; refs to refs, refs to refs that are circular, refs through refs.
+   * We are simply not allowing refs to refs - first two cases. Refs through refs may work depending on the order of resolution.
    * Must be called after all referenced docs are loaded by load().
    * @see _get().
    * @input $refs A priority queue of refs that need dereferencing.
@@ -185,10 +187,15 @@ class JsonCache implements \IteratorAggregate
     $ref = null;
     while(!$refs->isEmpty()) {
       $jsonRef = $refs->extract();
+      $pointerUri = $jsonRef->getUri();
       $ref =& $jsonRef->getRef();
-      $ref = $this->pointer($jsonRef->getUri());
+      $target =& $this->pointer($pointerUri);
+      if(self::isJsonRef($target)) {
+        throw new JsonReferenceException("JSON Reference to JSON Reference is not allowed");
+      }
     }
   }
+
 
   /**
    * Get the pointer from a JSON Ref.

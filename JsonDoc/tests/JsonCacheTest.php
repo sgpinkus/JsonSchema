@@ -27,19 +27,20 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $queue = new JsonRefPriorityQueue();
     JsonCache::queueAllRefs($doc, $queue, $uri);
-    $this->assertEquals($queue->count(), 2);
+    $this->assertEquals($queue->count(), 4);
     $jsonRef1 = $queue->extract();
     $jsonRef2 = $queue->extract();
+    $jsonRef3 = $queue->extract();
     $this->assertTrue($jsonRef1 instanceof JsonRef);
     $this->assertTrue($jsonRef2 instanceof JsonRef);
     $this->assertEquals($jsonRef1->getPointer(), '/');
-    $this->assertEquals($jsonRef2->getPointer(), '/C');
+    $this->assertEquals($jsonRef3->getPointer(), '/C');
     $jsonRef1 =& $jsonRef1->getRef();
     $jsonRef2 =& $jsonRef2->getRef();
     $jsonRef1 = "XXX";
     $jsonRef2 = "YYY";
     $this->assertEquals($doc->A, "XXX");
-    $this->assertEquals($doc->B[0], "YYY");
+    $this->assertEquals($doc->C->SomeRef, "YYY");
   }
 
   /**
@@ -59,7 +60,7 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
     $cache = new JsonCache(new JsonLoader());
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $cache->get($uri);
-    $uri->fragment = "/C";
+    $uri->fragment = "/C/Value";
     $ref =& $cache->pointer($uri);
     $this->assertEquals($ref, "C-Value");
     $ref = 87;
@@ -91,13 +92,10 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
 
   /**
    * Test ref to ref chain.
+   * @expectedException \JsonDoc\Exception\JsonReferenceException
    */
    public function testJsonCacheRefChain() {
-   }
-
-   /**
-    * Test circular ref chain.
-    */
-   public function testJsonCacheCircularRef() {
+    $cache = new JsonCache(new JsonLoader());
+    $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-ref-to-ref.json'));
    }
 }

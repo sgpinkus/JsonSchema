@@ -17,11 +17,11 @@ class JsonRef
    * @input $srcRef the varaiable that should be resolved to the pointer.
    * @input $jsonRef a URI. Should be absolute but not enforced.
    */
-  public function __construct(&$srcRef, Uri $jsonRef) {
+  public function __construct(&$srcRef, Uri $jsonRef, $priority) {
     $this->srcRef =& $srcRef;
     $this->jsonRef = $jsonRef;
     $this->pointer = $jsonRef->fragment ? preg_replace("#\/+#", "/", $jsonRef->fragment) : "/"; // Empty pointer replaced with / (same thing).
-    $this->priority = -1 * substr_count($this->pointer, "/");
+    $this->priority = $priority;
   }
 
   /**
@@ -29,6 +29,10 @@ class JsonRef
    */
   public function &getRef() {
     return $this->srcRef;
+  }
+
+  public function setRef(&$ref) {
+    $this->srcRef = $ref;
   }
 
   /**
@@ -59,7 +63,7 @@ class JsonRef
       if($this->pointer < $that->pointer) {
         return 1;
       }
-      else if($this->pointer < $that->pointer) {
+      else if($this->pointer > $that->pointer) {
         return -1;
       }
       else {
