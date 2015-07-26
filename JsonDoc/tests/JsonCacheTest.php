@@ -87,7 +87,7 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
     $cache = new JsonCache(new JsonLoader());
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-external-ref.json'));
     $this->assertEquals($cache->count(), 2);
-    $this->assertEquals($cache->pointer(new Uri('file://' . getenv('DATADIR') . '/user.json#/definitions/userId/minimum')), 0);
+    $this->assertEquals($cache->pointer(new Uri('file://' . getenv('DATADIR') . '/user-schema.json#/definitions/userId/minimum')), 0);
   }
 
   /**

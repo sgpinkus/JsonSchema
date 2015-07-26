@@ -185,7 +185,6 @@ class JsonCache implements \IteratorAggregate
    */
   private function _deRef(\SplPriorityQueue $queue) {
     while(!$queue->isEmpty()) {
-      defined('DEBUG') && print "\tRESOLVING {$jsonRef->getUri()}\n";
       $jsonRef = $queue->extract();
       $pointerUri = $jsonRef->getUri();
       $ref =& $jsonRef->getRef();
