@@ -65,7 +65,9 @@ class EmptyConstraint extends Constraint
    */
   public static function build($doc, $context = null) {
     $propertyHit = false;
+    $codeKey = '$code';
     $childConstraints = [];
+    $doc->$codeKey = true;
 
     if(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
@@ -81,7 +83,7 @@ class EmptyConstraint extends Constraint
           $newSymbol = $symbolClass::build($value, $doc);
           $childConstraints[] = $newSymbol;
         }
-        else if(is_object($value)) {
+        else if(is_object($value) && !isset($value->$codeKey)) {
           // For every property that is not a valid constraint build more JSON Schema on it.
           self::build($value, $doc);
         }
@@ -89,7 +91,6 @@ class EmptyConstraint extends Constraint
     }
 
     $constraint = new EmptyConstraint($childConstraints);
-    $codeKey = '$code';
     $doc->$codeKey = $constraint;
     return $constraint;
   }
