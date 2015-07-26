@@ -7,7 +7,7 @@ use \JsonDoc\Uri;
 /**
  * Basic tests.
  */
-class ObjectConstraintTest extends PHPUnit_Framework_TestCase
+class JsonSchemaTest extends PHPUnit_Framework_TestCase
 {
   public static function setUpBeforeClass() {
   }
@@ -20,7 +20,6 @@ class ObjectConstraintTest extends PHPUnit_Framework_TestCase
     $targetDoc = new JsonDoc(new Uri("file://" . getenv('DATADIR') . '/user.json'));
     $targetDoc = $targetDoc->getDoc();
     $schema = new JsonSchema($schemaDoc);
-    //var_dump($schema); exit();
     foreach($targetDoc->users as $user) {
       $valid = $schema->validate($user);
       $expected = true;
