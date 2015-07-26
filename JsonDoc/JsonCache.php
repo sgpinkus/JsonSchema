@@ -180,19 +180,20 @@ class JsonCache implements \IteratorAggregate
    * We are simply not allowing refs to refs - first two cases. Refs through refs may work depending on the order of resolution.
    * Must be called after all referenced docs are loaded by load().
    * @see _get().
-   * @input $refs A priority queue of refs that need dereferencing.
-   * @todo Handel circular refs and ref to a ref. Should be easy.
+   * @input $queue A priority queue of refs that need dereferencing.
+   * @todo Handle circular refs and ref to a refs properly.
    */
-  private function _deRef(\SplPriorityQueue $refs) {
-    $ref = null;
-    while(!$refs->isEmpty()) {
-      $jsonRef = $refs->extract();
+  private function _deRef(\SplPriorityQueue $queue) {
+    while(!$queue->isEmpty()) {
+      defined('DEBUG') && print "\tRESOLVING {$jsonRef->getUri()}\n";
+      $jsonRef = $queue->extract();
       $pointerUri = $jsonRef->getUri();
       $ref =& $jsonRef->getRef();
       $target =& $this->pointer($pointerUri);
       if(self::isJsonRef($target)) {
         throw new JsonReferenceException("JSON Reference to JSON Reference is not allowed");
       }
+      $ref = $target;
     }
   }
 

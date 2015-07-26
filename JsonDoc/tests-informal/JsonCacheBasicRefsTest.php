@@ -17,10 +17,9 @@ print "\n########## SOURCE DOC\n";
 var_dump($doc);
 print "\n";
 
+print "\n########## FOUND REFS\n";
 $queue = new JsonRefPriorityQueue();
 JsonCache::queueAllRefs($doc,$queue,$uri);
-
-print "\n########## FOUND REFS\n";
 $i = 0;
 while(!$queue->isEmpty()) {
   $item = $queue->extract();
