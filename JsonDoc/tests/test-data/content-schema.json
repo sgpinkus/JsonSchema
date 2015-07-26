@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "comment": "Example of schema refering to another schema",
+  "required": ["title", "content", "dateCreated", "author"],
+  "properties": {
+    "author": {
+      "$ref": "user.json#/definitions/userId"
+    }
+  }
+}
