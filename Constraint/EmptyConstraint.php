@@ -67,7 +67,7 @@ class EmptyConstraint extends Constraint
     $propertyHit = false;
     $childConstraints = [];
 
-    if(!is_object($doc)) {
+    if(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
     }
 
@@ -95,10 +95,10 @@ class EmptyConstraint extends Constraint
   }
 
   /**
-   * Don't try and expand anything beginning with $.
+   * Don't try and expand anything beginning with $ and id.
    * Not standard but no harm done really.
    */
   public static function skipProperty($name) {
-    return strpos($name, '$') === 0;
+    return (strpos($name, '$') === 0 || $name == 'id');
   }
 }
