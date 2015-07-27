@@ -1,12 +1,12 @@
 <?php
-use JsonDoc\JsonCache;
-use JsonDoc\JsonLoader;
-use JsonDoc\Uri;
-use JsonDoc\Exception\JsonDecodeException;
-use JsonDoc\JsonRefPriorityQueue;
-use JsonDoc\JsonPointer;
+use JsonDocs\JsonDocs;
+use JsonDocs\JsonLoader;
+use JsonDocs\Uri;
+use JsonDocs\Exception\JsonDecodeException;
+use JsonDocs\JsonRefPriorityQueue;
+use JsonDocs\JsonPointer;
 require_once '../loader.php';
-$cache = new JsonCache(new JsonLoader());
+$cache = new JsonDocs(new JsonLoader());
 $doc = $cache->get(new Uri('file://' . realpath('../tests/test-data/basic-ref-to-ref-succeeds.json')));
 var_dump($doc);
 $doc = $cache->get(new Uri('file://' . realpath('../tests/test-data/basic-ref-to-ref.json')));

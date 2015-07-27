@@ -1,10 +1,10 @@
 <?php
-use JsonDoc\JsonCache;
-use JsonDoc\JsonLoader;
-use JsonDoc\Uri;
-use JsonDoc\Exception\JsonDecodeException;
-use JsonDoc\JsonRefPriorityQueue;
-use JsonDoc\JsonPointer;
+use JsonDocs\JsonDocs;
+use JsonDocs\JsonLoader;
+use JsonDocs\Uri;
+use JsonDocs\Exception\JsonDecodeException;
+use JsonDocs\JsonRefPriorityQueue;
+use JsonDocs\JsonPointer;
 require_once '../loader.php';
 
 $uri = new Uri('file://' . realpath('../tests/test-data/basic-refs.json'));
@@ -19,7 +19,7 @@ print "\n";
 
 print "\n########## FOUND REFS\n";
 $queue = new JsonRefPriorityQueue();
-JsonCache::queueAllRefs($doc,$queue,$uri);
+JsonDocs::queueAllRefs($doc,$queue,$uri);
 $i = 0;
 while(!$queue->isEmpty()) {
   $item = $queue->extract();
