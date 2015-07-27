@@ -1,15 +1,15 @@
 <?php
 
-use \JsonDoc\JsonCache;
-use \JsonDoc\JsonRefPriorityQueue;
-use \JsonDoc\Uri;
-use \JsonDoc\JsonRef;
-use \JsonDoc\JsonLoader;
+use \JsonDocs\JsonDocs;
+use \JsonDocs\JsonRefPriorityQueue;
+use \JsonDocs\Uri;
+use \JsonDocs\JsonRef;
+use \JsonDocs\JsonLoader;
 
 /**
  * Basic tests Uri class.
  */
-class JsonCacheTest extends PHPUnit_Framework_TestCase
+class JsonDocsTest extends PHPUnit_Framework_TestCase
 {
   private static $basicJson;
   private static $basicRefsJson;
@@ -26,7 +26,7 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
     $doc = json_decode(self::$basicRefsJson);
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $queue = new JsonRefPriorityQueue();
-    JsonCache::queueAllRefs($doc, $queue, $uri);
+    JsonDocs::queueAllRefs($doc, $queue, $uri);
     $this->assertEquals($queue->count(), 4);
     $jsonRef1 = $queue->extract();
     $jsonRef2 = $queue->extract();
@@ -44,20 +44,66 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
   }
 
   /**
-   * Basic test of JsonCache instance.
+   * Basic test of JsonDocs instance.
    */
-  public function testJsonCache() {
-    $cache = new JsonCache(new JsonLoader());
+  public function testJsonDocs() {
+    $cache = new JsonDocs(new JsonLoader());
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic.json'));
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-refs.json'));
-    $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-refs.json'));
+  }
+
+  /**
+   * Test static getPointer(). Work on any doc.
+   */
+  public function testGetPointer() {
+    $doc = json_decode(self::$basicJson);
+    $ref =& JsonDocs::getPointer($doc,'/a');
+    $ref = 67;
+    $this->assertEquals($doc->a, 67);
+    $ref =& JsonDocs::getPointer($doc,'/b');
+    $ref =& JsonDocs::getPointer($doc,'/c');
+  }
+
+  /**
+   * Test static getPointer() more.
+   */
+  public function testGetPointerEmptyRoot() {
+    $doc = json_decode(self::$basicJson);
+    $ref = JsonDocs::getPointer($doc,'/');
+    $this->assertEquals($doc, $ref);
+    $ref = JsonDocs::getPointer($doc,'');
+    $this->assertEquals($doc, $ref);
+    $ref = JsonDocs::getPointer($doc,'/////');
+    $this->assertEquals($doc, $ref);
+  }
+
+  /**
+   * Test static getPointer() more.
+   */
+  public function testGetEmptyPointer() {
+    $doc = json_decode(self::$basicJson);
+    $ref = JsonDocs::getPointer($doc,'/');
+    $this->assertEquals($doc, $ref);
+    $ref = JsonDocs::getPointer($doc,'');
+    $this->assertEquals($doc, $ref);
+    $ref = JsonDocs::getPointer($doc,'/////');
+    $this->assertEquals($doc, $ref);
+  }
+
+  /**
+   * Test static getPointer() more.
+   * @expectedException \JsonDocs\Exception\ResourceNotFoundException
+   */
+  public function testGetNonPointer() {
+    $doc = json_decode(self::$basicJson);
+    $ref = JsonDocs::getPointer($doc,'/dne');
   }
 
   /**
    * Test pointer(). Lookup up the doc internally then get the pointer.
    */
   public function testPointer() {
-    $cache = new JsonCache(new JsonLoader());
+    $cache = new JsonDocs(new JsonLoader());
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $cache->get($uri);
     $uri->fragment = "/C/Value";
@@ -69,10 +115,10 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
 
   /**
    * Test static pointer() more.
-   * @expectedException \JsonDoc\Exception\ResourceNotFoundException
+   * @expectedException \JsonDocs\Exception\ResourceNotFoundException
    */
   public function testNonPointer() {
-    $cache = new JsonCache(new JsonLoader());
+    $cache = new JsonDocs(new JsonLoader());
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $cache->get($uri);
     $uri->fragment = "/C/0";
@@ -84,7 +130,7 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
    * basic-external-ref.json contains one such ref.
    */
   public function testGetLoading() {
-    $cache = new JsonCache(new JsonLoader());
+    $cache = new JsonDocs(new JsonLoader());
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-external-ref.json'));
     $this->assertEquals($cache->count(), 2);
     $this->assertEquals($cache->pointer(new Uri('file://' . getenv('DATADIR') . '/user-schema.json#/definitions/userId/minimum')), 0);
@@ -92,10 +138,10 @@ class JsonCacheTest extends PHPUnit_Framework_TestCase
 
   /**
    * Test ref to ref chain.
-   * @expectedException \JsonDoc\Exception\JsonReferenceException
+   * @expectedException \JsonDocs\Exception\JsonReferenceException
    */
-   public function testJsonCacheRefChain() {
-    $cache = new JsonCache(new JsonLoader());
+   public function testJsonDocsRefChain() {
+    $cache = new JsonDocs(new JsonLoader());
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-ref-to-ref.json'));
    }
 }

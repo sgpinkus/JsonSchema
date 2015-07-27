@@ -1,5 +1,5 @@
 <?php
-namespace JsonDoc;
+namespace JsonDocs;
 
 use Exception\ResourceNotFoundException;
 use JsonLoader;

@@ -1,5 +1,5 @@
 <?php
-namespace JsonDoc;
+namespace JsonDocs;
 
 /**
  * Stores a PHP src variable reference and a pointer it is to be resolved to.

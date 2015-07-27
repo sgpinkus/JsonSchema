@@ -1,5 +1,5 @@
 <?php
-namespace JsonDoc;
+namespace JsonDocs;
 
 /**
  * Shim interface to alow client to control loading.

@@ -1,10 +1,12 @@
 <?php
-namespace JsonDoc;
-use JsonDoc\JsonPointer;
-use JsonDoc\JsonRefPriorityQueue;
-use JsonDoc\Exception\JsonDecodeException;
-use JsonDoc\Exception\ResourceNotFoundException;
-use JsonDoc\Exception\JsonReferenceException;
+namespace JsonDocs;
+
+use JsonDocs\JsonNullLoader;
+use JsonDocs\JsonRefPriorityQueue;
+use JsonDocs\JsonRef;
+use JsonDocs\Exception\JsonDecodeException;
+use JsonDocs\Exception\ResourceNotFoundException;
+use JsonDocs\Exception\JsonReferenceException;
 
 /**
  * Instances of this class maintain a cache of dereferenced JSON documents and provide access to those documents.
@@ -13,16 +15,17 @@ use JsonDoc\Exception\JsonReferenceException;
  * Supports retrieving part of a doc by JSON Pointer. Note however, the fragment part of loaded URIs is ignored.
  * Actually loading raw data from remote (or local) sources pointed at by URIs is delegated to JsonLoader.
  */
-class JsonCache implements \IteratorAggregate
+class JsonDocs implements \IteratorAggregate
 {
   private $cache = [];
   private $loader;
 
   /**
-   * Init.
+   * Init. Use Null loader which refuses to load external refs by default for security.
+   * @input $loader JsonLoader optional loader.
    */
-  public function __construct(JsonLoader $loader) {
-    $this->loader = $loader;
+  public function __construct(JsonLoader $loader = null) {
+    $this->loader = $loader ? $loader : new JsonNullLoader();
   }
 
   /**
@@ -75,7 +78,7 @@ class JsonCache implements \IteratorAggregate
       throw new ResourceNotFoundException("Resource $keyUri not loaded");
     }
 
-    return JsonPointer::getPointer($this->cache[$keyUri.''], $pointer);
+    return self::getPointer($this->cache[$keyUri.''], $pointer);
   }
 
   /**
@@ -146,6 +149,28 @@ class JsonCache implements \IteratorAggregate
   }
 
   /**
+   * Remove all Json References ($ref) from loaded docs, replacing $ref object with PHP references to the pointed to value.
+   * There are a three special cases to consider; refs to refs, refs to refs that are circular, refs through refs.
+   * We are simply not allowing refs to refs - first two cases. Refs through refs may work depending on the order of resolution.
+   * Must be called after all referenced docs are loaded by load().
+   * @see _get().
+   * @input $queue A priority queue of refs that need dereferencing.
+   * @todo Handle circular refs and ref to a refs properly.
+   */
+  private function _deRef(\SplPriorityQueue $queue) {
+    while(!$queue->isEmpty()) {
+      $jsonRef = $queue->extract();
+      $pointerUri = $jsonRef->getUri();
+      $ref =& $jsonRef->getRef();
+      $target =& $this->pointer($pointerUri);
+      if(self::isJsonRef($target)) {
+        throw new JsonReferenceException("JSON Reference to JSON Reference is not allowed");
+      }
+      $ref = $target;
+    }
+  }
+
+  /**
    * Find all JSON Refs in a JSON doc and stuff them into a queue for later processing.
    * Can't use standard recursive iterator here because references + iterators don't work together.
    * Also handles rebasing a base URI based on the value of an 'id' field of objects.
@@ -175,27 +200,47 @@ class JsonCache implements \IteratorAggregate
   }
 
   /**
-   * Remove all Json References ($ref) from loaded docs, replacing $ref object with PHP references to the pointed to value.
-   * There are a three special cases to consider; refs to refs, refs to refs that are circular, refs through refs.
-   * We are simply not allowing refs to refs - first two cases. Refs through refs may work depending on the order of resolution.
-   * Must be called after all referenced docs are loaded by load().
-   * @see _get().
-   * @input $queue A priority queue of refs that need dereferencing.
-   * @todo Handle circular refs and ref to a refs properly.
+   * Traverse a JSON document data structure to find pointer reference.
+   * @input $doc Decoded JSON data structure.
+   * @input $pointer String JSON Pointer. Example "/x/y/0/z".
+   * @return reference to the pointed to value. Note return by *reference*.
    */
-  private function _deRef(\SplPriorityQueue $queue) {
-    while(!$queue->isEmpty()) {
-      $jsonRef = $queue->extract();
-      $pointerUri = $jsonRef->getUri();
-      $ref =& $jsonRef->getRef();
-      $target =& $this->pointer($pointerUri);
-      if(self::isJsonRef($target)) {
-        throw new JsonReferenceException("JSON Reference to JSON Reference is not allowed");
-      }
-      $ref = $target;
-    }
-  }
+  public static function &getPointer($doc, $pointer) {
+    $parts = explode("/", $pointer);
+    $currentPointer = "";
+    $doc= &$doc;
 
+    foreach($parts as $part) {
+      if($part == "") {
+        continue;
+      }
+
+      $part = str_replace('~1', '/', $part);
+      $part = str_replace('~0', '~', $part);
+      $currentPointer .= "/$part";
+
+      if(is_object($doc)) {
+        if(isset($doc->$part)) {
+          $doc = &$doc->$part;
+        }
+        else {
+          throw new ResourceNotFoundException("Could not find $pointer in document. Failed at $currentPointer");
+        }
+      }
+      else if(is_array($doc)) {
+        if(isset($doc[$part])) {
+          $doc = &$doc[$part];
+        }
+        else {
+          throw new ResourceNotFoundException("Could not find $pointer in document. Failed at $currentPointer");
+        }
+      }
+      else {
+        throw new ResourceNotFoundException("Could not find $pointer in document. Failed at $currentPointer. Not traversable");
+      }
+    }
+    return $doc;
+  }
 
   /**
    * Get the pointer from a JSON Ref.
@@ -224,4 +269,4 @@ class JsonCache implements \IteratorAggregate
   }
 }
 
-class JsonCacheException extends \Exception {}
+class JsonDocsException extends \Exception {}
