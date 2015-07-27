@@ -59,7 +59,7 @@ class EmptyConstraint extends Constraint
 
   /**
    * Build the constraint. Recursively.
-   * @input $doc the JSON Schema document structure. This document is marked up.
+   * @input $doc the JSON Schema document structure. This document is marked up with code.
    * @throws SymbolParseException.
    * @override
    */
@@ -67,12 +67,13 @@ class EmptyConstraint extends Constraint
     $propertyHit = false;
     $codeKey = '$code';
     $childConstraints = [];
-    $doc->$codeKey = true;
 
+    if(is_object($doc)) {
+      $doc->$codeKey = true;
+    }
     if(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
     }
-
     foreach($doc as $property => $value) {
       if(self::skipProperty($property)) {
         continue;

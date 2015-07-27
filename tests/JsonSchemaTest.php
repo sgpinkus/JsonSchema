@@ -1,8 +1,9 @@
 <?php
 
-use \JsonSchema\JsonSchema;
-use \JsonDoc\JsonDoc;
-use \JsonDoc\Uri;
+use JsonSchema\JsonSchema;
+use JsonDocs\JsonDocs;
+use \JsonDocs\JsonLoader;
+use JsonDocs\Uri;
 
 /**
  * Basic tests.
@@ -15,10 +16,9 @@ class JsonSchemaTest extends PHPUnit_Framework_TestCase
   /**
    */
   public function testJsonSchema() {
-    $schemaDoc = new JsonDoc(new Uri("file://" . getenv('DATADIR') . '/user-schema.json'));
-    $schemaDoc = $schemaDoc->getDoc();
-    $targetDoc = new JsonDoc(new Uri("file://" . getenv('DATADIR') . '/user.json'));
-    $targetDoc = $targetDoc->getDoc();
+    $jsonDocs = new JsonDocs(new JsonLoader());
+    $schemaDoc = $jsonDocs->get(new Uri("file://" . getenv('DATADIR') . '/user-schema.json'));
+    $targetDoc = $jsonDocs->get(new Uri("file://" . getenv('DATADIR') . '/user.json'));
     $schema = new JsonSchema($schemaDoc);
     foreach($targetDoc->users as $user) {
       $valid = $schema->validate($user);
