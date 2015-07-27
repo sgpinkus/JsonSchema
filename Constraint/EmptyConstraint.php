@@ -67,9 +67,10 @@ class EmptyConstraint extends Constraint
     $propertyHit = false;
     $codeKey = '$code';
     $childConstraints = [];
+    $constraint = new EmptyConstraint([]);
 
     if(is_object($doc)) {
-      $doc->$codeKey = true;
+      $doc->$codeKey = $constraint;
     }
     if(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
@@ -82,6 +83,7 @@ class EmptyConstraint extends Constraint
         if(isset(self::$childSymbols[$property])) {
           $symbolClass = self::$childSymbols[$property];
           $newSymbol = $symbolClass::build($value, $doc);
+          $newSymbol->setContext($doc);
           $childConstraints[] = $newSymbol;
         }
         else if(is_object($value) && !isset($value->$codeKey)) {
@@ -91,8 +93,7 @@ class EmptyConstraint extends Constraint
       }
     }
 
-    $constraint = new EmptyConstraint($childConstraints);
-    $doc->$codeKey = $constraint;
+    $constraint->childConstraints = $childConstraints;
     return $constraint;
   }
 

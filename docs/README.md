@@ -1,7 +1,7 @@
 # Overview
 Draft v4 compliant JSON Schema validator for PHP.
 
-  * Complete support for $refs, and the id keyword except for the next point.
+  * Complete support for `$refs`, and the `id` keyword except for the next point.
   * No support for the "inline dereferencing" option.
   * Simple design. In particular, the separation of code concerned with loading JSON, and JSON Reference, and code concerned with validation.
   * Simple interface for validation - doesn't expose the user to more thatn a couple of classes for the main use case - validation.
@@ -44,3 +44,9 @@ Draft v4 compliant JSON Schema validator for PHP.
   * uri
 
 # Usage
+See [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
+
+# TODO
+
+  * Currently validators/constraints just return a boolean. Need to add some sort of context to this.
+  * Implement the unimplemented.
