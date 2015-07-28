@@ -14,6 +14,13 @@ class RequiredConstraint extends Constraint
   public function __construct(array $required) {
     $this->required = $required;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+    return 'required';
+  }
 
   /**
    * @override

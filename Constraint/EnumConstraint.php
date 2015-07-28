@@ -13,6 +13,13 @@ class EnumConstraint extends Constraint
   public function __construct(array $values) {
     $this->values = $values;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'enum';
+  }
 
   /**
    * @override

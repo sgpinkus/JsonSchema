@@ -17,6 +17,13 @@ class UniqueItemsConstraint extends Constraint
   public function __construct($unique) {
     $this->unique = (bool)$unique;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+    return 'uniqueItems';
+  }
 
   /**
    * @override

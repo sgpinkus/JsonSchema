@@ -8,6 +8,13 @@ use JsonSchema\Constraint\Exception\ConstraintParseException;
  */
 class EmptyConstraint extends Constraint
 {
+	/**
+	 * @override
+	 */
+	public static function getName() {
+		return '{}';
+	}	
+	
   /** map of valid empty constraint properties to symbols/constraint class names. */
   private static $childSymbols = [
     'allOf' => 'JsonSchema\Constraint\AllOfConstraint',

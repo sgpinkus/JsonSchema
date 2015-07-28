@@ -14,6 +14,13 @@ class MaxPropertiesConstraint extends Constraint
   public function __construct($maxProperties) {
     $this->maxProperties = (int)$maxProperties;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'maxProperties';
+  }
 
   /**
    * @override

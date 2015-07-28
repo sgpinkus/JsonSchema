@@ -14,6 +14,13 @@ class MinItemsConstraint extends Constraint
   public function __construct($minItems) {
     $this->minItems = (int)$minItems;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'minItems';
+  }
 
   /**
    * @override

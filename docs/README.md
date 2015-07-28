@@ -47,6 +47,4 @@ Draft v4 compliant JSON Schema validator for PHP.
 See [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
 
 # TODO
-
-  * Currently validators/constraints just return a boolean. Need to add some sort of context to this.
-  * Implement the unimplemented.
+See [TODO](docs/TODO.md)

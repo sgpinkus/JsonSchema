@@ -16,6 +16,13 @@ class MaximumConstraint extends Constraint
     $this->maximum = $maximum;
     $this->exclusive = $exclusive;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'maximum';
+  }
 
   /**
    * @override

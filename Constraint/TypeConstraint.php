@@ -17,6 +17,13 @@ class TypeConstraint extends Constraint
     }
     $this->type = $type;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+    return 'type';
+  }
 
   /**
    * @override

@@ -10,6 +10,13 @@ class OneOfConstraint extends SomeOfConstraint
   /**
    * @override
    */
+  public static function getName() {
+    return 'oneOf';
+  }
+	
+  /**
+   * @override
+   */
   public function validate($doc) {
     $valid = false;
     foreach($this->childConstraints as $constraint) {

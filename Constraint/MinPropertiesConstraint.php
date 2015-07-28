@@ -14,6 +14,13 @@ class MinPropertiesConstraint extends Constraint
   public function __construct($minProperties) {
     $this->minProperties = (int)$minProperties;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'minProperties';
+  }
 
   /**
    * @override

@@ -23,6 +23,13 @@ class ItemsConstraint extends Constraint
     $this->items = $items;
     $this->additionalItems = $additionalItems;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'items';
+  }
 
   /**
    * Bit hairy.

@@ -22,6 +22,13 @@ class PropertiesConstraint extends Constraint
     $this->properties = $properties;
     $this->additionalProperties = $additionalProperties;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+    return 'properties';
+  }
 
   /**
    * Bit hairy.

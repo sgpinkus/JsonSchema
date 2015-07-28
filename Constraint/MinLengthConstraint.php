@@ -14,6 +14,13 @@ class MinLengthConstraint extends Constraint
   public function __construct($minLength) {
     $this->minLength = (int)$minLength;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'minLength';
+  }
 
   /**
    * @override

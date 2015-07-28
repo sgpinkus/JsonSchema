@@ -27,6 +27,11 @@ abstract class Constraint
   public static abstract function build($doc, $context = null);
 
   /**
+   * Get the name / keyword of the constraint. All constraints have a unique one.
+   */
+  public static abstract function getName();
+
+  /**
    * A constraint exists in the context of a JSON Schema document.
    * This context may be needed to access associated metadataabout the constraint.
    * @input $context StdClass. The context is always an object because the constraint is always a property of one.

@@ -18,6 +18,13 @@ class PatternConstraint extends Constraint
     }
     $this->pattern = $pattern;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+    return 'pattern';
+  }
 
   /**
    * @override

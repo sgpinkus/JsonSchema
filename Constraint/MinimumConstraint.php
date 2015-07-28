@@ -15,6 +15,13 @@ class MinimumConstraint extends Constraint
     $this->minimum = $minimum;
     $this->exclusive = $exclusive;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'minimum';
+  }
 
   /**
    * @override

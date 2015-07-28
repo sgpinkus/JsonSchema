@@ -17,6 +17,13 @@ class MultipleOfConstraint extends Constraint
   /**
    * @override
    */
+  public static function getName() {
+  	return 'multipleOf';
+  }
+
+  /**
+   * @override
+   */
   public function validate($doc) {
     $valid = true;
     if(is_int($doc) || is_float($doc)) {

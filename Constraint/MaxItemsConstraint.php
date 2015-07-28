@@ -18,6 +18,13 @@ class MaxItemsConstraint extends Constraint
   /**
    * @override
    */
+  public static function getName() {
+  	return 'maxItems';
+  }
+  
+  /**
+   * @override
+   */
   public function validate($doc) {
     $valid = true;
     if(is_array($doc)) {

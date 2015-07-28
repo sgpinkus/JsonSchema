@@ -14,6 +14,13 @@ class MaxLengthConstraint extends Constraint
   public function __construct($maxLength) {
     $this->maxLength = (int)$maxLength;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'maxLength';
+  }
 
   /**
    * @override

@@ -11,6 +11,13 @@ class NotConstraint extends Constraint
   public function __construct(EmptyConstraint $innerConstraint) {
     $this->innerConstraint = $innerConstraint;
   }
+  
+  /**
+   * @override
+   */
+  public static function getName() {
+  	return 'not';
+  }
 
   /**
    * @override
