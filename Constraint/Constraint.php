@@ -10,6 +10,7 @@ namespace JsonSchema\Constraint;
 abstract class Constraint
 {
   private $context = null;
+  private $continueMode = false;
 
   /**
    * @returns true|false depending on whether the doc validates|doesnt on this symbol.
@@ -46,5 +47,19 @@ abstract class Constraint
    */
   public function getContext() {
     return $this->context;
+  }
+  
+  /**
+   * @see continueMode.
+   */
+  public function setContinueMode($c) {
+     $this->continueMode = $c;
+  }
+  
+  /**
+   * Whether validation should continue and find all errors even if it can short cut.
+   */
+  public function getContinueMode() {
+    return $this->continueMode;
   }
 }
