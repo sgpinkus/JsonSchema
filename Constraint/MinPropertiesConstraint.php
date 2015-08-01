@@ -14,7 +14,7 @@ class MinPropertiesConstraint extends Constraint
   public function __construct($minProperties) {
     $this->minProperties = (int)$minProperties;
   }
-  
+
   /**
    * @override
    */
@@ -28,7 +28,9 @@ class MinPropertiesConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_object($doc)) {
-      $valid = count((array)$doc) >= $this->minProperties;
+      if(count((array)$doc) < $this->minProperties) {
+        $valid = new ValidationError($this, "count object < {$this->minProperties}");
+      }
     }
     return $valid;
   }

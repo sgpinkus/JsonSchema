@@ -6,15 +6,9 @@ use \JsonSchema\Constraint\Exception\ConstraintParseException;
 /**
  * Basic tests.
  */
-class ObjectConstraintTest extends PHPUnit_Framework_TestCase
+class ObjectConstraintTest extends ConstraintTest
 {
-  public static function setUpBeforeClass() {
-  }
-
-  /**
-   * Wrapped in an EmptyConstraint, but meh.
-   */
-  public function objectConstraintDataProvider() {
+  public function constraintDataProvider() {
     return [
       ['{"required": ["a","b","c"]}', '{"a":0, "b":1, "c":2}', true],
       ['{"required": ["a","b","c"]}', '{"a":0, "b":1, "c":2, "d": 4}', true],
@@ -40,20 +34,7 @@ class ObjectConstraintTest extends PHPUnit_Framework_TestCase
     ];
   }
 
-  /**
-   * @dataProvider objectConstraintDataProvider
-   */
-  public function testObjectConstraints($schemaDoc, $targetDoc, $valid) {
-    $schemaDoc = json_decode($schemaDoc);
-    $targetDoc = json_decode($targetDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
-    $this->assertEquals($constraint->validate($targetDoc), $valid);
-  }
-
-  /**
-   * Schema that violate JSON Schema syntax.
-   */
-  public function objectInvalidSchemaDataProvider() {
+  public function invalidConstraintDataProvider() {
     return [
       ['{"required": 0}'],
       ['{"required": []}'],
@@ -62,14 +43,5 @@ class ObjectConstraintTest extends PHPUnit_Framework_TestCase
       ['{"properties": 0}'],
       ['{"properties": {}, "additionalProperties": "none"}']
     ];
-  }
-
-  /**
-   * @dataProvider objectInvalidSchemaDataProvider
-   * @expectedException \JsonSchema\Constraint\Exception\ConstraintParseException
-   */
-  public function testInvalidTypeConstraint($schemaDoc) {
-    $schemaDoc = json_decode($schemaDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

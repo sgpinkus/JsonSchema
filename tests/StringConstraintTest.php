@@ -6,7 +6,7 @@ use \JsonSchema\Constraint\Exception\ConstraintParseException;
 /**
  * Basic tests.
  */
-class StringConstraintTest extends PHPUnit_Framework_TestCase
+class StringConstraintTest extends ConstraintTest
 {
   public static function setUpBeforeClass() {
   }
@@ -14,7 +14,7 @@ class StringConstraintTest extends PHPUnit_Framework_TestCase
   /**
    * Wrapped in an EmptyConstraint, but meh.
    */
-  public function stringConstraintDataProvider() {
+  public function constraintDataProvider() {
     return [
       ['{"maxLength": 0}', "233", true],
       ['{"maxLength": 0}', "\"\"", true],
@@ -29,13 +29,11 @@ class StringConstraintTest extends PHPUnit_Framework_TestCase
     ];
   }
 
-  /**
-   * @dataProvider stringConstraintDataProvider
-   */
-  public function testStringConstraint($schemaDoc, $targetDoc, $valid) {
-    $schemaDoc = json_decode($schemaDoc);
-    $targetDoc = json_decode($targetDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
-    $this->assertEquals($constraint->validate($targetDoc), $valid);
+  public function invalidConstraintDataProvider() {
+    return [
+      ['{"maxLength": -1}'],
+      ['{"minLength": -1}'],
+      ['{"pattern": "not a pattern"}']
+    ];
   }
 }

@@ -18,7 +18,7 @@ class PatternConstraint extends Constraint
     }
     $this->pattern = $pattern;
   }
-  
+
   /**
    * @override
    */
@@ -31,8 +31,8 @@ class PatternConstraint extends Constraint
    */
   public function validate($doc) {
     $valid = true;
-    if(is_string($doc)) {
-      $valid = (bool)preg_match($this->pattern, $doc);
+    if(is_string($doc) && !preg_match($this->pattern, $doc)) {
+      $valid = new ValidationError($this, "$doc does not match  {$this->pattern}");
     }
     return $valid;
   }

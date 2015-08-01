@@ -16,7 +16,7 @@ class MaximumConstraint extends Constraint
     $this->maximum = $maximum;
     $this->exclusive = $exclusive;
   }
-  
+
   /**
    * @override
    */
@@ -30,11 +30,11 @@ class MaximumConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_int($doc) || is_float($doc)) {
-      if($this->exclusive) {
-        $valid = $doc < $this->maximum;
+      if($this->exclusive && $doc >= $this->maximum) {
+        $valid = new ValidationError($this, "$doc >= {$this->maximum}");
       }
-      else {
-        $valid = $doc <= $this->maximum;
+      else if($doc > $this->maximum) {
+        $valid = new ValidationError($this, "$doc > {$this->maximum}");
       }
     }
     return $valid;

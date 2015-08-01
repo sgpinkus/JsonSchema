@@ -13,7 +13,7 @@ abstract class Constraint
   private $continueMode = false;
 
   /**
-   * @returns true|false depending on whether the doc validates|doesnt on this symbol.
+   * @returns Mixed true|Validation depending on whether the doc validates|doesnt on this symbol.
    */
   public abstract function validate($doc);
 
@@ -34,7 +34,7 @@ abstract class Constraint
 
   /**
    * A constraint exists in the context of a JSON Schema document.
-   * This context may be needed to access associated metadataabout the constraint.
+   * This context may be needed to access associated metadata about the constraint.
    * @input $context StdClass. The context is always an object because the constraint is always a property of one.
    */
   public function setContext(\StdClass $context) {
@@ -48,18 +48,18 @@ abstract class Constraint
   public function getContext() {
     return $this->context;
   }
-  
+
   /**
    * @see continueMode.
    */
   public function setContinueMode($c) {
      $this->continueMode = $c;
   }
-  
+
   /**
    * Whether validation should continue and find all errors even if it can short cut.
    */
-  public function getContinueMode() {
+  public function continueMode() {
     return $this->continueMode;
   }
 }

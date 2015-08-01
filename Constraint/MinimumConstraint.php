@@ -15,7 +15,7 @@ class MinimumConstraint extends Constraint
     $this->minimum = $minimum;
     $this->exclusive = $exclusive;
   }
-  
+
   /**
    * @override
    */
@@ -29,11 +29,11 @@ class MinimumConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_int($doc) || is_float($doc)) {
-      if($this->exclusive) {
-        $valid = $doc > $this->minimum;
+      if($this->exclusive && $doc <= $this->minimum) {
+        $valid = new ValidationError($this, "$doc <= {$this->minimum}");
       }
-      else {
-        $valid = $doc >= $this->minimum;
+      else if($doc < $this->minimum) {
+        $valid = new ValidationError($this, "$doc < {$this->minimum}");
       }
     }
     return $valid;

@@ -23,17 +23,17 @@ class ItemsConstraint extends Constraint
     $this->items = $items;
     $this->additionalItems = $additionalItems;
   }
-  
+
   /**
    * @override
    */
   public static function getName() {
-  	return 'items';
+    return 'items';
   }
 
   /**
-   * Bit hairy.
-   * Similarly to the properties constraint, a positional constraint only applies if the position is defined.
+   * Ensure items in an array match the per item constraints specified. Bit hairy.
+   * Similarly to the properties constraint, a positional constraint only applies if the position is defined in the target
    * Thats a bit strange but pretty sure that is what the spec is saying.
    * Further more, note additionalItems is only relevant when items is an array.
    * @override
@@ -43,22 +43,37 @@ class ItemsConstraint extends Constraint
     if(is_array($doc)) {
       if(is_array($this->items)) {
         if($this->additionalItems == false && sizeof($doc) > sizeof($this->items)) {
-          $valid = false;
+          $valid = new ValidationError($this, "No additional items allowed");
         }
         else {
           foreach($this->items as $i => $constraint) {
-            if(isset($doc[$i]) && !$constraint->validate($doc[$i])) {
-              $valid = false;
-              break;
+            if(isset($doc[$i])) {
+              $validation = $constraint->validate($doc[$i]);
+              if($validation instanceof ValidationError) {
+                if($valid === true) {
+                  $valid = new ValidationError($this, "One or more items failed to validate.");
+                }
+                if(!$this->continueMode()) {
+                  break;
+                }
+                $valid->addChild($validation);
+              }
             }
           }
         }
-        if($valid == true && is_object($this->additionalItems)) {
+        // If we reach here additionalItems are allowed, but they must pass additionalItems constraint if specified.
+        if($valid === true && is_object($this->additionalItems)) {
           $additionalIndex = sizeof($items);
           for($i = sizeof($items); $i < sizeof($doc); $i++) {
-            if(!$this->additionalItems->validate($doc[$i])) {
-              $valid = false;
-              break;
+            $validation = $this->additionalItems->validate($doc[$i]);
+            if($validation instanceof ValidationError) {
+              if($valid === true) {
+                $valid = new ValidationError($this, "One or more additional items failed validation.");
+              }
+              if(!$this->continueMode()) {
+                break;
+              }
+              $valid->addChild($validation);
             }
           }
         }
@@ -66,9 +81,13 @@ class ItemsConstraint extends Constraint
       // items is a single EmptyConstraint that must validate against all.
       else {
         foreach($doc as $value) {
-          if(!$this->items->validate($value)) {
-            $valid = false;
-            break;
+          $validation = $this->items->validate($value);
+          if($validation instanceof ValidationError) {
+            $valid = new ValidationError($this, "One ore more items failed validation.");
+            if(!$this->continueMode()) {
+              break;
+            }
+            $valid->addChild($validation);
           }
         }
       }

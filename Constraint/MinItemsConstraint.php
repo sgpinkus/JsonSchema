@@ -14,7 +14,7 @@ class MinItemsConstraint extends Constraint
   public function __construct($minItems) {
     $this->minItems = (int)$minItems;
   }
-  
+
   /**
    * @override
    */
@@ -28,7 +28,9 @@ class MinItemsConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_array($doc)) {
-      $valid = count($doc) >= $this->minItems;
+      if(count($doc) < $this->minItems) {
+        $valid = new ValidationError($this, "Number of items < {$this->minItems}");
+      }
     }
     return $valid;
   }

@@ -14,7 +14,7 @@ class MinLengthConstraint extends Constraint
   public function __construct($minLength) {
     $this->minLength = (int)$minLength;
   }
-  
+
   /**
    * @override
    */
@@ -28,7 +28,9 @@ class MinLengthConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_string($doc)) {
-      $valid = strlen($doc) >= $this->minLength;
+      if(strlen($doc) < $this->minLength) {
+        $valid = new ValidationError($this, "strlen($doc) < {$this->minLength}");
+      }
     }
     return $valid;
   }

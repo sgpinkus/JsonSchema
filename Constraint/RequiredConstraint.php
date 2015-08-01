@@ -14,7 +14,7 @@ class RequiredConstraint extends Constraint
   public function __construct(array $required) {
     $this->required = $required;
   }
-  
+
   /**
    * @override
    */
@@ -26,13 +26,20 @@ class RequiredConstraint extends Constraint
    * @override
    */
   public function validate($doc) {
+    $notSet = [];
     $valid = true;
     if(is_object($doc)) {
       foreach($this->required as $key) {
         if(!isset($doc->$key)) {
-          $valid = false;
-          break;
+          if(!$this->continueMode()) {
+            $valid = new ValidationError($this, "One or more required properties missing.");
+            break;
+          }
+          $notSet[] = $key;
         }
+      }
+      if(!empty($notSet)) {
+        $valid = new ValidationError($this, "Required properties missing. " . implode(',', $notSet) . ".");
       }
     }
     return $valid;

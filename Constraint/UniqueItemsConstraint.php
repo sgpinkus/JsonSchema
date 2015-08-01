@@ -17,7 +17,7 @@ class UniqueItemsConstraint extends Constraint
   public function __construct($unique) {
     $this->unique = (bool)$unique;
   }
-  
+
   /**
    * @override
    */
@@ -35,7 +35,7 @@ class UniqueItemsConstraint extends Constraint
       foreach($doc as $v) {
         $sv = serialize($v);
         if(isset($h[$sv])) {
-           $valid = false;
+           $valid = new ValidationError($this, "Non unique item $sv found.");
            break;
         }
         $h[$sv] = true;

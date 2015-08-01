@@ -6,15 +6,9 @@ use \JsonSchema\Constraint\Exception\ConstraintParseException;
 /**
  * Basic tests.
  */
-class NumericConstraintTest extends PHPUnit_Framework_TestCase
+class NumericConstraintTest extends ConstraintTest
 {
-  public static function setUpBeforeClass() {
-  }
-
-  /**
-   * Wrapped in an EmptyConstraint, but meh.
-   */
-  public function numericConstraintDataProvider() {
+  public function constraintDataProvider() {
     return [
       ['{"minimum": 1}', "2", true],
       ['{"minimum": 1}', "1", true],
@@ -34,31 +28,9 @@ class NumericConstraintTest extends PHPUnit_Framework_TestCase
     ];
   }
 
-  /**
-   * @dataProvider numericConstraintDataProvider
-   */
-  public function testNumericConstraint($schemaDoc, $targetDoc, $valid) {
-    $schemaDoc = json_decode($schemaDoc);
-    $targetDoc = json_decode($targetDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
-    $this->assertEquals($constraint->validate($targetDoc), $valid);
-  }
-
-  /**
-   * Schema that violate JSON Schema syntax.
-   */
-  public function numericInvalidSchemaDataProvider() {
+  public function invalidConstraintDataProvider() {
     return [
       ['{"minimum": "numeric"}']
     ];
-  }
-
-  /**
-   * @dataProvider numericInvalidSchemaDataProvider
-   * @expectedException \JsonSchema\Constraint\Exception\ConstraintParseException
-   */
-  public function testInvalidTypeConstraint($schemaDoc) {
-    $schemaDoc = json_decode($schemaDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

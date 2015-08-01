@@ -6,15 +6,9 @@ use \JsonSchema\Constraint\Exception\ConstraintParseException;
 /**
  * Basic tests.
  */
-class ArrayConstraintTest extends PHPUnit_Framework_TestCase
+class ArrayConstraintTest extends ConstraintTest
 {
-  public static function setUpBeforeClass() {
-  }
-
-  /**
-   * Wrapped in an EmptyConstraint, but meh.
-   */
-  public function arrayConstraintDataProvider() {
+  public function constraintDataProvider() {
     return [
       ['{"minItems": 0}', '[1,2]', true],
       ['{"minItems": 1}', '[1,2]', true],
@@ -46,33 +40,11 @@ class ArrayConstraintTest extends PHPUnit_Framework_TestCase
     ];
   }
 
-  /**
-   * @dataProvider arrayConstraintDataProvider
-   */
-  public function testArrayConstraint($schemaDoc, $targetDoc, $valid) {
-    $schemaDoc = json_decode($schemaDoc);
-    $targetDoc = json_decode($targetDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
-    $this->assertEquals($constraint->validate($targetDoc), $valid);
-  }
-
-  /**
-  * Schema that violate JSON Schema syntax.
-  */
-  public function itemsInvalidSchemaDataProvider() {
+  public function invalidConstraintDataProvider() {
     return [
       ['{"items": "numeric"}'],
       ['{"items": 2}'],
       ['{"uniqueItems": "true"}']
     ];
-  }
-
-  /**
-   * @dataProvider itemsInvalidSchemaDataProvider
-   * @expectedException \JsonSchema\Constraint\Exception\ConstraintParseException
-   */
-  public function testInvalidTypeConstraint($schemaDoc) {
-    $schemaDoc = json_decode($schemaDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

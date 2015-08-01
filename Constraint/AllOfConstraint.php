@@ -20,9 +20,15 @@ class AllOfConstraint extends SomeOfConstraint
   public function validate($doc) {
     $valid = true;
     foreach($this->childConstraints as $constraint) {
-      if(!$constraint->validate($doc)) {
-        $valid = false;
-        break;
+      $validation = $constraint->validate($doc);
+      if($validation instanceof ValidationError) {
+        if($valid === true) {
+          $valid = new ValidationError($this, "Not all constraints passed. All required to pass.");
+        }
+        $valid->addChild($validation);
+        if(!$this->continueMode()) {
+          break;
+        }
       }
     }
     return $valid;

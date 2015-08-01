@@ -14,7 +14,7 @@ class MaxLengthConstraint extends Constraint
   public function __construct($maxLength) {
     $this->maxLength = (int)$maxLength;
   }
-  
+
   /**
    * @override
    */
@@ -28,7 +28,9 @@ class MaxLengthConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_string($doc)) {
-      $valid = strlen($doc) <= $this->maxLength;
+      if(strlen($doc) > $this->maxLength) {
+        $valid = new ValidationError($this, "strlen($doc) > {$this->maxLength}");
+      }
     }
     return $valid;
   }

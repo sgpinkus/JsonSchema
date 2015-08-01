@@ -6,15 +6,9 @@ use \JsonSchema\Constraint\Exception\ConstraintParseException;
 /**
  * Basic tests.
  */
-class EmptyConstraintTest extends PHPUnit_Framework_TestCase
+class EmptyConstraintTest extends ConstraintTest
 {
-  private static $basicJson;
-  private static $basicRefsJson;
-
-  public static function setUpBeforeClass() {
-  }
-
-  public function emptyConstraintDataProvider() {
+  public function constraintDataProvider() {
     return [
       ['{}', false, true],
       ['{}', 5, true],
@@ -32,35 +26,9 @@ class EmptyConstraintTest extends PHPUnit_Framework_TestCase
   }
 
   /**
-   * @dataProvider emptyConstraintDataProvider
+   *
    */
-  public function testEmptyConstraint($schemaDoc, $targetDoc, $valid) {
-    $schemaDoc = json_decode($schemaDoc);
-    $targetDoc = json_decode($targetDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
-    $this->assertEquals($constraint->validate($targetDoc), $valid);
-  }
-
-  /**
-   * Schema that violate JSON Schema syntax.
-   */
-  public function exceptionalConstraintDataProvider() {
-    return [
-      ['{"allOf": []}'],
-      ['{"anyOf": []}'],
-      ['{"oneOf": []}'],
-      ['{"not": []}'],
-      ['{"enum": []}'],
-      ['{"type": []}']
-    ];
-  }
-
-  /**
-   * @dataProvider exceptionalConstraintDataProvider
-   * @expectedException JsonSchema\Constraint\Exception\ConstraintParseException
-   */
-  public function testExceptionalConstraint($schemaDoc) {
-    $schemaDoc = json_decode($schemaDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
+  public function invalidConstraintDataProvider() {
+    return [[5]];
   }
 }

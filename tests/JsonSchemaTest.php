@@ -10,11 +10,6 @@ use JsonDocs\Uri;
  */
 class JsonSchemaTest extends PHPUnit_Framework_TestCase
 {
-  public static function setUpBeforeClass() {
-  }
-
-  /**
-   */
   public function testJsonSchema() {
     $jsonDocs = new JsonDocs(new JsonLoader());
     $schemaDoc = $jsonDocs->get(new Uri("file://" . getenv('DATADIR') . '/user-schema.json'));
@@ -24,10 +19,11 @@ class JsonSchemaTest extends PHPUnit_Framework_TestCase
       $valid = $schema->validate($user);
       $expected = true;
       if(strpos($user->comment, "invalid") !== false) {
-        $expected = false;
+        $this->assertInstanceOf('\JsonSchema\Constraint\ValidationError', $valid);
       }
-      $this->assertEquals($valid,$expected, $user->comment);
+      else {
+        $this->assertEquals(true, $valid, $user->comment);
+      }
     }
-
   }
 }

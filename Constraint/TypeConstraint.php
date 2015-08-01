@@ -17,7 +17,7 @@ class TypeConstraint extends Constraint
     }
     $this->type = $type;
   }
-  
+
   /**
    * @override
    */
@@ -29,34 +29,34 @@ class TypeConstraint extends Constraint
    * @override
    */
   public function validate($doc) {
-    $valid = false;
+    $valid = true;
     switch($this->type) {
       case 'array': {
-        $valid = is_array($doc);
+        $valid = is_array($doc) ? true : new ValidationError($this, "not an array");
         break;
       }
       case 'boolean': {
-        $valid = is_bool($doc);
+        $valid = is_bool($doc) ? true : new ValidationError($this, "not a boolean");
         break;
       }
       case 'integer': {
-        $valid = is_int($doc);
+        $valid = is_int($doc) ? true : new ValidationError($this, "not an integer");
         break;
       }
       case 'number': {
-        $valid = is_int($doc) || is_float($doc);
+        $valid = (is_int($doc) || is_float($doc)) ? true : new ValidationError($this, "not a number");
         break;
       }
       case 'null': {
-        $valid = is_null($doc);
+        $valid = is_null($doc) ? true : new ValidationError($this, "not null");
         break;
       }
       case 'object': {
-        $valid = is_object($doc);
+        $valid = is_object($doc) ? true : new ValidationError($this, "not an object");
         break;
       }
       case 'string': {
-        $valid = is_string($doc);
+        $valid = is_string($doc) ? true : new ValidationError($this, "not an string");
         break;
       }
     }

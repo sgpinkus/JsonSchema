@@ -21,14 +21,16 @@ class MaxItemsConstraint extends Constraint
   public static function getName() {
   	return 'maxItems';
   }
-  
+
   /**
    * @override
    */
   public function validate($doc) {
     $valid = true;
     if(is_array($doc)) {
-      $valid = count($doc) <= $this->maxItems;
+      if(count($doc) > $this->maxItems) {
+        $valid = new ValidationError($this, "Number of items > {$this->maxItems}");
+      }
     }
     return $valid;
   }

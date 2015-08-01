@@ -11,7 +11,7 @@ class NotConstraint extends Constraint
   public function __construct(EmptyConstraint $innerConstraint) {
     $this->innerConstraint = $innerConstraint;
   }
-  
+
   /**
    * @override
    */
@@ -23,7 +23,12 @@ class NotConstraint extends Constraint
    * @override
    */
   public function validate($doc) {
-    return ! $this->innerConstraint->validate($doc);
+    $valid = true;
+    $validation = $this->innerConstraint->validate($doc);
+    if(!$validation instanceof ValidationError) {
+      $valid = new ValidationError($this, "Validation succeed. Expected failure.");
+    }
+    return $valid;
   }
 
   /**

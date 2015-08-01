@@ -22,7 +22,7 @@ class PropertiesConstraint extends Constraint
     $this->properties = $properties;
     $this->additionalProperties = $additionalProperties;
   }
-  
+
   /**
    * @override
    */
@@ -31,7 +31,7 @@ class PropertiesConstraint extends Constraint
   }
 
   /**
-   * Bit hairy.
+   * Ensure properties of object match given constraints.
    * Properties only apply if the property is defined on the target.
    * @override
    */
@@ -40,22 +40,38 @@ class PropertiesConstraint extends Constraint
     if(is_object($doc)) {
       $arrayDoc = (array)$doc;
       if($this->additionalProperties == false && sizeof($arrayDoc) > sizeof($this->properties)) {
-        $valid = false;
+        $valid = new ValidationError($this, "No additional properties allowed");
       }
       else {
         foreach($this->properties as $i => $constraint) {
-          if(isset($arrayDoc[$i]) && !$constraint->validate($arrayDoc[$i])) {
-            $valid = false;
-            break;
+          if(isset($arrayDoc[$i])) {
+            $validation = $constraint->validate($arrayDoc[$i]);
+            if($validation instanceof ValidationError) {
+              if($valid === true) {
+                $valid = new ValidationError($this, "One or more properties failed to validate.");
+              }
+              if(!$this->continueMode()) {
+                break;
+              }
+              $valid->addChild($validation);
+            }
           }
         }
       }
-      // All properties not validated by properties must validate against additionalProperties.
+      // If we reach here additionalProperties are allowed, but they must pass additionalProperties constraint if specified.
       if($valid == true && is_object($this->additionalProperties)) {
         foreach($arrayDoc as $i => $value) {
-          if(!(isset($this->properties[$i]) || $this->additionalProperties->validate($arrayDoc[$i]))) {
-            $valid = false;
-            break;
+          if(!isset($this->properties[$i])) {
+            $validation = $this->additionalProperties->validate($arrayDoc[$i]);
+            if($validation instanceof ValidationError) {
+              if($valid === true) {
+                $valid = new ValidationError($this, "One or more additional items failed validation.");
+              }
+              if(!$this->continueMode()) {
+                break;
+              }
+              $valid->addChild($validation);
+            }
           }
         }
       }

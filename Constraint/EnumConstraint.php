@@ -13,7 +13,7 @@ class EnumConstraint extends Constraint
   public function __construct(array $values) {
     $this->values = $values;
   }
-  
+
   /**
    * @override
    */
@@ -25,7 +25,7 @@ class EnumConstraint extends Constraint
    * @override
    */
   public function validate($doc) {
-    $valid = false;
+    $valid = new ValidationError($this, "Value not in enumeration.");
     foreach($this->values() as $constraint) {
       if($constraint->validate()) {
         $valid = true;

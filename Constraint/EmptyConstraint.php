@@ -13,8 +13,8 @@ class EmptyConstraint extends Constraint
 	 */
 	public static function getName() {
 		return '{}';
-	}	
-	
+	}
+
   /** map of valid empty constraint properties to symbols/constraint class names. */
   private static $childSymbols = [
     'allOf' => 'JsonSchema\Constraint\AllOfConstraint',
@@ -52,13 +52,21 @@ class EmptyConstraint extends Constraint
 
   /**
    * Validate some JSON doc against this symbol.
+   * Although its nto clearly stated in the spec, all child constraints must pass. I.e. its an allOf.
+   * @override
    */
   public function validate($doc) {
     $valid = true;
     foreach($this->childConstraints as $constraint) {
-      if(!$constraint->validate($doc)) {
-        $valid = false;
-        break;
+      $validation = $constraint->validate($doc);
+      if($validation instanceof ValidationError) {
+        if($valid === true) {
+          $valid = new ValidationError($this, "Not all constraints passed. All required to pass.");
+        }
+        $valid->addChild($validation);
+        if(!$this->continueMode()) {
+          break;
+        }
       }
     }
     return $valid;

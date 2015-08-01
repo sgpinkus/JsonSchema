@@ -24,5 +24,4 @@ class TmplConstraint extends Constraint
     }
     return new static($doc);
   }
-  }
 }

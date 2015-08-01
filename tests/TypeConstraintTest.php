@@ -6,18 +6,9 @@ use \JsonSchema\Constraint\Exception\ConstraintParseException;
 /**
  * Basic tests.
  */
-class TypeConstraintTest extends PHPUnit_Framework_TestCase
+class TypeConstraintTest extends ConstraintTest
 {
-  private static $basicJson;
-  private static $basicRefsJson;
-
-  public static function setUpBeforeClass() {
-  }
-
-  /**
-   * Results in a TypeConstraint wrapped in an EmptyConstraint, but meh.
-   */
-  public function typeConstraintDataProvider() {
+  public function constraintDataProvider() {
     return [
       ['{"type": "boolean"}', "false", true],
       ['{"type": "boolean"}', "true", true],
@@ -74,33 +65,11 @@ class TypeConstraintTest extends PHPUnit_Framework_TestCase
     ];
   }
 
-  /**
-   * @dataProvider typeConstraintDataProvider
-   */
-  public function testTypeConstraint($schemaDoc, $targetDoc, $valid) {
-    $schemaDoc = json_decode($schemaDoc);
-    $targetDoc = json_decode($targetDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
-    $this->assertEquals($constraint->validate($targetDoc), $valid);
-  }
-
-  /**
-   * Schema that violate JSON Schema syntax.
-   */
-  public function typeInvalidSchemaDataProvider() {
+  public function invalidConstraintDataProvider() {
     return [
       ['{"type": "OBJECT"}'],
       ['{"type": "numeric"}'],
       ['{"type": ["numeric"]}']
     ];
-  }
-
-  /**
-   * @dataProvider typeInvalidSchemaDataProvider
-   * @expectedException \JsonSchema\Constraint\Exception\ConstraintParseException
-   */
-  public function testInvalidTypeConstraint($schemaDoc) {
-    $schemaDoc = json_decode($schemaDoc);
-    $constraint = EmptyConstraint::build($schemaDoc);
   }
 }

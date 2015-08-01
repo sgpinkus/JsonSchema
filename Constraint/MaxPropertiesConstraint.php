@@ -14,7 +14,7 @@ class MaxPropertiesConstraint extends Constraint
   public function __construct($maxProperties) {
     $this->maxProperties = (int)$maxProperties;
   }
-  
+
   /**
    * @override
    */
@@ -28,7 +28,9 @@ class MaxPropertiesConstraint extends Constraint
   public function validate($doc) {
     $valid = true;
     if(is_object($doc)) {
-      $valid = count((array)$doc) <= $this->maxProperties;
+      if(count((array)$doc) > $this->maxProperties) {
+        $valid = new ValidationError($this, "size of object > {$this->maxProperties}");
+      }
     }
     return $valid;
   }
