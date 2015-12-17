@@ -20,7 +20,7 @@ class JsonRef
   public function __construct(&$srcRef, Uri $jsonRef, $priority) {
     $this->srcRef =& $srcRef;
     $this->jsonRef = $jsonRef;
-    $this->pointer = $jsonRef->fragment ? preg_replace("#\/+#", "/", $jsonRef->fragment) : "/"; // Empty pointer replaced with / (same thing).
+    $this->pointer = $jsonRef->fragment ? preg_replace("#/+#", "/", $jsonRef->fragment) : "/"; // Empty pointer replaced with / (same thing).
     $this->priority = $priority;
   }
 

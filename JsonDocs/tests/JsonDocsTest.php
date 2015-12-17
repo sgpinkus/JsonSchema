@@ -20,27 +20,31 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
   }
 
   /**
-   * Test travesing some doc and collectin JSON Refs as JsonRef objects.
+   * Test travesing some doc and collecting JSON Refs as JsonRef objects.
    */
   public function testFindAndReplaceRefs() {
     $doc = json_decode(self::$basicRefsJson);
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
-    $queue = new JsonRefPriorityQueue();
-    JsonDocs::queueAllRefs($doc, $queue, $uri);
-    $this->assertEquals($queue->count(), 4);
-    $jsonRef1 = $queue->extract();
-    $jsonRef2 = $queue->extract();
-    $jsonRef3 = $queue->extract();
+    $refQueue = new JsonRefPriorityQueue();
+    $refUris = [];
+    $ids = [];
+    JsonDocs::parseDoc($doc, $refQueue, $refUris, $ids, $uri);
+    $this->assertEquals($refQueue->count(), 5);
+    $jsonRef1 = $refQueue->extract();
+    $jsonRef2 = $refQueue->extract();
+    $jsonRef3 = $refQueue->extract();
+    $jsonRef4 = $refQueue->extract();
     $this->assertTrue($jsonRef1 instanceof JsonRef);
     $this->assertTrue($jsonRef2 instanceof JsonRef);
     $this->assertEquals($jsonRef1->getPointer(), '/');
-    $this->assertEquals($jsonRef3->getPointer(), '/C');
+    $this->assertEquals($jsonRef2->getPointer(), 'foo');
+    $this->assertEquals($jsonRef4->getPointer(), '/C');
     $jsonRef1 =& $jsonRef1->getRef();
     $jsonRef2 =& $jsonRef2->getRef();
     $jsonRef1 = "XXX";
     $jsonRef2 = "YYY";
     $this->assertEquals($doc->A, "XXX");
-    $this->assertEquals($doc->C->SomeRef, "YYY");
+    $this->assertEquals($doc->F, "YYY");
   }
 
   /**
