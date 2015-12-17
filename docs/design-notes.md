@@ -1,4 +1,5 @@
-To implement a full functional JSON Schema implementation in PHP. Of those PHP libs listed at http://json-schema.org, https://github.com/justinrainbow/json-schema seemed to be the most full featured. But even this lib only partially implements "$refs" and does not validate the schema its using for validation. There seems to be a number of other open issues with it too.
+# Objective
+To implement a full functional JSON Schema validator in PHP. Of those PHP libs listed at http://json-schema.org, https://github.com/justinrainbow/json-schema seems to be the most full featured. But even this lib only partially implements "$refs" and does not seem to check the validity of the json its using for validation. There seems to be a number of other open issues with it too.
 
 # Major Requirements & Constraints
 The major requirements and constraints are listed in [README.md](/README.md#Overview). Basically I wanted a fully functional simple and elegant class library.
@@ -6,7 +7,7 @@ The major requirements and constraints are listed in [README.md](/README.md#Over
 # Analysis & Design
 
 ## JSON Schema
-Json Schema has a simple and elegant design but some part are ambiguous or at least vulnerable to misinterpretation. Some things to note about JSON Schema:
+Json Schema has a simple and elegant design but some parts are ambiguous or at least vulnerable to misinterpretation. Some things to note about JSON Schema:
 
   1. This is a valid constraint. Its the empty constraint:
 
@@ -19,26 +20,11 @@ Json Schema has a simple and elegant design but some part are ambiguous or at le
         "allOf": [{}]
       }
 
-  3. Certain constraints are recursive. Example the object, and array type constraints, allOf, anyOf.
+  3. Certain constraints are recursive. Example: object, array type constraints, allOf, anyOf.
 
   4. A JSON Schema document can be a mix of JSON defined constraints and arbitrary fields. Its kind of strange but that is how it is. Valid JSON which can be addressed via JSON Pointer can be nested at arbitrary depth in a document. See http://json-schema.org/latest/json-schema-core.html#anchor7.
 
-  5. A given level (by that I mean nesting level in a JSON object) of a valid JSON Schema represents a single constraint on a single value of the target JSON document, except in the case that the level is a sub-level of some other JSON Schema constraint. This is true even for parts of the json schema doc that are not intended to be constraints - since `{}` is a valid constraint. Example given:
-
-      {
-        "SomeSchemas" : {
-          "PartA" { ... },
-          "PartB" { ... }
-        },
-        "MoreSchemas" {
-          "Foo": { ... },
-          "Bah": { ... }
-        }
-      }
-
-    The doc at fragment address `#MoreSchemas` is a constraint equivalent to the empty constraint.
-
-  6. How do we interpret this seemingly contradictory schema?:
+  5. How do we interpret this seemingly contradictory schema?:
 
     {
       "type": "object",
@@ -46,19 +32,48 @@ Json Schema has a simple and elegant design but some part are ambiguous or at le
       "pattern": "foo"
     }
 
-    Upon initial reading of the spec one might draw the conclusion that "minimum" for example is only relevant when "type" is "number" or "integer". That is, "minimum" is a keyword that is only relevant in this circumstance and does not represent a standalone constraint. However this is not the intention of the spec. The above schema specifies 3 constraints. Many constraints are only relevant to certain type. For instance the constraint "minimum" is only relevant to numeric types, and succeeds  (or alternatively is simply ignored) when the type being validated is not numeric. This is specified some what ambiguously in [JSON Schema Validation, Section 4.1](http://json-schema.org/latest/json-schema-validation.html#anchor8).
+    Upon initial reading of the spec one might draw the conclusion that "minimum" for example is only relevant when "type" is "number" or "integer". That is, "minimum" is a keyword that is only relevant in this circumstance and does not represent a standalone constraint. However this is not the intention of the spec. The above schema specifies 3 constraints. Many constraints are only relevant to certain type. For instance the constraint "minimum" is only relevant to numeric types, and is ignored (or equivaliently always succeeds) when the type being validated is not numeric. This is specified some what ambiguously in [JSON Schema Validation, Section 4.1](http://json-schema.org/latest/json-schema-validation.html#anchor8).
 
-## JSON References - Handling $refs
-JSON References reference a value. The entire ref object is replaced by the value. The JSON Schema document and the validator that will be generated from it are separate things. Handling references is done in an initial phase. The generation of a validator is done from a JSON document is done on the in memory deserialized version of a JSON document and has no concept of a JSON $ref. With the exception that where ever a ref occurred there is now a native PHP reference.
+## On "id" JSON Reference & JSON Pointer
+JSON Schema refers to [JSON Reference](http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03) which in turn refers to [JSON Pointer](http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04). JSON Reference defines the semantics of the  `{ $ref: ... }` object. JSON Pointer defines the semantics of pointers which may *only* occur in the *fragment* of a JSON Reference URI. JSON Schema itself states that JSON References are allowed, and additionally defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a $ref object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the "id" field is used to establish the base URI of all decesdent object for which the given id is the closest ancestor id. The URI specification already rigoursly defined an algorithm for ["Establishing a Base URI"](http://tools.ietf.org/html/rfc3986#section-5.1). Unfortunately the JSON Schema specification does not explicitly refer to it. They *do* however state that the id field is URI, and indeed a base URI. So one has to defer to the URI specification where the JSON Schema spec is ambiguous, which is exactly what we do.
 
-## Generating a Parser/Validator
-The implementation is simplified if we allow mutation of the parsed JSON Schema document, pegging the corresponding generated validator code to the document. For two main reasons:
+Long story short. Forget what the spec says here. Its twisted and ambiguous:
 
-  1. We need to support JSON Pointers to arbitrary bit of valid JSON Schema that can be used to validate documents out of context of the original document.
-  2. JSON Pointer leads to references. Its possible, after $refs in the JSON Schema has been resolved, many references to the same part of the document exist. We don't want to generate parser code for each one. Marking up the document with generated code is a simple way of caching the relevant generated code so that next time the document segment is traversed we can detect the previous code and avoid generating it again.
+  * id at the root level if present shall establish a base URI.
+  * Non root id fields shall not establish a new Base URI!
+  * Non root id fields shall be like ids in XSD. That is they can be used by local $refs.
+
+Example:
+
+  {
+    {
+      id: "#foo",
+      ...
+    }
+    {
+      bah: { $ref: "#foo" }
+      ...
+    }
+  }
+
+Does what you think it does. Its already been mulled over here - https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that.
+
+## Parsing JSON References - { $ref: ... }
+Some notes on [JSON Reference](http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03).
+
+  * A JSON Ref has the form `{ $ref: <ref> }`, where <ref> is a valid URI. Everything but `$ref` ub teh reference object is ignored.
+  * A JSON Reference references a value in some JSON document. The entire ref object is replaced by this value.
+
+The JSON Schema document and the validator that will be generated from it, should be treated separate entities. Dereferencing should be done in an initial pass in order to separate concerns. The validator generator need not knwo or care about JSON Reference. Note however, where ever a ref occurred there will be a native PHP reference, so the presence of a reference in the underlying JSON Schema document is detectable in this way.
+
+## Generating a Validator
+The implementation is simplified if we allow mutation of the parsed JSON Schema document in order to "peg" the corresponding generated validator code to the document. For two main reasons:
+
+  1. We need to support JSON Pointers to arbitrary bits of valid JSON Schema that can be used to validate documents out of context of the original document.
+  2. JSON Pointer leads to references. Its possible, after $refs in the JSON Schema have been resolved, that many references to the same part of the document exist. We don't want to generate parser code for each one. Marking up the document with generated code is a simple way of caching the relevant generated code so that next time the document segment is traversed we can detect the previous code and avoid generating it again.
 
 ## Pointers To Validators
-What gets pegged to the document and is thus addressable, what doesn't? JSON Schema is a recursive language. In short only objects are addressable. Given:
+Only objects are addressable via JSON pointer.
 
     { a: { allOf: [{minimum: 3}, {maximum: 4}]}
 
@@ -66,6 +81,8 @@ What gets pegged to the document and is thus addressable, what doesn't? JSON Sch
     /a          VALID
     /a/allOf    INVALID
     /a/allOf/0  VALID
+
+At the target of a pointer, there is always some pegged validator code segment.
 
 ## Validators
 All validators / constraints shall be represented by classes.
@@ -75,4 +92,4 @@ A JSON Document represents a schema. This schema is parsed into a validator. In 
 
 Generating a constraint from a part of a JSON schema doc is done via the static method build(). In general this is because construction need not necessarily be from a document. Tempting to KISS and just stick it in the constructor. Currently I have one concrete use case for not putting the parser logic in the constructor. TypeConstraint reuses a OneOfConstraint. But doing it this way we have an issue of duplicating validation logic between the constructor and the build method.
 
-Let build()  containt all document parsing logic in general. Let the constructor handle validation of it's parameters. There is still an issue with this. The constructor validation may occlude the nature of an exception.
+Let build() contain all document parsing logic in general. Let the constructor handle validation of it's parameters. There is still an issue with this. The constructor validation may occlude the nature of an exception.
