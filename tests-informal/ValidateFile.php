@@ -20,7 +20,7 @@ function main($argc, $argv) {
     print $valid->getName() . ": " .$valid->getMessage() ."\n";
   }
   else {
-    print "OK. $pointer.\n";
+    print "OK.\n";
   }
 }
 

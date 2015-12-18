@@ -6,7 +6,7 @@ use JsonSchema\Constraint\ValidationError;
 /**
  * Represents a validation error, so we can store some context. This is returned by Constraint::validate().
  * Some validation errors have a collection of many child validation errors.
- * I'm betting you can do waht RecursiveTreeIterator with RecursiveIterators somehow with just IteratorAggregate.
+ * You get the child errors if any with getIterator().
  */
 class ValidationError implements \IteratorAggregate
 {

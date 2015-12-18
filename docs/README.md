@@ -43,7 +43,7 @@ Draft v4 compliant JSON Schema validator for PHP.
   * uri
 
 # Usage
-See [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
+See [ValidateFile.php](tests-informal/ValidateFile.php), [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
 
 # TODO
 See [TODO](docs/TODO.md)
