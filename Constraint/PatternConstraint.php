@@ -32,7 +32,7 @@ class PatternConstraint extends Constraint
   public function validate($doc, $context) {
     $valid = true;
     if(is_string($doc) && !preg_match($this->pattern, $doc)) {
-      $valid = new ValidationError($this, "$doc does not match  {$this->pattern}");
+      $valid = new ValidationError($this, "'$doc' does not match '{$this->pattern}'", $context);
     }
     return $valid;
   }

@@ -14,12 +14,20 @@ class ValidationError implements \IteratorAggregate
   private $validationErrors = [];
   private $constraint;
   private $message;
-  private $name;
+  private $constraintName;
+  private $context;
 
-  public function __construct(Constraint $constraint, $message) {
+  /**
+   * Init.
+   * @input $constraint The Constraint that failed.
+   * @input $message string describing how Constraint failed.
+   * @input $context string something to indicate what part of the doc caused the failure.
+   */
+  public function __construct(Constraint $constraint, $message, $context) {
     $this->constraint = $constraint;
     $this->message = $message;
-    $this->name = $constraint->getName();
+    $this->constraintName = $constraint->getName();
+    $this->context = $context;
   }
 
   public function getConstraint() {
@@ -31,7 +39,11 @@ class ValidationError implements \IteratorAggregate
   }
 
   public function getName() {
-    return $this->name;
+    return $this->constraintName;
+  }
+
+  public function getContext() {
+    return $this->context;
   }
 
   public function getIterator() {
@@ -43,7 +55,7 @@ class ValidationError implements \IteratorAggregate
   }
 
   private function toStringRec($depth = 0) {
-    $str = str_repeat("  ", $depth) . $this->getName() . ": " .$this->getMessage() ."\n";
+    $str = str_repeat("  ", $depth) . $this->getContext() . ": constraint:" . $this->getName() . "; message:" .$this->getMessage() ."\n";
     foreach($this->getIterator() as $error) {
       $str .= $error->toStringRec(++$depth);
     }

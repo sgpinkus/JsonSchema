@@ -30,10 +30,10 @@ class MinimumConstraint extends Constraint
     $valid = true;
     if(is_int($doc) || is_float($doc)) {
       if($this->exclusive && $doc <= $this->minimum) {
-        $valid = new ValidationError($this, "$doc <= {$this->minimum}");
+        $valid = new ValidationError($this, "$doc <= {$this->minimum}", $context);
       }
       else if($doc < $this->minimum) {
-        $valid = new ValidationError($this, "$doc < {$this->minimum}");
+        $valid = new ValidationError($this, "$doc < {$this->minimum}", $context);
       }
     }
     return $valid;

@@ -29,7 +29,7 @@ class MinPropertiesConstraint extends Constraint
     $valid = true;
     if(is_object($doc)) {
       if(count((array)$doc) < $this->minProperties) {
-        $valid = new ValidationError($this, "count object < {$this->minProperties}");
+        $valid = new ValidationError($this, "count object < {$this->minProperties}", $context);
       }
     }
     return $valid;

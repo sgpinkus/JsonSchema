@@ -80,8 +80,8 @@ class ItemsConstraint extends Constraint
       }
       // items is a single EmptyConstraint that must validate against all.
       else {
-        foreach($doc as $value) {
-          $validation = $this->items->validate($value);
+        foreach($doc as $i => $value) {
+          $validation = $this->items->validate($value, $i);
           if($validation instanceof ValidationError) {
             $valid = new ValidationError($this, "One ore more items failed validation.", $context);
             if(!$this->continueMode()) {

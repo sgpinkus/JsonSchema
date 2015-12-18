@@ -29,7 +29,7 @@ class MaxPropertiesConstraint extends Constraint
     $valid = true;
     if(is_object($doc)) {
       if(count((array)$doc) > $this->maxProperties) {
-        $valid = new ValidationError($this, "size of object > {$this->maxProperties}");
+        $valid = new ValidationError($this, "size of object > {$this->maxProperties}", $context);
       }
     }
     return $valid;

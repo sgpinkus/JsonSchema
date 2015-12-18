@@ -35,7 +35,7 @@ class UniqueItemsConstraint extends Constraint
       foreach($doc as $v) {
         $sv = serialize($v);
         if(isset($h[$sv])) {
-           $valid = new ValidationError($this, "Non unique item $sv found.");
+           $valid = new ValidationError($this, "Non unique item $sv found.", $context);
            break;
         }
         $h[$sv] = true;

@@ -29,7 +29,7 @@ class MinItemsConstraint extends Constraint
     $valid = true;
     if(is_array($doc)) {
       if(count($doc) < $this->minItems) {
-        $valid = new ValidationError($this, "Number of items < {$this->minItems}");
+        $valid = new ValidationError($this, "Number of items < {$this->minItems}", $context);
       }
     }
     return $valid;

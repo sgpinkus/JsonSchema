@@ -29,7 +29,7 @@ class MaxItemsConstraint extends Constraint
     $valid = true;
     if(is_array($doc)) {
       if(count($doc) > $this->maxItems) {
-        $valid = new ValidationError($this, "Number of items > {$this->maxItems}");
+        $valid = new ValidationError($this, "Number of items > {$this->maxItems}", $context);
       }
     }
     return $valid;

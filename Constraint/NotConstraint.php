@@ -24,9 +24,9 @@ class NotConstraint extends Constraint
    */
   public function validate($doc, $context) {
     $valid = true;
-    $validation = $this->innerConstraint->validate($doc);
+    $validation = $this->innerConstraint->validate($doc, $context);
     if(!$validation instanceof ValidationError) {
-      $valid = new ValidationError($this, "Validation succeed. Expected failure.");
+      $valid = new ValidationError($this, "Validation succeed. Expected failure.", $context);
     }
     return $valid;
   }

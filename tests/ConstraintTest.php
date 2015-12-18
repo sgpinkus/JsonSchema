@@ -27,10 +27,10 @@ abstract class ConstraintTest extends PHPUnit_Framework_TestCase
     $targetDoc = json_decode($targetDoc);
     $constraint = EmptyConstraint::build($schemaDoc);
     if($valid === true) {
-      $this->assertEquals($constraint->validate($targetDoc), true);
+      $this->assertEquals($constraint->validate($targetDoc, ""), true);
     }
     else {
-      $this->assertInstanceOf('\JsonSchema\Constraint\ValidationError', $constraint->validate($targetDoc));
+      $this->assertInstanceOf('\JsonSchema\Constraint\ValidationError', $constraint->validate($targetDoc, ""));
     }
   }
 

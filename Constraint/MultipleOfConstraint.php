@@ -29,14 +29,14 @@ class MultipleOfConstraint extends Constraint
     if(is_int($doc) || is_float($doc)) {
       if($this->divisor == 0) {
         if($doc != 0) {
-          $valid = new ValidationError($this, "$doc not a multiple of 0");
+          $valid = new ValidationError($this, "$doc not a multiple of 0", $context);
         }
       }
       else if(is_int($doc) && $doc%$this->divisor != 0) {
-        $valid = new ValidationError($this, "$doc not a multiple of {$this->divisor}");
+        $valid = new ValidationError($this, "$doc not a multiple of {$this->divisor}", $context);
       }
       else if(is_float($doc) && ($doc/(float)$this->divisor) != round($doc/(float)$this->divisor)) {
-        $valid = new ValidationError($this, "$doc not a multiple of {$this->divisor}");
+        $valid = new ValidationError($this, "$doc not a multiple of {$this->divisor}", $context);
       }
     }
     return $valid;

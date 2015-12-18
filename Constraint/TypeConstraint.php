@@ -32,31 +32,31 @@ class TypeConstraint extends Constraint
     $valid = true;
     switch($this->type) {
       case 'array': {
-        $valid = is_array($doc) ? true : new ValidationError($this, "not an array");
+        $valid = is_array($doc) ? true : new ValidationError($this, "not an array", $context);
         break;
       }
       case 'boolean': {
-        $valid = is_bool($doc) ? true : new ValidationError($this, "not a boolean");
+        $valid = is_bool($doc) ? true : new ValidationError($this, "not a boolean", $context);
         break;
       }
       case 'integer': {
-        $valid = is_int($doc) ? true : new ValidationError($this, "not an integer");
+        $valid = is_int($doc) ? true : new ValidationError($this, "not an integer", $context);
         break;
       }
       case 'number': {
-        $valid = (is_int($doc) || is_float($doc)) ? true : new ValidationError($this, "not a number");
+        $valid = (is_int($doc) || is_float($doc)) ? true : new ValidationError($this, "not a number", $context);
         break;
       }
       case 'null': {
-        $valid = is_null($doc) ? true : new ValidationError($this, "not null");
+        $valid = is_null($doc) ? true : new ValidationError($this, "not null", $context);
         break;
       }
       case 'object': {
-        $valid = is_object($doc) ? true : new ValidationError($this, "not an object");
+        $valid = is_object($doc) ? true : new ValidationError($this, "not an object", $context);
         break;
       }
       case 'string': {
-        $valid = is_string($doc) ? true : new ValidationError($this, "not an string");
+        $valid = is_string($doc) ? true : new ValidationError($this, "not an string", $context);
         break;
       }
     }

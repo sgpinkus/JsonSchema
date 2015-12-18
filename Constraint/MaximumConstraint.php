@@ -31,10 +31,10 @@ class MaximumConstraint extends Constraint
     $valid = true;
     if(is_int($doc) || is_float($doc)) {
       if($this->exclusive && $doc >= $this->maximum) {
-        $valid = new ValidationError($this, "$doc >= {$this->maximum}");
+        $valid = new ValidationError($this, "$doc >= {$this->maximum}", $context);
       }
       else if($doc > $this->maximum) {
-        $valid = new ValidationError($this, "$doc > {$this->maximum}");
+        $valid = new ValidationError($this, "$doc > {$this->maximum}", $context);
       }
     }
     return $valid;

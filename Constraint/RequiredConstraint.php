@@ -32,14 +32,14 @@ class RequiredConstraint extends Constraint
       foreach($this->required as $key) {
         if(!isset($doc->$key)) {
           if(!$this->continueMode()) {
-            $valid = new ValidationError($this, "One or more required properties missing.");
+            $valid = new ValidationError($this, "One or more required properties missing.", $context);
             break;
           }
           $notSet[] = $key;
         }
       }
       if(!empty($notSet)) {
-        $valid = new ValidationError($this, "Required properties missing. " . implode(',', $notSet) . ".");
+        $valid = new ValidationError($this, "Required properties missing. " . implode(',', $notSet) . ".", $context);
       }
     }
     return $valid;
