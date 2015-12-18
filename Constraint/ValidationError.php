@@ -7,6 +7,7 @@ use JsonSchema\Constraint\ValidationError;
  * Represents a validation error, so we can store some context. This is returned by Constraint::validate().
  * Some validation errors have a collection of many child validation errors.
  * You get the child errors if any with getIterator().
+ * @todo need to be able to print better context for errors.
  */
 class ValidationError implements \IteratorAggregate
 {
@@ -35,6 +36,18 @@ class ValidationError implements \IteratorAggregate
 
   public function getIterator() {
     return new \ArrayIterator($this->validationErrors);
+  }
+
+  public function __toString() {
+    return $this->toStringRec();
+  }
+
+  private function toStringRec($depth = 0) {
+    $str = str_repeat("  ", $depth) . $this->getName() . ": " .$this->getMessage() ."\n";
+    foreach($this->getIterator() as $error) {
+      $str .= $error->toStringRec(++$depth);
+    }
+    return $str;
   }
 
   public function addChild(ValidationError $child) {
