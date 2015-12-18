@@ -22,17 +22,24 @@ class EnumConstraint extends Constraint
   }
 
   /**
+   * @bug does not work for object because compare is by ref.
    * @override
    */
   public function validate($doc, $context) {
-    $valid = new ValidationError($this, "Value not in enumeration.");
-    foreach($this->values() as $constraint) {
-      if($constraint->validate()) {
-        $valid = true;
-        break;
-      }
+    $valid = true;
+    if(!in_array($doc, $this->values)) {
+      $docStr = self::varDump($doc);
+      $enumStr = self::varDump($this->values);
+      $valid = new ValidationError($this, "Value '$docStr' not in enumeration '$enumStr'.", $context);
     }
     return $valid;
+  }
+
+  /**
+   * @todo more robust.
+   */
+  public static function varDump($var) {
+    return json_encode($var);
   }
 
   /**
