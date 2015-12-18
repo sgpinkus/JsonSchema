@@ -13,14 +13,13 @@ abstract class Constraint
   private $continueMode = false;
 
   /**
-   * @returns Mixed true|Validation depending on whether the doc validates|doesnt on this symbol.
+   * @returns Mixed true|ValidationError depending on whether the doc validates|doesnt on this symbol.
    */
   public abstract function validate($doc);
 
   /**
    * Parse the docs into a symbols. The $doc input may be mutated/marked up.
-   * Some constraints are dependent on other constraints occuring in same level.
-   * Example minimum, minimumExclusive. Thus need to provide context to build.
+   * $context is needed since some constraints are dependent on other constraints occuring in same level. Example minimum, minimumExclusive.
    * @input $doc Mixed JSON schema document data structure.
    * @input $context Mixed the context $doc was found in.
    * @returns Constraint.

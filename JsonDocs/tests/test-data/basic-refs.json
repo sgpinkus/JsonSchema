@@ -3,5 +3,7 @@
   "B": [ { "$ref": "#/C" }, 1, 2, 3 ],
   "C1": [ { "$ref": "#/D" }, 1, 2, 3 ],
   "C": {"Value": "C-Value", "SomeRef": { "$ref": "#"}},
-  "D": {"Value": "D-Value"}
+  "D": {"Value": "D-Value"},
+  "E": { "id": "foo", "Value": "E-Value" },
+  "F": { "$ref": "#foo" }
 }

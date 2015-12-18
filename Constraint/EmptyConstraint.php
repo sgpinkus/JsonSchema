@@ -15,7 +15,7 @@ class EmptyConstraint extends Constraint
 		return '{}';
 	}
 
-  /** map of valid empty constraint properties to symbols/constraint class names. */
+  /** Map of valid empty constraint properties to symbols/constraint class names. */
   private static $childSymbols = [
     'allOf' => 'JsonSchema\Constraint\AllOfConstraint',
     'anyOf' => 'JsonSchema\Constraint\AnyOfConstraint',
@@ -52,7 +52,7 @@ class EmptyConstraint extends Constraint
 
   /**
    * Validate some JSON doc against this symbol.
-   * Although its nto clearly stated in the spec, all child constraints must pass. I.e. its an allOf.
+   * Although its not clearly stated in the spec, all child constraints must pass. I.e. its an allOf.
    * @override
    */
   public function validate($doc) {
@@ -81,34 +81,36 @@ class EmptyConstraint extends Constraint
   public static function build($doc, $context = null) {
     $propertyHit = false;
     $codeKey = '$code';
-    $childConstraints = [];
     $constraint = new EmptyConstraint([]);
 
-    if(is_object($doc)) {
-      $doc->$codeKey = $constraint;
-    }
     if(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
     }
-    foreach($doc as $property => $value) {
-      if(self::skipProperty($property)) {
-        continue;
-      }
-      else {
-        if(isset(self::$childSymbols[$property])) {
-          $symbolClass = self::$childSymbols[$property];
-          $newSymbol = $symbolClass::build($value, $doc);
-          $newSymbol->setContext($doc);
-          $childConstraints[] = $newSymbol;
-        }
-        else if(is_object($value) && !isset($value->$codeKey)) {
-          // For every property that is not a valid constraint build more JSON Schema on it.
-          self::build($value, $doc);
-        }
-      }
+    if(isset($doc->$codeKey)) {
+      $constraint = $doc->$codeKey;
     }
-
-    $constraint->childConstraints = $childConstraints;
+    else {
+      $doc->$codeKey = $constraint;
+      $childConstraints = [];
+      foreach($doc as $property => $value) {
+        if(self::skipProperty($property)) {
+          continue;
+        }
+        else {
+          if(isset(self::$childSymbols[$property])) {
+            $symbolClass = self::$childSymbols[$property];
+            $newSymbol = $symbolClass::build($value, $doc);
+            $newSymbol->setContext($doc);
+            $childConstraints[] = $newSymbol;
+          }
+          else if(is_object($value) && !isset($value->$codeKey)) {
+            // For every property that is not a valid constraint build more JSON Schema on it.
+            self::build($value, $doc);
+          }
+        }
+      }
+      $constraint->childConstraints = $childConstraints;
+    }  
     return $constraint;
   }
 

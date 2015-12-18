@@ -10,7 +10,7 @@ function testIt(JsonSchema $schema, $doc, $pointer = "/") {
   $valid = $schema->validate($doc, $pointer);
   if($valid instanceof ValidationError) {
     print "Validation Failed:\n";
-    print $valid->getName() . ": " .$valid->getMessage() ."\n";
+    print $valid;
   }
   else {
     print "OK. $pointer.\n";

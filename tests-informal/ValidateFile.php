@@ -17,10 +17,10 @@ function main($argc, $argv) {
   $valid = $schema->validate($target);
   if($valid instanceof ValidationError) {
     print "Validation Failed:\n";
-    print $valid->getName() . ": " .$valid->getMessage() ."\n";
+    print $valid;
   }
   else {
-    print "OK. $pointer.\n";
+    print "OK.\n";
   }
 }
 

@@ -10,10 +10,13 @@ use JsonDocs\Uri;
  */
 class JsonSchemaTest extends PHPUnit_Framework_TestCase
 {
+  /**
+   * Basic test. Whether the user object is valid is listed in the loaded JSON doc.
+   */
   public function testJsonSchema() {
-    $jsonDocs = new JsonDocs(new JsonLoader());
-    $schemaDoc = $jsonDocs->get(new Uri("file://" . getenv('DATADIR') . '/user-schema.json'));
-    $targetDoc = $jsonDocs->get(new Uri("file://" . getenv('DATADIR') . '/user.json'));
+    $jsonDocs = new JsonDocs();
+    $schemaDoc = $jsonDocs->get(new Uri("file:///user-schema.json"), json_decode( file_get_contents(getenv('DATADIR') . '/user-schema.json')));
+    $targetDoc = $jsonDocs->get(new Uri("file:///user.json"), json_decode(file_get_contents(getenv('DATADIR') . '/user.json')));
     $schema = new JsonSchema($schemaDoc);
     foreach($targetDoc->users as $user) {
       $valid = $schema->validate($user);
