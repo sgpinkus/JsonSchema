@@ -38,8 +38,9 @@ class JsonDocs implements \IteratorAggregate
    * Get a reference to a deserialized, dereferenced JSON document data structure.
    * Fragment part of URIs is silently ignored.
    * Use the optional $doc parameter if you've already loaded and decoded the document but still need to deref it.
+   * Note any type will be accepted in $doc because decoded JSON can be any type.
    * @input $uri Uri an absolute URI.
-   * @input $doc Mixed optional JSON document structure.
+   * @input $doc mixed optional JSON document structure.
    * @returns mixed reference to the loaded JSON object data structure.
    * @throws JsonLoaderException, JsonDecodeException, JsonCacheException
    */
@@ -188,7 +189,7 @@ class JsonDocs implements \IteratorAggregate
         if(self::getId($value) && self::isJsonRef($value)) {
           throw new JsonReferenceException("Illegal JSON Schema. An object may not have both of 'id' and '\$ref'");
         }
-        elseif(self::getId($value)) {
+        elseif($key != "properties" && self::getId($value)) { // An "id" is not a keyword in some contexts (properties AFAICT).
           $id = self::getId($value);
           if(isset($identities[$id])) {
             throw new JsonReferenceException("Duplicate id '$id' found");

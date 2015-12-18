@@ -56,6 +56,18 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-refs.json'));
   }
 
+
+  /**
+   * We better at least be able to load the JSON Schema schema.
+   */
+  public function testJsonSchemaSchema() {
+    $this->assertEquals(true, true);
+    $jsonDocs = new JsonDocs();
+    $docUri = "file://" . getenv('DATADIR') . '/schema.json';
+    $doc = file_get_contents($docUri);
+    $schemaDoc = $jsonDocs->get(new Uri($docUri), $doc);
+  }
+
   /**
    * Test static getPointer(). Work on any doc.
    */
@@ -144,8 +156,18 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    * Test ref to ref chain.
    * @expectedException \JsonDocs\Exception\JsonReferenceException
    */
-   public function testJsonDocsRefChain() {
+  public function testJsonDocsRefChain() {
     $cache = new JsonDocs(new JsonLoader());
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-ref-to-ref.json'));
-   }
+  }
+
+  /**
+   * Test ref to ref chain.
+   * @expectedException \JsonDocs\Exception\ResourceNotFoundException
+   */
+  public function testUseOfId() {
+    $cache = new JsonDocs(new JsonLoader());
+    $cache->get(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json'));
+    $cache->pointer(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json#fooey'));
+  }
 }
