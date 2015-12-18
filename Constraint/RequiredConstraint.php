@@ -25,7 +25,7 @@ class RequiredConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $notSet = [];
     $valid = true;
     if(is_object($doc)) {

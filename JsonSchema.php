@@ -36,6 +36,6 @@ class JsonSchema
       }
       $schema = $schema->$code;
     }
-    return $schema->validate($doc);
+    return $schema->validate($doc, "");
   }
 }

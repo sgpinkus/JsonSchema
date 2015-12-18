@@ -25,7 +25,7 @@ class MinLengthConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     if(is_string($doc)) {
       if(strlen($doc) < $this->minLength) {

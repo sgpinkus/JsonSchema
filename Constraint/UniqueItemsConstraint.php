@@ -28,7 +28,7 @@ class UniqueItemsConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     if(is_array($doc) && $this->unique) {
       $h = [];

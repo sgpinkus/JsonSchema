@@ -28,7 +28,7 @@ class TypeConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     switch($this->type) {
       case 'array': {

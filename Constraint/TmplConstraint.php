@@ -11,7 +11,7 @@ class TmplConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     return true;
   }
 

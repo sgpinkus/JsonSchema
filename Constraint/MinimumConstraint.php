@@ -26,7 +26,7 @@ class MinimumConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     if(is_int($doc) || is_float($doc)) {
       if($this->exclusive && $doc <= $this->minimum) {

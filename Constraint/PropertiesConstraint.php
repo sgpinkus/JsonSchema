@@ -35,20 +35,20 @@ class PropertiesConstraint extends Constraint
    * Properties only apply if the property is defined on the target.
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     if(is_object($doc)) {
       $arrayDoc = (array)$doc;
       if($this->additionalProperties == false && sizeof($arrayDoc) > sizeof($this->properties)) {
-        $valid = new ValidationError($this, "No additional properties allowed");
+        $valid = new ValidationError($this, "No additional properties allowed", $context);
       }
       else {
         foreach($this->properties as $i => $constraint) {
           if(isset($arrayDoc[$i])) {
-            $validation = $constraint->validate($arrayDoc[$i]);
+            $validation = $constraint->validate($arrayDoc[$i], $i);
             if($validation instanceof ValidationError) {
               if($valid === true) {
-                $valid = new ValidationError($this, "One or more properties failed to validate.");
+                $valid = new ValidationError($this, "One or more properties failed to validate.", $context);
               }
               if(!$this->continueMode()) {
                 break;
@@ -62,10 +62,10 @@ class PropertiesConstraint extends Constraint
       if($valid == true && is_object($this->additionalProperties)) {
         foreach($arrayDoc as $i => $value) {
           if(!isset($this->properties[$i])) {
-            $validation = $this->additionalProperties->validate($arrayDoc[$i]);
+            $validation = $this->additionalProperties->validate($arrayDoc[$i], $i);
             if($validation instanceof ValidationError) {
               if($valid === true) {
-                $valid = new ValidationError($this, "One or more additional items failed validation.");
+                $valid = new ValidationError($this, "One or more additional items failed validation.", $context);
               }
               if(!$this->continueMode()) {
                 break;

@@ -15,7 +15,7 @@ abstract class Constraint
   /**
    * @returns Mixed true|ValidationError depending on whether the doc validates|doesnt on this symbol.
    */
-  public abstract function validate($doc);
+  public abstract function validate($doc, $context);
 
   /**
    * Parse the docs into a symbols. The $doc input may be mutated/marked up.

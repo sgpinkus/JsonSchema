@@ -22,7 +22,7 @@ class NotConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     $validation = $this->innerConstraint->validate($doc);
     if(!$validation instanceof ValidationError) {

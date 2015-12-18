@@ -24,7 +24,7 @@ class EnumConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = new ValidationError($this, "Value not in enumeration.");
     foreach($this->values() as $constraint) {
       if($constraint->validate()) {

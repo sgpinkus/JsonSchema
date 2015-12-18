@@ -17,7 +17,7 @@ class OneOfConstraint extends SomeOfConstraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = new ValidationError($this, "No constraints passed. Exactly one required.");
     $countOf = 0;
     foreach($this->childConstraints as $constraint) {

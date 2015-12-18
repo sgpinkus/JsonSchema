@@ -25,7 +25,7 @@ class MaxPropertiesConstraint extends Constraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     if(is_object($doc)) {
       if(count((array)$doc) > $this->maxProperties) {

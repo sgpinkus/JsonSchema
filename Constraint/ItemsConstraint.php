@@ -38,20 +38,20 @@ class ItemsConstraint extends Constraint
    * Further more, note additionalItems is only relevant when items is an array.
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     if(is_array($doc)) {
       if(is_array($this->items)) {
         if($this->additionalItems == false && sizeof($doc) > sizeof($this->items)) {
-          $valid = new ValidationError($this, "No additional items allowed");
+          $valid = new ValidationError($this, "No additional items allowed", $context);
         }
         else {
           foreach($this->items as $i => $constraint) {
             if(isset($doc[$i])) {
-              $validation = $constraint->validate($doc[$i]);
+              $validation = $constraint->validate($doc[$i], $i);
               if($validation instanceof ValidationError) {
                 if($valid === true) {
-                  $valid = new ValidationError($this, "One or more items failed to validate.");
+                  $valid = new ValidationError($this, "One or more items failed to validate.", $context);
                 }
                 if(!$this->continueMode()) {
                   break;
@@ -65,10 +65,10 @@ class ItemsConstraint extends Constraint
         if($valid === true && is_object($this->additionalItems)) {
           $additionalIndex = sizeof($items);
           for($i = sizeof($items); $i < sizeof($doc); $i++) {
-            $validation = $this->additionalItems->validate($doc[$i]);
+            $validation = $this->additionalItems->validate($doc[$i], $i);
             if($validation instanceof ValidationError) {
               if($valid === true) {
-                $valid = new ValidationError($this, "One or more additional items failed validation.");
+                $valid = new ValidationError($this, "One or more additional items failed validation.", $context);
               }
               if(!$this->continueMode()) {
                 break;
@@ -83,7 +83,7 @@ class ItemsConstraint extends Constraint
         foreach($doc as $value) {
           $validation = $this->items->validate($value);
           if($validation instanceof ValidationError) {
-            $valid = new ValidationError($this, "One ore more items failed validation.");
+            $valid = new ValidationError($this, "One ore more items failed validation.", $context);
             if(!$this->continueMode()) {
               break;
             }

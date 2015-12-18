@@ -17,13 +17,13 @@ class AllOfConstraint extends SomeOfConstraint
   /**
    * @override
    */
-  public function validate($doc) {
+  public function validate($doc, $context) {
     $valid = true;
     foreach($this->childConstraints as $constraint) {
-      $validation = $constraint->validate($doc);
+      $validation = $constraint->validate($doc, $context);
       if($validation instanceof ValidationError) {
         if($valid === true) {
-          $valid = new ValidationError($this, "Not all constraints passed. All required to pass.");
+          $valid = new ValidationError($this, "Not all constraints passed. All required to pass.", $context);
         }
         $valid->addChild($validation);
         if(!$this->continueMode()) {
