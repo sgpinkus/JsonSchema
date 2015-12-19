@@ -1,12 +1,15 @@
 # Objective
-To implement a full functional JSON Schema validator in PHP. Of those PHP libs listed at http://json-schema.org, https://github.com/justinrainbow/json-schema seems to be the most full featured. But even this lib only partially implements "$refs" and does not seem to check the validity of the json its using for validation. There seems to be a number of other open issues with it too.
+To implement a full functional JSON Schema validator in PHP.
+
+#  Analysis of Alternatives
+Of those PHP libs listed at http://json-schema.org, https://github.com/justinrainbow/json-schema seems to be the most full featured. But even this lib only partially implements "$refs" and does not seem to check the validity of the json its using for validation. There seems to be a number of other open issues with it too.
 
 # Major Requirements & Constraints
 The major requirements and constraints are listed in [README.md](/README.md#Overview). Basically I wanted a fully functional simple and elegant class library.
 
 # Analysis & Design
 
-## JSON Schema
+## On JSON Schema
 Json Schema has a simple and elegant design but some parts are ambiguous or at least vulnerable to misinterpretation. Some things to note about JSON Schema:
 
   1. This is a valid constraint. Its the empty constraint:
