@@ -17,27 +17,26 @@ class EmptyConstraint extends Constraint
 
   /** Map of valid empty constraint properties to symbols/constraint class names. */
   private static $childSymbols = [
-    'allOf' => 'JsonSchema\Constraint\AllOfConstraint',
-    'anyOf' => 'JsonSchema\Constraint\AnyOfConstraint',
-    'oneOf' => 'JsonSchema\Constraint\OneOfConstraint',
-    'enum' => 'JsonSchema\Constraint\EnumConstraint',
-    'type' => 'JsonSchema\Constraint\TypeConstraint',
-    'not' => 'JsonSchema\Constraint\NotConstraint',
-    'minimum' => 'JsonSchema\Constraint\MinimumConstraint',
-    'maximum' => 'JsonSchema\Constraint\MaximumConstraint',
-    'multipleOf' => 'JsonSchema\Constraint\MultipleOfConstraint',
-    'minLength' => 'JsonSchema\Constraint\MinLengthConstraint',
-    'maxLength' => 'JsonSchema\Constraint\MaxLengthConstraint',
-    'pattern' => 'JsonSchema\Constraint\PatternConstraint',
-    'minItems' => 'JsonSchema\Constraint\MinItemsConstraint',
-    'maxItems' => 'JsonSchema\Constraint\MaxItemsConstraint',
-    'items' => 'JsonSchema\Constraint\ItemsConstraint',
-    'uniqueItems' => 'JsonSchema\Constraint\UniqueItemsConstraint',
-    'minProperties' => 'JsonSchema\Constraint\MinPropertiesConstraint',
-    'maxProperties' => 'JsonSchema\Constraint\MaxPropertiesConstraint',
-    'required' => 'JsonSchema\Constraint\RequiredConstraint',
-    'properties' => 'JsonSchema\Constraint\PropertiesConstraint',
-    'patternProperties' => 'JsonSchema\Constraint\PatternPropertiesConstraint',
+    'JsonSchema\Constraint\AllOfConstraint',
+    'JsonSchema\Constraint\AnyOfConstraint',
+    'JsonSchema\Constraint\OneOfConstraint',
+    'JsonSchema\Constraint\EnumConstraint',
+    'JsonSchema\Constraint\TypeConstraint',
+    'JsonSchema\Constraint\NotConstraint',
+    'JsonSchema\Constraint\MinimumConstraint',
+    'JsonSchema\Constraint\MaximumConstraint',
+    'JsonSchema\Constraint\MultipleOfConstraint',
+    'JsonSchema\Constraint\MinLengthConstraint',
+    'JsonSchema\Constraint\MaxLengthConstraint',
+    'JsonSchema\Constraint\PatternConstraint',
+    'JsonSchema\Constraint\MinItemsConstraint',
+    'JsonSchema\Constraint\MaxItemsConstraint',
+    'JsonSchema\Constraint\ItemsConstraint',
+    'JsonSchema\Constraint\UniqueItemsConstraint',
+    'JsonSchema\Constraint\MinPropertiesConstraint',
+    'JsonSchema\Constraint\MaxPropertiesConstraint',
+    'JsonSchema\Constraint\RequiredConstraint',
+    'JsonSchema\Constraint\PropertiesConstraint'
   ];
   /** All the constraints that are found in the given object. */
   private $childConstraints = [];
@@ -73,12 +72,13 @@ class EmptyConstraint extends Constraint
   }
 
   /**
-   * Build the constraint. Recursively.
+   * Build empty constraint recursively.
+   * Any keys not caught by loaded symbols are also built if they are valid JSON Schema.
    * @input $doc the JSON Schema document structure. This document is marked up with code.
    * @throws SymbolParseException.
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($doc) {
     $propertyHit = false;
     $codeKey = '$code';
     $constraint = new EmptyConstraint([]);
@@ -92,21 +92,21 @@ class EmptyConstraint extends Constraint
     else {
       $doc->$codeKey = $constraint;
       $childConstraints = [];
-      foreach($doc as $property => $value) {
-        if(self::skipProperty($property)) {
-          continue;
+      $remainingKeys = array_keys((array)$doc); // init collection of keys not handled by a symbol.
+      foreach(self::$childSymbols as $symbol) {
+        if($symbol::wants($doc, $remainingKeys)) {
+          $newSymbol = $symbol::build($doc);
+          $newSymbol->setContext($doc);
+          $childConstraints[] = $newSymbol;
+          $remainingKeys = self::removeCaughtKeys($remainingKeys, $symbol::getKeys());
+          if(!self::keysLeft($remainingKeys)) {
+            break;
+          }
         }
-        else {
-          if(isset(self::$childSymbols[$property])) {
-            $symbolClass = self::$childSymbols[$property];
-            $newSymbol = $symbolClass::build($value, $doc);
-            $newSymbol->setContext($doc);
-            $childConstraints[] = $newSymbol;
-          }
-          else if(is_object($value) && !isset($value->$codeKey)) {
-            // For every property that is not a valid constraint build more JSON Schema on it.
-            self::build($value, $doc);
-          }
+      }
+      foreach($remainingKeys as $key) {
+        if(is_object($doc->$key) && !self::skipProperty($key)) {
+          self::build($doc);
         }
       }
       $constraint->childConstraints = $childConstraints;
@@ -115,10 +115,29 @@ class EmptyConstraint extends Constraint
   }
 
   /**
+   * Remove keys that a constraint bulit on, so they are not treated as EmptyConstraints.
+   */
+  public static function removeCaughtKeys(array $remainingKeys, array $caughtKeys) {
+    return array_diff($remainingKeys, $caughtKeys);
+  }
+
+  /**
+   * Test if we need to keep asking symbols to parse object.
+   */
+  public static function keysLeft(array $remainingKeys) {
+    foreach($remainingKeys as $key) {
+      if(!self::skipProperty($key)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Don't try and expand anything beginning with $ and id.
    * Not standard but no harm done really.
    */
   public static function skipProperty($name) {
-    return (strpos($name, '$') === 0 || $name == 'id');
+    return (strpos($name, '$') === 0);
   }
 }

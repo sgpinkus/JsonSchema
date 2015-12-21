@@ -2,9 +2,15 @@
 require_once '../loader.php';
 use JsonSchema\Constraint\EmptyConstraint;
 $schemaDoc = '{
-  "oneOf": [{},{},{}]
+  "anyOf": [{},{},{}]
 }';
 $targetDoc = '{}';
 $schemaDoc = json_decode($schemaDoc);
 $constraint = EmptyConstraint::build($schemaDoc);
-var_dump($constraint->validate($targetDoc));
+$valid = $constraint->validate($targetDoc, "");
+if($valid === true) {
+  print "OK\n";
+}
+else {
+  print $valid;
+}

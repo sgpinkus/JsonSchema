@@ -42,7 +42,8 @@ class MinimumConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
+    $doc = $context->minimum;
     if(!(is_int($doc) || is_float($doc))) {
       throw new ConstraintParseException('The value of "minimum" MUST be a JSON number.');
     }

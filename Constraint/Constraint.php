@@ -13,23 +13,52 @@ abstract class Constraint
   private $continueMode = false;
 
   /**
+   * @input $doc Mixed the vale to valid.
+   * @input $context String the name or label of the value if appropriate.
    * @returns Mixed true|ValidationError depending on whether the doc validates|doesnt on this symbol.
    */
   public abstract function validate($doc, $context);
 
   /**
-   * Parse the docs into a symbols. The $doc input may be mutated/marked up.
+   * Parse the docs into a symbols.
+   * Note the $doc input may be mutated/marked up in process of building. All mutations are additive and shall be stored in properties named "^\$.*"
    * $context is needed since some constraints are dependent on other constraints occuring in same level. Example minimum, minimumExclusive.
-   * @input $doc Mixed JSON schema document data structure.
-   * @input $context Mixed the context $doc was found in.
+   * @input $context Mixed the context the targe was found in.
    * @returns Constraint.
    */
-  public static abstract function build($doc, $context = null);
+  public static abstract function build($context);
 
   /**
    * Get the name / keyword of the constraint. All constraints have a unique one.
    */
   public static abstract function getName();
+
+  /**
+   * Get the JSON Schema keywords this symbol parses.
+   * Convenience default impl. May not be applicable.
+   * @returns Array of JSON Schema keywords this constraint parses.
+   */
+  public static function getKeys() {
+    $name = [static::getName()];
+    return $name;
+  }
+
+  /**
+   * Can we build a constraint?
+   * Convenience default impl. May not be applicable.
+   * @input StdClass the document at the given level.
+   * @input Array the keys of the doc at that level. An optimization.
+   */
+  public static function wants($doc, array $docKeys) {
+    $wants = false;
+    foreach(static::getKeys() as $symbol) {
+      if(in_array($symbol, $docKeys)) {
+        $wants = true;
+        break;
+      }
+    }
+    return $wants;
+  }
 
   /**
    * A constraint exists in the context of a JSON Schema document.

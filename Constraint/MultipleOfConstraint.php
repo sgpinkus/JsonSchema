@@ -45,7 +45,8 @@ class MultipleOfConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
+    $doc = $context->multipleOf;
     if(!(is_int($doc) || is_float($doc))) {
       throw new ConstraintParseException('The value of "multipleOf" MUST be a JSON number.');
     }

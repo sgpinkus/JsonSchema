@@ -52,7 +52,8 @@ class EnumConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
+    $doc = $context->enum;
     if(!is_array($doc)) {
       throw new ConstraintParseException('This keyword\'s value MUST be an array');
     }

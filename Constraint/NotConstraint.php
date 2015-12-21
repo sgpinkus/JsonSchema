@@ -34,7 +34,7 @@ class NotConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
-    return new static(EmptyConstraint::build($doc));
+  public static function build($context) {
+    return new static(EmptyConstraint::build($context));
   }
 }

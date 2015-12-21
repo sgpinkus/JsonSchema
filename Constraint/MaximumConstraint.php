@@ -43,7 +43,8 @@ class MaximumConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
+    $doc = $context->maximum;
     if(!(is_int($doc) || is_float($doc))) {
       throw new ConstraintParseException('The value of "maximum" MUST be a JSON number.');
     }

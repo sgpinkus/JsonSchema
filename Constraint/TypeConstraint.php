@@ -73,8 +73,9 @@ class TypeConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
     $constraint = null;
+    $doc = $context->type;
 
     if(!(is_array($doc) || is_string($doc))) {
       throw new ConstraintParseException('The value MUST be either a string or an array.');

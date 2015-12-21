@@ -38,7 +38,8 @@ class MaxLengthConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
+    $doc = $context->maxLength;
     if(!is_int($doc)) {
       throw new ConstraintParseException('The value MUST be an integer.');
     }

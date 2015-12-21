@@ -5,8 +5,11 @@ use JsonSchema\Constraint\Constraint;
 use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
- * All three properties constraints.
- * These three constraints are interelated so cannot be addressed independently - bit of a PITA.
+ * All three properties related constraints.
+ * These three constraints are interelated so cannot be addressed independently - bit of a PITA really.
+ * This implementation treats true, {} as equivalent valus of additionalProperties.
+ * This may or may not deviat from the spec, but is more logical and intuitive than any alternate interpretation.
+ * @see http://json-schema.org/latest/json-schema-validation.html#anchor64
  */
 class PropertiesConstraint extends Constraint
 {
@@ -28,13 +31,20 @@ class PropertiesConstraint extends Constraint
    * @override
    */
   public static function getName() {
-    return '[properties, patternProperties, additionalProperties]';
+    return "['properties', 'patternProperties', 'additionalProperties']";
+  }
+
+  /**
+   * @override
+   */
+  public static function getKeys() {
+    return ['properties', 'patternProperties', 'additionalProperties'];
   }
 
   /**
    * Ensure properties of object match given constraints.
    * Properties only apply if the property is defined on the target.
-   * Minor issue: in continueMode first error becomes the parent error, while following errors push onto it.
+   * @bug Minor. In continueMode first error becomes the parent error, while following errors push onto it.
    * @override
    */
   public function validate($doc, $context) {
@@ -110,12 +120,15 @@ class PropertiesConstraint extends Constraint
    * properties, additionalProperties, or patternProperties must be set in context.
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
     $constraints = [];
-    $properties = null;
-    $patternProperties = null;
-    $additionalProperties = null;
+    $properties = [];
+    $patternProperties = [];
+    $additionalProperties = true;
 
+    if(!(isset($context->properties) || isset($context->patternProperties) || isset($context->additionalProperties))) {
+      throw new ConstraintParseException('One of properties, additionalProperties, or patternProperties must be set for PropertiesConstraint.');
+    }
     if(isset($context->properties)) {
       $properties = self::buildPropertyConstraints($context->properties);
     }
@@ -124,9 +137,6 @@ class PropertiesConstraint extends Constraint
     }
     if(isset($context->additionalProperties)) {
       $additionalProperties = self::buildAdditionalPropertyConstraints($context->additionalProperties);
-    }
-    if(!(isset($properties) || isset($patternProperties) || isset($additionalProperties))) {
-      throw new ConstraintParseException('One of properties, additionalProperties, or patternProperties must be set for PropertiesConstraint.');
     }
     return new static($properties, $patternProperties, $additionalProperties);
   }
@@ -139,7 +149,7 @@ class PropertiesConstraint extends Constraint
     if(!is_object($properties)) {
       throw new ConstraintParseException('The value MUST be an object.');
     }
-    foreach($doc as $key => $value) {
+    foreach($properties as $key => $value) {
       $constraints[$key] = EmptyConstraint::build($value);
     }
     return $constraints;
@@ -153,7 +163,7 @@ class PropertiesConstraint extends Constraint
     if(!is_object($properties)) {
       throw new ConstraintParseException('The value MUST be an object.');
     }
-    foreach($doc as $key => $value) {
+    foreach($properties as $key => $value) {
       if(preg_match($key, "0") === false) {
         throw new ConstraintParseException("The keys of 'patternProperties' must be valid regexps.");
       }
@@ -166,11 +176,11 @@ class PropertiesConstraint extends Constraint
    *
    */
   public static function buildAdditionalPropertyConstraints($additionalProperties) {
-    $constraint = false;
+    $constraint = true;
     if(is_bool($additionalProperties)) {
       $constraint = $additionalProperties;
     }
-    elseif(is_object($properties)) {
+    elseif(is_object($additionalProperties)) {
       $constraint = EmptyConstraint::build($additionalProperties);
     }
     else {

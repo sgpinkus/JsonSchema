@@ -18,7 +18,9 @@ class TmplConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
+    $name = static::getName();
+    $doc = $context->$name;
     if(!is_string($doc)) {
       throw new ConstraintParseException('The value MUST be a string.');
     }

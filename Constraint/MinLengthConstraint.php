@@ -38,7 +38,8 @@ class MinLengthConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
+    $doc = $context->minLength;
     if(!is_int($doc)) {
       throw new ConstraintParseException('The value MUST be an integer.');
     }

@@ -4,22 +4,28 @@ use JsonSchema\Constraint\EmptyConstraint;
 use JsonSchema\Constraint\ValidationError;
 
 $schemaDocs = [
-  '{"oneOf": [{},{}]}',
-  '{"oneOf": [{"type": "number"},{"type": "string"}]}',
-  '{"anyOf": [{"type": "number"},{"type": "string"}]}',
-  '{"anyOf": [{"type": "number"},{"type": "object"}]}',
-  '{"allOf": [{"type": "number"},{"type": "string"}]}'
+  ['{"anyOf": [{},{}], "fooey": {"minimum": 99}}', '{}'],
+  ['{"allOf": [{},{}]}', '{}'],
+  ['{"oneOf": [{},{}]}', '{}'],
+  ['{"anyOf": [{"minimum": 0}, {"maximum": 5}]}', -1],
+  ['{"allOf": [{"minimum": 0}, {"maximum": 5}]}', -1],
+  ['{"oneOf": [{"minimum": 0}, {"maximum": 5}]}', -1],
+  ['{"anyOf": [{"minimum": 0}, {"maximum": 5}]}', 1],
+  ['{"allOf": [{"minimum": 0}, {"maximum": 5}]}', 1],
+  ['{"oneOf": [{"minimum": 0}, {"maximum": 5}, {"fooey": {}}]}', 1],
 ];
-$targetDoc = '{}';
-foreach($schemaDocs as $schemaDoc) {
-  $schemaDoc = json_decode($schemaDoc);
+for($i = 0; $i < count($schemaDocs); $i++) {
+  $doc = $schemaDocs[$i];
+  $schemaDoc = json_decode($doc[0]);
+  $targetDoc = json_decode($doc[1]);
   $constraint = EmptyConstraint::build($schemaDoc);
-  $validation = $constraint->validate($targetDoc);
-  if($validation instanceof ValidationError) {
-    print "Error: \n";
-    print "  {$validation->getConstraint()->getName()}: {$validation->getMessage()}\n";
-    foreach($validation as $v) {
-      print "    {$v->getConstraint()->getName()}: {$v->getMessage()}\n";
-    }
+  $valid = $constraint->validate($doc[1], "");
+  print "$i: {$doc[0]} {$doc[1]}:\n";
+  if($valid === true) {
+    print "OK\n";
   }
+  else {
+    print $valid;
+  }
+  print "\n";
 }

@@ -41,9 +41,10 @@ class PatternConstraint extends Constraint
    * @todo PCRE valid not necessarily ECMA.
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
     $constraint = null;
-
+    $doc = $context->pattern;
+    
     if(!is_string($doc)) {
       throw new ConstraintParseException('The value MUST be a string.');
     }

@@ -5,10 +5,14 @@ use JsonSchema\Constraint\Constraint;
 use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
- * The items constraint.
- * I'm interpreting the spec as saying additionalItems is irrelevant if items is not set.
- * The only issue is maybe additionalItems = false, + item undefined is valid and matches the empty array.
- * Well, the spec is stupid and I refuse to obey. Update the spec and let maxLength apply to an array.
+ * Both items, and addtionalItems constraints.
+ * Suppose target=[1,2,3] and:
+ *  - `items` is an array: The schema array is effectively trimmed to size of target. I.e [a,b,c,d,e] => [a,b,c]. `1` *must* match `a` etc.
+ *  - `items` is an array shorter than target, say [a,b]: [1,2] => [a,b]. The remaining [3] is addressed by addtionalItems.
+ *  - `items` is an object: each item in target must validate against the JSON schema in the items object. addtionalItems is irrelevant - there are none.
+ * Use case - empty array = {'items': [], 'addtionalItems': false}
+ * This interpretation may or may not deviate slightly from the spec. But it makes sense doesn't it!
+ * @see http://json-schema.org/latest/json-schema-validation.html#anchor37
  */
 class ItemsConstraint extends Constraint
 {
@@ -32,17 +36,15 @@ class ItemsConstraint extends Constraint
   }
 
   /**
-   * Ensure items in an array match the per item constraints specified. Bit hairy.
-   * Similarly to the properties constraint, a positional constraint only applies if the position is defined in the target
-   * Thats a bit strange but pretty sure that is what the spec is saying.
-   * Further more, note additionalItems is only relevant when items is an array.
+   * Validate array of items.
+   * @see ItemsConstraint
    * @override
    */
   public function validate($doc, $context) {
     $valid = true;
     if(is_array($doc)) {
       if(is_array($this->items)) {
-        if($this->additionalItems == false && sizeof($doc) > sizeof($this->items)) {
+        if($this->additionalItems === false && sizeof($doc) > sizeof($this->items)) {
           $valid = new ValidationError($this, "No additional items allowed", $context);
         }
         else {
@@ -53,10 +55,10 @@ class ItemsConstraint extends Constraint
                 if($valid === true) {
                   $valid = new ValidationError($this, "One or more items failed to validate.", $context);
                 }
+                $valid->addChild($validation);
                 if(!$this->continueMode()) {
                   break;
                 }
-                $valid->addChild($validation);
               }
             }
           }
@@ -70,10 +72,10 @@ class ItemsConstraint extends Constraint
               if($valid === true) {
                 $valid = new ValidationError($this, "One or more additional items failed validation.", $context);
               }
+              $valid->addChild($validation);
               if(!$this->continueMode()) {
                 break;
               }
-              $valid->addChild($validation);
             }
           }
         }
@@ -84,10 +86,10 @@ class ItemsConstraint extends Constraint
           $validation = $this->items->validate($value, $i);
           if($validation instanceof ValidationError) {
             $valid = new ValidationError($this, "One ore more items failed validation.", $context);
+            $valid->addChild($validation);
             if(!$this->continueMode()) {
               break;
             }
-            $valid->addChild($validation);
           }
         }
       }
@@ -98,22 +100,24 @@ class ItemsConstraint extends Constraint
   /**
    * @override
    */
-  public static function build($doc, $context = null) {
+  public static function build($context) {
     $constraints = null;
+    $doc = $context->items;
 
     if(!(is_array($doc) || is_object($doc))) {
-      throw new ConstraintParseException('The value MUST be either an object or an array.');
+      throw new ConstraintParseException("The value of 'items' MUST be either an object or an array.");
     }
     if(isset($context->additionalItems) && !(is_bool($context->additionalItems) || is_obect($context->additionalItems))) {
-      throw new ConstraintParseException('The value of "additionalItems" MUST be either a boolean or an object.');
+      throw new ConstraintParseException("The value of 'additionalItems' MUST be either a boolean or an object.");
     }
     if(is_array($doc)) {
+      $constraints = [];
       foreach($doc as $value) {
         $constraints[] = EmptyConstraint::build($value);
       }
     }
     else {
-      $constraints = EmptyConstraint::build($doc);
+      $constraints = EmptyConstraint::build($context->items);
     }
     $additionalItems = isset($context->additionalItems) ? $context->additionalItems : true;
     if(is_object($additionalItems)) {
