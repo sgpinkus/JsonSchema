@@ -1,5 +1,5 @@
 <?php
-require_once '../loader.php';
+require_once 'loader.php';
 use JsonDocs\JsonDocs;
 use JsonDocs\JsonLoader;
 use JsonDocs\Uri;

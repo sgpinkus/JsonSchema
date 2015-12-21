@@ -35,10 +35,10 @@ Json Schema has a simple and elegant design but some parts are ambiguous or at l
       "pattern": "foo"
     }
 
-    Upon initial reading of the spec one might draw the conclusion that "minimum" for example is only relevant when "type" is "number" or "integer". That is, "minimum" is a keyword that is only relevant in this circumstance and does not represent a standalone constraint. However this is not the intention of the spec. The above schema specifies 3 constraints. Many constraints are only relevant to certain type. For instance the constraint "minimum" is only relevant to numeric types, and is ignored (or equivaliently always succeeds) when the type being validated is not numeric. This is specified some what ambiguously in [JSON Schema Validation, Section 4.1](http://json-schema.org/latest/json-schema-validation.html#anchor8).
+    Upon initial reading of the spec one might draw the conclusion that "minimum" for example is only relevant when "type" is "number" or "integer". That is, "minimum" is a keyword that is only relevant in this circumstance and does not represent a standalone constraint. However this is not the intention of the spec. The above schema specifies 3 constraints. Many constraints are only relevant to certain type. For instance the constraint "minimum" is only relevant to numeric types, and is ignored (or equivalently always succeeds) when the type being validated is not numeric. This is specified some what ambiguously in [JSON Schema Validation, Section 4.1](http://json-schema.org/latest/json-schema-validation.html#anchor8).
 
 ## On "id" JSON Reference & JSON Pointer
-JSON Schema refers to [JSON Reference](http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03) which in turn refers to [JSON Pointer](http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04). JSON Reference defines the semantics of the  `{ $ref: ... }` object. JSON Pointer defines the semantics of pointers which may *only* occur in the *fragment* of a JSON Reference URI. JSON Schema itself states that JSON References are allowed, and additionally defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a $ref object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the "id" field is used to establish the base URI of all decesdent object for which the given id is the closest ancestor id. The URI specification already rigoursly defined an algorithm for ["Establishing a Base URI"](http://tools.ietf.org/html/rfc3986#section-5.1). Unfortunately the JSON Schema specification does not explicitly refer to it. They *do* however state that the id field is URI, and indeed a base URI. So one has to defer to the URI specification where the JSON Schema spec is ambiguous, which is exactly what we do.
+JSON Schema refers to [JSON Reference](http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03) which in turn refers to [JSON Pointer](http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-04). JSON Reference defines the semantics of the  `{ $ref: ... }` object. JSON Pointer defines the semantics of pointers which may *only* occur in the *fragment* of a JSON Reference URI. JSON Schema itself states that JSON References are allowed, and additionally defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a $ref object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the "id" field is used to establish the base URI of all descendent object for which the given id is the closest ancestor id. The URI specification already rigorously defined an algorithm for ["Establishing a Base URI"](http://tools.ietf.org/html/rfc3986#section-5.1). Unfortunately the JSON Schema specification does not explicitly refer to it. They *do* however state that the id field is URI, and indeed a base URI. So one has to defer to the URI specification where the JSON Schema spec is ambiguous, which is exactly what we do.
 
 Long story short. Forget what the spec says here. Its twisted and ambiguous. Follow this - https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that:
 
@@ -70,6 +70,17 @@ There are still more issues with JSON Schema references and JSON pointers not we
 
 Consider how XSD handled refs. References must reference elements at the top level of a document. These elements must not be refs and must have unique ids. Simple. Serves 99% of all use cases.
 
+## On Constraints - Interpreting the spec
+Some ambiguity in the spec on the following properties. Design decisions outline in the following.
+
+### Properties, PatternProperties, AdditionalProperties
+This trio has to be considered together, they are interdependent. There is IMO some ambiguity around `additionalProperties`. The spec states "if its value is boolean true or a schema, validation succeeds". But its not clear whether they are talking about `additionalProperties` in isolation or the trio. I take it they are talking about the property in isolation. Its not useful very unintuitive to have `additionalProperties` override what is specified by properties, and patternProperties.
+
+The specification does clearly describe a precedence order with `properties` being applied to properties first, then `patternProperties` applied to matching properties. `additionalProperties` naturally applies to the rest. Makes sense to me.
+
+### Items, AdditionalItems
+Same ambiguity as for additionalProperties. I take it additionalItems only applies to items not caught by items. Not this entails additionalItems is irrelevant it items is an object, since there are no additional properties.
+
 ## Parsing JSON References - { $ref: ... }
 Some notes on [JSON Reference](http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03).
 
@@ -77,7 +88,7 @@ Some notes on [JSON Reference](http://tools.ietf.org/html/draft-pbryan-zyp-json-
   * A JSON Reference may reference a value in some JSON document.
   * The entire ref object is replaced by its value.
 
-The JSON Schema document and the validator that will be generated from it, should be treated separate entities. Dereferencing should be done in an initial pass in order to separate concerns. The validator generator need not knwo or care about JSON Reference. Note however, where ever a ref occurred there will be a native PHP reference, so the presence of a reference in the underlying JSON Schema document is detectable in this way.
+The JSON Schema document and the validator that will be generated from it, should be treated separate entities. Dereferencing should be done in an initial pass in order to separate concerns. The validator generator need not know or care about JSON Reference. Note however, where ever a ref occurred there will be a native PHP reference, so the presence of a reference in the underlying JSON Schema document is detectable in this way.
 
 ## Generating a Validator
 The implementation is simplified if we allow mutation of the parsed JSON Schema document in order to "peg" the corresponding generated validator code to the document. For two main reasons:
