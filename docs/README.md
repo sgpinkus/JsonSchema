@@ -43,7 +43,25 @@ Draft v4 compliant JSON Schema validator for PHP.
 
 # Usage
 
-    php tests-informal/ValidateFile.php tests/test-data/user-schema.json  tests/test-data/user.json /users/0
+    <?php
+    require_once 'loader.php';
+    use JsonDocs\JsonDocs;
+    use JsonDocs\JsonLoader;
+    use JsonDocs\Uri;
+    use JsonSchema\JsonSchema;
+    use JsonSchema\Constraint\ValidationError;
+    assert($argc == 3) or die();
+    // JsonDocs does the dereferencing, and acts as a cache of JSON docs.
+    $jsonDocs = new JsonDocs(new JsonLoader());
+    // Build validator, and dereference JSON Doc. JsonDocs would attempt to if 2nd arg not passed.
+    $schema = new JsonSchema($jsonDocs->get(new Uri("file:///tmp/target.json"), json_decode(file_get_contents($argv[1]))));
+    $valid = $schema->validate(json_decode(file_get_contents($argv[2])));
+    if($valid === true) {
+      print "OK\n";
+    }
+    else {
+      print $valid;
+    }
 
 
 Also see [ValidateFile.php](tests-informal/ValidateFile.php), [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
