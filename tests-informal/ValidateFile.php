@@ -14,12 +14,11 @@ function main($argc, $argv) {
   $schema = new JsonSchema($schemaDoc);
   print "Schema created\n";
   $target = json_decode(file_get_contents($argv[2])) or die("Invalid JSON file\n");
-  print "Target loaded:\n";
-  //var_dump($target);
-  $target = $jsonDocs->get(new Uri("file:///tmp/target.json"), $target);
+  print "Target loaded\n";
   if(isset($argv[3])) {
-    $target = $jsonDocs->pointer(new Uri("file:///tmp/target.json#{$argv[3]}"));
+    $target = $jsonDocs::getPointer($target, $argv[3]);
   }
+  print "Validate:\n";
   $valid = $schema->validate($target);
   if($valid === true) {
     print "OK\n";

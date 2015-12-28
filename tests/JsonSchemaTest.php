@@ -29,4 +29,17 @@ class JsonSchemaTest extends PHPUnit_Framework_TestCase
       }
     }
   }
+
+  /**
+   * The Json Schema Schema should validte the Json Schema!
+   * @bug validation will enter recursive loop if the target is derefd because refs are not detected.
+   */
+  public function testJsonSchemaSchema() {
+    $jsonDocs = new JsonDocs();
+    $schemaDoc = $jsonDocs->get(new Uri("file:///schema.json"), json_decode(file_get_contents(getenv('DATADIR') . '/schema.json')));
+    $targetDoc = json_decode(file_get_contents(getenv('DATADIR') . '/schema.json'));
+    $schema = new JsonSchema($schemaDoc);
+    $valid = $schema->validate($targetDoc);
+    $this->assertEquals(true, $valid, $valid);
+  }
 }
