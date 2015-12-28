@@ -142,7 +142,7 @@ class PropertiesConstraint extends Constraint
   }
 
   /**
-   *
+   * 
    */
   public static function buildPropertyConstraints($properties) {
     $constraints = [];
@@ -164,12 +164,24 @@ class PropertiesConstraint extends Constraint
       throw new ConstraintParseException('The value MUST be an object.');
     }
     foreach($properties as $key => $value) {
-      if(preg_match($key, "0") === false) {
-        throw new ConstraintParseException("The keys of 'patternProperties' must be valid regexps.");
+      $key = self::fixPreg($key);
+      if(@preg_match($key, "0") === false) {
+        throw new ConstraintParseException("Invalid regexp '$key'. The keys of 'patternProperties' must be valid regexps.");
       }
       $constraints[$key] = EmptyConstraint::build($value);
     }
     return $constraints;
+  }
+
+  /**
+   * According to spec patterns are of the 'ECMA 262 regular expression dialect'.
+   * According to spec example such patterns have no delimiter.
+   */
+  public static function fixPreg($preg) {
+    if(substr($preg, 0, 1) != substr($preg, -1, 1)) {
+      $preg = "/{$preg}/";
+    }
+    return $preg;
   }
 
   /**

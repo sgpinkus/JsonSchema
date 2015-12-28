@@ -65,8 +65,7 @@ class ItemsConstraint extends Constraint
         }
         // If we reach here additionalItems are allowed, but they must pass additionalItems constraint if specified.
         if($valid === true && is_object($this->additionalItems)) {
-          $additionalIndex = sizeof($items);
-          for($i = sizeof($items); $i < sizeof($doc); $i++) {
+          for($i = sizeof($this->items); $i < sizeof($doc); $i++) {
             $validation = $this->additionalItems->validate($doc[$i], $i);
             if($validation instanceof ValidationError) {
               if($valid === true) {
@@ -107,7 +106,7 @@ class ItemsConstraint extends Constraint
     if(!(is_array($doc) || is_object($doc))) {
       throw new ConstraintParseException("The value of 'items' MUST be either an object or an array.");
     }
-    if(isset($context->additionalItems) && !(is_bool($context->additionalItems) || is_obect($context->additionalItems))) {
+    if(isset($context->additionalItems) && !(is_bool($context->additionalItems) || is_object($context->additionalItems))) {
       throw new ConstraintParseException("The value of 'additionalItems' MUST be either a boolean or an object.");
     }
     if(is_array($doc)) {

@@ -13,6 +13,7 @@ class PatternConstraint extends Constraint
 
   public function __construct($pattern) {
     // Test validity. Note no such thing as a compiled regexp in P, but does have a cache.
+    $pattern = self::fixPreg($pattern);
     if(@preg_match($pattern, "0") === false) {
       throw new \BadMethodCallException("Not a valid regular expression.");
     }
@@ -49,11 +50,22 @@ class PatternConstraint extends Constraint
       throw new ConstraintParseException('The value MUST be a string.');
     }
     try {
-     $constraint = new static($doc);
+      $constraint = new static($doc);
     }
     catch(\BadMethodCallException $e) {
       throw new ConstraintParseException('This string SHOULD be a valid regular expression, according to the ECMA 262 regular expression dialect.');
     }
     return $constraint;
+  }
+
+  /**
+   * According to spec patterns are of the 'ECMA 262 regular expression dialect'.
+   * According to spec example such patterns have no delimiter.
+   */
+  public static function fixPreg($preg) {
+    if(substr($preg, 0, 1) != substr($preg, -1, 1)) {
+      $preg = "/{$preg}/";
+    }
+    return $preg;
   }
 }

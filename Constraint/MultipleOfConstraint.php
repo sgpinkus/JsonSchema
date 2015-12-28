@@ -5,13 +5,16 @@ use JsonSchema\Constraint\Constraint;
 use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
+ * Is the target a multiple of some number - which is either a double (PHP float same thing), or int.
+ * Spec does not specify how to deall with floats. This implementation just casts the divisro to a double, and test for a remainder.
+ * @bug 15.3 is not a multiple of 5.1 because loss of precision.
  */
 class MultipleOfConstraint extends Constraint
 {
   private $divisor;
 
   public function __construct($divisor) {
-    $this->divisor = $divisor;
+    $this->divisor = (float)$divisor;
   }
 
   /**
@@ -32,11 +35,10 @@ class MultipleOfConstraint extends Constraint
           $valid = new ValidationError($this, "$doc not a multiple of 0", $context);
         }
       }
-      else if(is_int($doc) && $doc%$this->divisor != 0) {
-        $valid = new ValidationError($this, "$doc not a multiple of {$this->divisor}", $context);
-      }
-      else if(is_float($doc) && ($doc/(float)$this->divisor) != round($doc/(float)$this->divisor)) {
-        $valid = new ValidationError($this, "$doc not a multiple of {$this->divisor}", $context);
+      else {
+        if(($doc/$this->divisor) != round($doc/$this->divisor)) {
+          $valid = new ValidationError($this, "$doc not a multiple of {$this->divisor}", $context);
+        }
       }
     }
     return $valid;
