@@ -18,12 +18,12 @@ class JsonSchemaTestSuiteTest extends PHPUnit_Framework_TestCase
     'not.json',           // bug
     'dependencies.json'   // not implemented
   ];
-  
+
   /**
-   * 
+   *
    */
   public function fileProvider() {
-    $filePath = getenv('DATADIR') . "/JSON-Schema-Test-Suite/tests/draft4/";
+    $filePath = getenv('DATADIR') . "/json-schema-tests-draft4/";
     $files = glob("{$filePath}*.json");
     $files = array_map(function($f) { return [$f];}, $files);
     return $files;
