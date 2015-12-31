@@ -1,0 +1,14 @@
+{
+  "name": "sam-at-github/phpjsonschema",
+  "description": "A PHP JSON Schema validator",
+  "license": "GPL-3.0",
+  "require": {
+    "php": ">=5.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "JsonSchema\\": "",
+      "JsonDocs\\": "JsonDocs"
+    }
+  }
+}
