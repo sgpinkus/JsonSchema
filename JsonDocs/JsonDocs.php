@@ -37,10 +37,10 @@ class JsonDocs implements \IteratorAggregate
   /**
    * Get a reference to a deserialized, dereferenced JSON document data structure.
    * Fragment part of URIs is silently ignored.
-   * Use the optional $doc parameter if you've already loaded and decoded the document but still need to deref it.
-   * Note any type will be accepted in $doc because decoded JSON can be any type.
+   * Use the optional $doc parameter to override loading of the document via the Loader.
+   * $doc is required to be a serialized JSON doc *string*. $doc can decode to any type.
    * @input $uri Uri an absolute URI.
-   * @input $doc mixed optional JSON document structure.
+   * @input $doc string optional JSON document structure.
    * @returns mixed reference to the loaded JSON object data structure.
    * @throws JsonLoaderException, JsonDecodeException, JsonCacheException
    */
@@ -102,6 +102,20 @@ class JsonDocs implements \IteratorAggregate
    * @input $uri a normalized Uri.
    */
   private function _get(Uri $uri, $eDoc = null) {
+    if(isset($eDoc) && !is_string($eDoc)) {
+      throw new \InvalidArgumentException("Expected string, got " . gettype($eDoc));
+    }
+    if(isset($eDoc)) {
+      try {
+        $eDoc = json_decode($eDoc);
+        if($eDoc === null) {
+          throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
+        }
+      }
+      catch(ErrorException $e) {
+        throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
+      }
+    }
     $doc = $this->load($uri, new JsonRefPriorityQueue(), true, $eDoc);
     return $doc;
   }

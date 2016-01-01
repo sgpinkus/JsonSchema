@@ -9,7 +9,7 @@ $basicRefsJsonUri = 'file:///' . dirname(__FILE__) . '/test-data/basic-refs.json
 $basicRefsJson = json_decode(file_get_contents($basicRefsJsonUri));
 assert($basicRefsJson !== null);
 $jsonDoc = new JsonDocs();
-$doc = $jsonDoc->get(new Uri('file:///fooey'), $basicRefsJson);
+$doc = $jsonDoc->get(new Uri('file:///fooey'), json_encode($basicRefsJson));
 var_dump($doc);
 print "---\n";
 $refQueue = new JsonRefPriorityQueue();
@@ -23,20 +23,20 @@ foreach($refQueue as $k => $ref) {
 }
 print "---\n";
 $jsonDocs = new JsonDocs();
-$doc = $jsonDocs->get(new Uri("file:///user-schema.json"), json_decode(file_get_contents('file://' . dirname(__FILE__) . '/test-data/user-schema.json')));
+$doc = $jsonDocs->get(new Uri("file:///user-schema.json"), file_get_contents('file://' . dirname(__FILE__) . '/test-data/user-schema.json'));
 var_dump($doc);
-$doc = $jsonDocs->get(new Uri("file:///astring.json"), json_decode("\"astring\""));
+$doc = $jsonDocs->get(new Uri("file:///astring.json"), "\"astring\"");
 var_dump($doc);
 print "---\n";
 $jsonDocs = new JsonDocs();
 $docUri = 'file://' . dirname(__FILE__) . '/test-data//schema.json';
-$doc = json_decode(file_get_contents($docUri));
+$doc = file_get_contents($docUri);
 var_dump($doc);
 $schemaDoc = $jsonDocs->get(new Uri($docUri), $doc);
 print "---\n";
 $jsonDocs = new JsonDocs();
 $docUri = 'file://' . dirname(__FILE__) . '/test-data//no-keyword-id.json';
-$doc = json_decode(file_get_contents($docUri));
+$doc = file_get_contents($docUri);
 $schemaDoc = $jsonDocs->get(new Uri($docUri), $doc);
 try {
   $p = $jsonDocs->pointer(new Uri("$docUri#fooey"));

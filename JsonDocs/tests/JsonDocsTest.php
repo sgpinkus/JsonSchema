@@ -170,4 +170,34 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json'));
     $cache->pointer(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json#fooey'));
   }
+
+  /**
+   * Test load from string.
+   */
+  public function testLoadFromString() {
+    $cache = new JsonDocs(new JsonLoader());
+    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey0'), "{}"), json_decode("{}"));
+    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey1'), "[]"), []);
+    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey2'), "0"), 0);
+    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey3'), "\"string\""), "string");
+    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey4'), "true"), true);
+  }
+
+  /**
+   * Test load from not a string which is not allowed.
+   * @expectedException \InvalidArgumentException
+   */
+  public function testLoadFromNotAString() {
+    $cache = new JsonDocs(new JsonLoader());
+    $cache->get(new Uri('file:///tmp/fooey0'), json_decode("{}"));
+  }
+
+  /**
+   * Test load from junk string.
+   * @expectedException \InvalidArgumentException
+   */
+  public function testLoadFromInvalidString() {
+    $cache = new JsonDocs(new JsonLoader());
+    $cache->get(new Uri('file:///tmp/fooey0'), "{x}");
+  }
 }
