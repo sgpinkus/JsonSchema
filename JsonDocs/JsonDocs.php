@@ -38,19 +38,47 @@ class JsonDocs implements \IteratorAggregate
    * Get a reference to a deserialized, dereferenced JSON document data structure.
    * Fragment part of URIs is silently ignored.
    * Use the optional $doc parameter to override loading of the document via the Loader.
-   * $doc param is required to be a serialized JSON doc *string*. This avoids possibility of passing in an already derefd doc, and makes deep clone eassier.
-   * $doc param can decode to any type.
+   * $doc param is required to be a serialized JSON doc *string*. This avoids possibility of passing in an already derefd doc, and makes deep clone eassier. $doc param can decode to any type.
+   * It possible the desired URI of the document is stored in the top level id field. If no Uri is explicitly passed try and use that.
    * @input $uri Uri an absolute URI.
    * @input $doc string optional JSON document structure.
    * @returns mixed reference to the loaded JSON object data structure.
    * @throws JsonLoaderException, JsonDecodeException, JsonCacheException
    */
-  public function get(Uri $uri, $doc = null) {
+  public function get(Uri $uri = null, $doc = null) {
+    if(!(isset($uri) || isset($doc))) {
+      throw new \InvalidArgumentException("Need a URI, a document, or a both to load successfully");
+    }
+    if(isset($doc) && !is_string($doc)) {
+      throw new \InvalidArgumentException("Expected string, got " . gettype($doc));
+    }
+    if(isset($doc)) {
+      try {
+        $doc = json_decode($doc);
+        if($doc === null) {
+          throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
+        }
+      }
+      // @todo enable ErrorExceptions.
+      catch(ErrorException $e) {
+        throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
+      }
+      // Now we have decode the doc we can try find a URI if required.
+      if(!isset($uri)) {
+        try {
+          $uri = new Uri($doc->id);
+        }
+        catch(Exception $e) {
+          throw new \InvalidArgumentException("If URI parameter is not passed the JSON document must have a top level id field that is a valid URI");
+        }
+      }
+    }
     $keyUri = self::normalizeKeyUri($uri);
     if(isset($this->cache[$keyUri.''])) {
       return $this->cache[$keyUri.'']['doc'];
     }
-    return $this->_get($uri, $doc);
+    $doc = $this->load($uri, new JsonRefPriorityQueue(), false, $doc);
+    return $doc;
   }
 
   /**
@@ -84,7 +112,7 @@ class JsonDocs implements \IteratorAggregate
     $pointer = $uri->fragment ? $uri->fragment : "";
 
     if(!isset($this->cache[$keyUri.''])) {
-      throw new ResourceNotFoundException("Resource $keyUri not loaded");
+      throw new \ResourceNotFoundException("Resource $keyUri not loaded");
     }
 
     return self::getPointer($this->cache[$keyUri.'']['doc'], $pointer, $this->cache[$keyUri.'']['ids']);
@@ -98,38 +126,14 @@ class JsonDocs implements \IteratorAggregate
   }
 
   /**
-   * Internal function called by get().
-   * load() and _deRef() must be called in sequence. They are coupled by a queue of refs that load() builds, _deRef() uses.
-   * @input $uri a normalized Uri.
-   */
-  private function _get(Uri $uri, $eDoc = null) {
-    if(isset($eDoc) && !is_string($eDoc)) {
-      throw new \InvalidArgumentException("Expected string, got " . gettype($eDoc));
-    }
-    if(isset($eDoc)) {
-      try {
-        $eDoc = json_decode($eDoc);
-        if($eDoc === null) {
-          throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
-        }
-      }
-      catch(ErrorException $e) {
-        throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
-      }
-    }
-    $doc = $this->load($uri, new JsonRefPriorityQueue(), true, $eDoc);
-    return $doc;
-  }
-
-  /**
    * Fully load un-dereferenced JSON Documents at given URI.
    * Collect all refs that need to to be resolved into a priority queue.
    * Before we begin dereferencing we make sure all JSON doc resources that are refered to are loaded by calling this method recursively.
-   * This method should only be called by _get(), and itself.
+   * This method should only be called by get(), and itself.
    * @input $uri of the resource to load. Must be fully qualified.
    * @input $refQueue a collection in which to store the refs we find.
    * @input $replaceId bool whether to replace the `id` field with the normalized URI the resource is loaded from.
-   * @see _get()
+   * @see get()
    */
   private function load(Uri $uri, \SplPriorityQueue $refQueue, $replaceId = false, $doc = null) {
     $tempRefs = [];
@@ -170,7 +174,7 @@ class JsonDocs implements \IteratorAggregate
    * Must be called after all referenced docs are loaded by load().
    * @input $refQueue A priority queue of refs that need dereferencing.
    * @todo Handle circular refs and ref to a refs properly.
-   * @see _get().
+   * @see get().
    * @see JsonRefPriorityQueue
    */
   private function _deRef(\SplPriorityQueue $refQueue) {

@@ -10,8 +10,22 @@
     {
      "comment": "invalid",
      "firstName": "John",
+     "lastName": "Doe",
+     "email": "john.doe.nowhere.com",
+     "userId": 2
+    },
+    {
+     "comment": "invalid",
+     "firstName": "J",
+     "lastName": "Doe",
      "email": "john.doe@nowhere.com",
-     "userId": 1
+     "userId": 34
+    },
+    {
+     "comment": "invalid",
+     "firstName": "John",
+     "email": "john.doe@nowhere.com",
+     "userId": 3
     },
     {
      "comment": "invalid",
