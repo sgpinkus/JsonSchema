@@ -15,8 +15,8 @@ class JsonSchemaTest extends PHPUnit_Framework_TestCase
    */
   public function testJsonSchema() {
     $jsonDocs = new JsonDocs();
-    $schemaDoc = $jsonDocs->get(new Uri("file:///user-schema.json"), json_decode( file_get_contents(getenv('DATADIR') . '/user-schema.json')));
-    $targetDoc = $jsonDocs->get(new Uri("file:///user.json"), json_decode(file_get_contents(getenv('DATADIR') . '/user.json')));
+    $schemaDoc = $jsonDocs->get(new Uri("file:///user-schema.json"), file_get_contents(getenv('DATADIR') . '/user-schema.json'));
+    $targetDoc = $jsonDocs->get(new Uri("file:///user.json"), file_get_contents(getenv('DATADIR') . '/user.json'));
     $schema = new JsonSchema($schemaDoc);
     foreach($targetDoc->users as $user) {
       $valid = $schema->validate($user);
@@ -36,7 +36,7 @@ class JsonSchemaTest extends PHPUnit_Framework_TestCase
    */
   public function testJsonSchemaSchema() {
     $jsonDocs = new JsonDocs();
-    $schemaDoc = $jsonDocs->get(new Uri("file:///schema.json"), json_decode(file_get_contents(getenv('DATADIR') . '/schema.json')));
+    $schemaDoc = $jsonDocs->get(new Uri("file:///schema.json"), file_get_contents(getenv('DATADIR') . '/schema.json'));
     $targetDoc = json_decode(file_get_contents(getenv('DATADIR') . '/schema.json'));
     $schema = new JsonSchema($schemaDoc);
     $valid = $schema->validate($targetDoc);

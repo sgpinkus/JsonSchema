@@ -38,7 +38,8 @@ class JsonDocs implements \IteratorAggregate
    * Get a reference to a deserialized, dereferenced JSON document data structure.
    * Fragment part of URIs is silently ignored.
    * Use the optional $doc parameter to override loading of the document via the Loader.
-   * $doc is required to be a serialized JSON doc *string*. $doc can decode to any type.
+   * $doc param is required to be a serialized JSON doc *string*. This avoids possibility of passing in an already derefd doc, and makes deep clone eassier.
+   * $doc param can decode to any type.
    * @input $uri Uri an absolute URI.
    * @input $doc string optional JSON document structure.
    * @returns mixed reference to the loaded JSON object data structure.

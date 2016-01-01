@@ -39,7 +39,7 @@ class JsonSchemaTestSuiteTest extends PHPUnit_Framework_TestCase
     $testGroup = json_decode(file_get_contents($file));
     $jsonDocs = new JsonDocs();
     foreach($testGroup as $k => $tests) {
-      $schemaDoc = $jsonDocs->get(new Uri("file:///test-{$k}.json"), $tests->schema);
+      $schemaDoc = $jsonDocs->get(new Uri("file:///test-{$k}.json"), json_encode($tests->schema));
       $schema = new JsonSchema($schemaDoc);
       foreach($tests->tests as $test) {
         $valid = $schema->validate($test->data);
