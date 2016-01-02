@@ -5,34 +5,34 @@
      "firstName": "John",
      "lastName": "Doe",
      "email": "john.doe@nowhere.com",
-     "userId": 1
+     "_id": 1
     },
     {
      "comment": "invalid",
      "firstName": "John",
      "lastName": "Doe",
      "email": "john.doe.nowhere.com",
-     "userId": 2
+     "_id": 2
     },
     {
      "comment": "invalid",
      "firstName": "J",
      "lastName": "Doe",
      "email": "john.doe@nowhere.com",
-     "userId": 34
+     "_id": 34
     },
     {
      "comment": "invalid",
      "firstName": "John",
      "email": "john.doe@nowhere.com",
-     "userId": 3
+     "_id": 3
     },
     {
      "comment": "invalid",
      "firstName": "John",
      "lastName": "Doe",
      "email": "john.doe@nowhere.com",
-     "userId": -1
+     "_id": -1
     }
   ]
 }

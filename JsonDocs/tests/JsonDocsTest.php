@@ -149,7 +149,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
     $cache = new JsonDocs(new JsonLoader());
     $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-external-ref.json'));
     $this->assertEquals($cache->count(), 2);
-    $this->assertEquals($cache->pointer(new Uri('file://' . getenv('DATADIR') . '/user-schema.json#/definitions/userId/minimum')), 0);
+    $this->assertEquals($cache->pointer(new Uri('file://' . getenv('DATADIR') . '/user-schema.json#/definitions/_id/minimum')), 0);
   }
 
   /**

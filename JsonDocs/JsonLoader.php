@@ -9,10 +9,11 @@ namespace JsonDocs;
 class JsonLoader
 {
   /**
-   * Load raw data from $uri. The data should be decodable.
+   * Load raw data from $uri. The data returned should be a JSON doc decodable with json_decode().
    * @throws ResourceNotFoundException.
    */
   public function load($uri) {
+
     return file_get_contents($uri);
   }
 }

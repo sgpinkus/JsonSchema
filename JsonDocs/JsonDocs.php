@@ -145,7 +145,7 @@ class JsonDocs implements \IteratorAggregate
     }
 
     if($doc === null) {
-      $doc = $this->loader->load($uri);
+      $doc = $this->loader->load($keyUri);
       $doc = json_decode($doc);
       if($doc === null) {
         throw new JsonDecodeException(json_last_error());

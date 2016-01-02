@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "comment": "Two related schema in one file.",
+  "definitions" : {
+    "_id" : {
+      "type": "integer",
+      "minimum": 0,
+      "exclusiveMinimum": true
+    },
+    "firstName": { "type": "string", "minLength": 2 },
+    "lastName": { "type": "string", "minLength": 2 },
+    "email": { "type": "string", "pattern": ".+@.+", "comment": "close enough" },
+    "comment": { "type": "string" }
+  },
+  "create": {
+    "title": "Data definition for creating user objects.",
+    "comment": "For creation we don't want an _id."
+    "properties": {
+      "_id": { "allOf": [{ "$ref": "#/definitions/_id" }, { "readOnly": true }] },
+      "firstName": { "$ref": "#/definitions/firstName" },
+      "lastName": { "$ref": "#/definitions/lastName" },
+      "email": { "$ref": "#/definitions/email" },
+      "comment": { "$ref": "#/definitions/comment" }
+    },
+    "additionalProperties": false,
+    "required": ["firstName", "lastName", "email"]
+  },
+  "update": {
+    "title": "Data definition for updating user objects.",
+    "properties": {
+      "_id": { "$ref": "#/definitions/_id" },
+      "firstName": { "$ref": "#/definitions/firstName" },
+      "lastName": { "$ref": "#/definitions/lastName" },
+      "email": { "$ref": "#/definitions/email" },
+      "comment": { "$ref": "#/definitions/comment" }
+    },
+    "additionalProperties": false,
+    "required": ["_id"],
+    "minProperties": 2
+  }
+}

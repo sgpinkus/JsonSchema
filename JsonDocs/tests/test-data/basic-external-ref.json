@@ -4,7 +4,7 @@
   "required": ["title", "content", "dateCreated", "author"],
   "properties": {
     "author": {
-      "$ref": "user-schema.json#/definitions/userId"
+      "$ref": "user-schema.json#/definitions/_id"
     }
   }
 }

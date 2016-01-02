@@ -9,17 +9,17 @@ use JsonSchema\Constraint\ValidationError;
 function main($argc, $argv) {
   (sizeof($argv) == 3 or sizeof($argv) == 4) or die(usage());
   $jsonDocs = new JsonDocs(new JsonLoader());
-  $schema_file = make_path($argv[1]) or die("Invalid schema file\n");
-  $schemaDoc = $jsonDocs->get(new Uri($schema_file));
+  list($schemaFile, $schemaPointer) = makePath($argv[1]) or die("Invalid schema file\n");
+  $schemaDoc = $jsonDocs->get(new Uri($schemaFile));
   $schema = new JsonSchema($schemaDoc);
-  print "Schema created\n";
+  print "Schema created from $schemaFile\n";
   $target = json_decode(file_get_contents($argv[2])) or die("Invalid JSON file\n");
   print "Target loaded\n";
   if(isset($argv[3])) {
     $target = $jsonDocs::getPointer($target, $argv[3]);
   }
-  print "Validate:\n";
-  $valid = $schema->validate($target);
+  print "Validate [at $schemaPointer]:\n";
+  $valid = $schema->validate($target, $schemaPointer);
   if($valid === true) {
     print "OK\n";
   }
@@ -28,12 +28,14 @@ function main($argc, $argv) {
   }
 }
 
-function make_path($file) {
+function makePath($file) {
+  @list($file, $frag) = explode("#", $file);
   $file = realpath($file);
+  $frag = $frag ? "$frag" : "/";
   if(!$file) {
     return false;
   }
-  return "file://$file";
+  return ["file://$file", $frag];
 }
 
 function usage() {
