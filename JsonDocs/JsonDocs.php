@@ -11,6 +11,7 @@ use JsonDocs\Exception\JsonReferenceException;
 /**
  * Instances of this class dereference and then provide access to a cache of dereferenced JSON documents.
  * Basically its a cache of deserialized, dereferenced JSON docs keyed by the absolute URI (scheme+domain+path part only) of the document.
+ * That key URI can be provided by the client. Or, if the client does not provide it, we use the top id field if its present and is an absolute URI.
  * Loading JSON that contains JSON refs and dereferencing it are closely coupled. So this class has both loading and deref responsibilities.
  * Json References are literally replaced with PHP references to other loaded documents in the internal cache.
  * Supports retrieving part of a doc by JSON Pointer. Note however, when loading a document the fragment part of a URIs is ignored.
@@ -36,7 +37,7 @@ class JsonDocs implements \IteratorAggregate
 
   /**
    * Get a reference to a deserialized, dereferenced JSON document data structure.
-   * Fragment part of URIs is silently ignored.
+   * This is a collection of whole resources. This fragment part of $uri is stripped and ignored.
    * Use the optional $doc parameter to override loading of the document via the Loader.
    * $doc param is required to be a serialized JSON doc *string*. This avoids possibility of passing in an already derefd doc, and makes deep clone eassier. $doc param can decode to any type.
    * It possible the desired URI of the document is stored in the top level id field. If no Uri is explicitly passed try and use that.
@@ -144,7 +145,7 @@ class JsonDocs implements \IteratorAggregate
     }
 
     if($doc === null) {
-      $doc = $this->loader->load($keyUri);
+      $doc = $this->loader->load($uri);
       $doc = json_decode($doc);
       if($doc === null) {
         throw new JsonDecodeException(json_last_error());
@@ -311,7 +312,6 @@ class JsonDocs implements \IteratorAggregate
    */
   public static function normalizeKeyUri(Uri $uri) {
     $keyUri = clone $uri;
-    unset($keyUri->query);
     unset($keyUri->fragment);
     return $keyUri;
   }
