@@ -83,11 +83,17 @@ class JsonDocs implements \IteratorAggregate
   }
 
   /**
-   * Just deref an existing JSON document data structure.
-   * @see get().
+   * Get source before deref. The loaded document cannot be serialized because it might contain ref loops.
+   * Fragment part of $uri is ignored.
+   * @input $uri Uri.
+   * @returns String serialized JSON document or null.
    */
-  public function deRef(Uri $uri, $doc) {
-    return $this->get($uri, $doc);
+  public function getSrc(Uri $uri) {
+    $keyUri = self::normalizeKeyUri($uri);
+    if(isset($this->cache[$keyUri.''])) {
+      return $this->cache[$keyUri.'']['src'];
+    }
+    return null;
   }
 
   /**
@@ -156,8 +162,9 @@ class JsonDocs implements \IteratorAggregate
     }
     $identities = [];
     $refUris = [];
+    $srcDoc = json_encode($doc); // Maintain source so it can be recovered.
     self::parseDoc($doc, $refQueue, $refUris, $identities, $keyUri);
-    $this->cache[$keyUri.''] = ['doc' => $doc, 'ids' => $identities];
+    $this->cache[$keyUri.''] = ['doc' => $doc, 'ids' => $identities, 'src' => $srcDoc];
 
     foreach($refUris as $uri) {
       $this->load($uri, $refQueue, false);

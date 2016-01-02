@@ -200,4 +200,20 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
     $cache = new JsonDocs(new JsonLoader());
     $cache->get(new Uri('file:///tmp/fooey0'), "{x}");
   }
+
+  /**
+   * Test getSrc
+   */
+  public function testgetSrc() {
+    $cache = new JsonDocs(new JsonLoader());
+    $cache->get(new Uri('file:///tmp/fooey0'), "{}");
+    $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0')), "{}");
+    $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0#/some/subschema')), "{}", "Fragment part is ignored");
+    $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
+    $target = file_get_contents($uri);
+    $cache->get($uri);
+    $this->assertEquals($cache->getSrc($uri), json_encode(json_decode($target)));
+    $uri->fragment = "fooey";
+    $this->assertEquals($cache->getSrc($uri), json_encode(json_decode($target)), "Fragment part is ignored");
+  }
 }
