@@ -32,7 +32,7 @@ class JsonSchema
     if($pointer) {
       $schema = JsonDocs::getPointer($this->doc, $pointer);
       if(!isset($schema->$code)) {
-        throw new \InvalidArgumentException("Invalid pointer.");
+        throw new \InvalidArgumentException("Could not resolve pointer $pointer");
       }
       $schema = $schema->$code;
     }

@@ -14,7 +14,7 @@
   },
   "create": {
     "title": "Data definition for creating user objects.",
-    "comment": "For creation we don't want an _id."
+    "comment": "For creation we don't want an _id.",
     "properties": {
       "_id": { "allOf": [{ "$ref": "#/definitions/_id" }, { "readOnly": true }] },
       "firstName": { "$ref": "#/definitions/firstName" },
