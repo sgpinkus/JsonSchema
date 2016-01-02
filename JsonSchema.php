@@ -26,16 +26,16 @@ class JsonSchema
    * @input $doc Mixed the target of validation.
    * @input $pointer A JSON Pointer pointing into the schema.
    */
-  public function validate($doc, $pointer = null) {
+  public function validate($doc, $pointer = "/") {
     $code = '$code';
     $schema = $this->rootSymbol;
-    if($pointer) {
+    if($pointer !== "/") {
       $schema = JsonDocs::getPointer($this->doc, $pointer);
       if(!isset($schema->$code)) {
-        throw new \InvalidArgumentException("Invalid pointer.");
+        throw new \InvalidArgumentException("Could not resolve pointer $pointer");
       }
       $schema = $schema->$code;
     }
-    return $schema->validate($doc, "");
+    return $schema->validate($doc, "/");
   }
 }

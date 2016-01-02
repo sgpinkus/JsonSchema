@@ -55,7 +55,10 @@ class ValidationError implements \IteratorAggregate
   }
 
   private function toStringRec($depth = 0) {
-    $str = str_repeat("  ", $depth) . $this->getContext() . ": constraint:" . $this->getName() . "; message:" .$this->getMessage() ."\n";
+    $str = str_repeat("  ", $depth) .
+      "path:" . $this->getContext() . "; " .
+      "constraint:" . $this->getName() . "; " .
+      "message:" .$this->getMessage() ."\n";
     foreach($this->getIterator() as $error) {
       $str .= $error->toStringRec(++$depth);
     }
