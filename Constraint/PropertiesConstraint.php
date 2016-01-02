@@ -102,11 +102,12 @@ class PropertiesConstraint extends Constraint
         }
         elseif($this->additionalProperties === false) {
           if(sizeof($arrayDoc) > 0) {
+            $additionalPropertiesString = implode(",", array_keys($arrayDoc));
             if($valid === true) {
-              $valid = new ValidationError($this, "Additional properties found.", $context);
+              $valid = new ValidationError($this, "Additional properties found ($additionalPropertiesString).", $context);
             }
             else {
-              $vali->addChild(new ValidationError($this, "Additional properties found.", $context));
+              $vali->addChild(new ValidationError($this, "Additional properties found ($additionalPropertiesString).", $context));
             }
           }
         }
@@ -142,7 +143,7 @@ class PropertiesConstraint extends Constraint
   }
 
   /**
-   * 
+   *
    */
   public static function buildPropertyConstraints($properties) {
     $constraints = [];

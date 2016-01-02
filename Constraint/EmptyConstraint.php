@@ -106,7 +106,7 @@ class EmptyConstraint extends Constraint
       }
       foreach($remainingKeys as $key) {
         if(is_object($doc->$key) && !self::skipProperty($key)) {
-          self::build($doc);
+          self::build($doc->$key);
         }
       }
       $constraint->childConstraints = $childConstraints;
