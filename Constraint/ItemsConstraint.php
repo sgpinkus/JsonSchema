@@ -50,7 +50,7 @@ class ItemsConstraint extends Constraint
         else {
           foreach($this->items as $i => $constraint) {
             if(isset($doc[$i])) {
-              $validation = $constraint->validate($doc[$i], $i);
+              $validation = $constraint->validate($doc[$i], "{$context}{$i}/");
               if($validation instanceof ValidationError) {
                 if($valid === true) {
                   $valid = new ValidationError($this, "One or more items failed to validate.", $context);
@@ -66,7 +66,7 @@ class ItemsConstraint extends Constraint
         // If we reach here additionalItems are allowed, but they must pass additionalItems constraint if specified.
         if($valid === true && is_object($this->additionalItems)) {
           for($i = sizeof($this->items); $i < sizeof($doc); $i++) {
-            $validation = $this->additionalItems->validate($doc[$i], $i);
+            $validation = $this->additionalItems->validate($doc[$i], "{$context}{$i}/");
             if($validation instanceof ValidationError) {
               if($valid === true) {
                 $valid = new ValidationError($this, "One or more additional items failed validation.", $context);
@@ -82,7 +82,7 @@ class ItemsConstraint extends Constraint
       // items is a single EmptyConstraint that must validate against all.
       else {
         foreach($doc as $i => $value) {
-          $validation = $this->items->validate($value, $i);
+          $validation = $this->items->validate($value, "{$context}{$i}/");
           if($validation instanceof ValidationError) {
             $valid = new ValidationError($this, "One ore more items failed validation.", $context);
             $valid->addChild($validation);
