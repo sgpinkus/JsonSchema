@@ -23,16 +23,19 @@ class RequiredConstraint extends Constraint
   }
 
   /**
+   * Consider this schema {"properties": {"x": {"type": "null"}}, "required": ["x"]}. If 'x' = null, x' is not isset().
+   * To get around this we extract a list of keys from the target.
    * @override
    */
   public function validate($doc, $context) {
     $notSet = [];
     $valid = true;
     if(is_object($doc)) {
+      $arrayDoc = array_keys((array)$doc);
       foreach($this->required as $key) {
-        if(!isset($doc->$key)) {
+        if(!in_array($key, $arrayDoc)) {
           if(!$this->continueMode()) {
-            $valid = new ValidationError($this, "One or more required properties missing: {$key}", $context);
+            $valid = new ValidationError($this, "One or more required properties missing: {$key} [" . implode(",", $arrayDoc), $context);
             break;
           }
           $notSet[] = $key;

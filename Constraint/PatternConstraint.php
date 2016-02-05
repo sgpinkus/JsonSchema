@@ -12,7 +12,7 @@ class PatternConstraint extends Constraint
   private $pattern;
 
   public function __construct($pattern) {
-    // Test validity. Note no such thing as a compiled regexp in P, but does have a cache.
+    // Test validity. Note no such thing as a compiled regexp in PHP, but does have a cache.
     $pattern = self::fixPreg($pattern);
     if(@preg_match($pattern, "0") === false) {
       throw new \BadMethodCallException("Not a valid regular expression.");
@@ -45,7 +45,7 @@ class PatternConstraint extends Constraint
   public static function build($context) {
     $constraint = null;
     $doc = $context->pattern;
-    
+
     if(!is_string($doc)) {
       throw new ConstraintParseException('The value MUST be a string.');
     }

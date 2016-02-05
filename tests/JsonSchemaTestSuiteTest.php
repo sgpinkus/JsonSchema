@@ -16,7 +16,9 @@ class JsonSchemaTestSuiteTest extends PHPUnit_Framework_TestCase
     'ref.json',           // refs
     'definitions.json',   // refs
     'not.json',           // bug
-    'dependencies.json'   // not implemented
+    'dependencies.json',  // not implemented
+    'bignum.json',        // optional not implemented
+    'zeroTerminatedFloats.json', // optional not implemented
   ];
 
   /**
@@ -25,6 +27,7 @@ class JsonSchemaTestSuiteTest extends PHPUnit_Framework_TestCase
   public function fileProvider() {
     $filePath = getenv('DATADIR') . "/json-schema-tests-draft4/";
     $files = glob("{$filePath}*.json");
+    $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) { return [$f];}, $files);
     return $files;
   }

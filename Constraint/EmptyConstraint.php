@@ -8,12 +8,12 @@ use JsonSchema\Constraint\Exception\ConstraintParseException;
  */
 class EmptyConstraint extends Constraint
 {
-	/**
-	 * @override
-	 */
-	public static function getName() {
-		return '{}';
-	}
+  /**
+   * @override
+   */
+  public static function getName() {
+    return '{}';
+  }
 
   /** Map of valid empty constraint properties to symbols/constraint class names. */
   private static $childSymbols = [
@@ -36,14 +36,15 @@ class EmptyConstraint extends Constraint
     'JsonSchema\Constraint\MinPropertiesConstraint',
     'JsonSchema\Constraint\MaxPropertiesConstraint',
     'JsonSchema\Constraint\RequiredConstraint',
-    'JsonSchema\Constraint\PropertiesConstraint'
+    'JsonSchema\Constraint\PropertiesConstraint',
+    'JsonSchema\Constraint\FormatConstraint'
   ];
   /** All the constraints that are found in the given object. */
   private $childConstraints = [];
 
   /**
    * Construct the empty constraint.
-   * @input $childConstraints Result of this constraint is these constraints are ANDed together.
+   * @input $childConstraints Result of this constraint is results of these constraints ANDed together.
    */
   public function __construct(array $childConstraints) {
     $this->childConstraints = $childConstraints;
@@ -134,7 +135,7 @@ class EmptyConstraint extends Constraint
   }
 
   /**
-   * Don't try and expand anything beginning with $ and id.
+   * Don't try and expand anything beginning with $.
    * Not standard but no harm done really.
    */
   public static function skipProperty($name) {

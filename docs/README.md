@@ -30,16 +30,11 @@ Draft v4 compliant JSON Schema validator for PHP.
   * anyOf
   * oneOf
   * not
+  * format
 
 # UnImplemented Constraints
 
   * dependencies
-  * date-time
-  * email
-  * hostname
-  * ipv4
-  * ipv6
-  * uri
 
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
