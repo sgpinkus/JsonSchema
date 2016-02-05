@@ -15,7 +15,6 @@ class JsonSchemaTestSuiteTest extends PHPUnit_Framework_TestCase
     'refRemote.json',     // refs
     'ref.json',           // refs
     'definitions.json',   // refs
-    'not.json',           // bug
     'dependencies.json',  // not implemented
     'bignum.json',        // optional not implemented
     'zeroTerminatedFloats.json', // optional not implemented
