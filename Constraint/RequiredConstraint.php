@@ -35,7 +35,7 @@ class RequiredConstraint extends Constraint
       foreach($this->required as $key) {
         if(!in_array($key, $arrayDoc)) {
           if(!$this->continueMode()) {
-            $valid = new ValidationError($this, "One or more required properties missing: {$key} [" . implode(",", $arrayDoc), $context);
+            $valid = new ValidationError($this, "One or more required properties missing: {$key}", $context);
             break;
           }
           $notSet[] = $key;
