@@ -37,10 +37,11 @@ class JsonDocs implements \IteratorAggregate
 
   /**
    * Get a reference to a deserialized, dereferenced JSON document data structure.
-   * This is a collection of whole resources. This fragment part of $uri is stripped and ignored.
-   * Use the optional $doc parameter to override loading of the document via the Loader.
-   * $doc param is required to be a serialized JSON doc *string*. This avoids possibility of passing in an already derefd doc, and makes deep clone eassier. $doc param can decode to any type.
-   * It possible the desired URI of the document is stored in the top level id field. If no Uri is explicitly passed try and use that.
+   * JsonDocs is a collection of whole resources. Thus the fragment part of $uri is stripped and ignored.
+   * Use the optional $doc parameter to override loading of the document via the JsonLoader.
+   * The $doc param is required to be a serialized JSON doc *string*. This avoids possibility of passing in an already derefd doc, and makes deep clone easier.
+   * The $doc param can decode to any type.
+   * Its possible the desired URI of the document is stored in the top level id field. If no Uri is explicitly passed we try and use that.
    * @input $uri Uri an absolute URI.
    * @input $doc string optional JSON document structure.
    * @returns mixed reference to the loaded JSON object data structure.
@@ -199,7 +200,7 @@ class JsonDocs implements \IteratorAggregate
   }
 
   /**
-   * Find and stash all JSON Refs, their referenced URIs, and object with and `id` in a JSON doc.
+   * Find and stash all JSON Refs, and their referenced URIs.
    * Can't use standard recursive iterator here because references + iterators don't work together.
    * @input $doc a decoded JSON doc.
    * @input $refQueue a queue for stuffing found JSON Refs into.

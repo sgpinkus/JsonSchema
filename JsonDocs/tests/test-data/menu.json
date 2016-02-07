@@ -1,0 +1,14 @@
+{
+  "title": "About",
+  "link": "/about",
+  "children": [
+    {
+      "title": "me",
+      "link": "/about/me"
+    },
+    {
+      "title": "you",
+      "link": "/about/you"
+    }
+  ]
+}

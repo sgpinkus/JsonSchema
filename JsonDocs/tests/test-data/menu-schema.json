@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "title": { "type": "string", "minLength": 1 },
+    "link": { "type": "string",  "minLength": 1 },
+    "children": {"type": "array", "items": { "$ref": "#/" }, "additionalItems": false }
+  },
+  "required": ["title"]
+}

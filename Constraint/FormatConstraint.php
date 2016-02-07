@@ -72,7 +72,7 @@ class FormatConstraint extends Constraint
       }
     }
     if(!$valid) {
-      $valid = new ValidationError($this, "'$doc' not a valid $format.", $context);
+      $valid = new ValidationError($this, "'$doc' not a valid {$this->format}.", $context);
     }
     return $valid;
   }
