@@ -39,6 +39,7 @@ class EmptyConstraint extends Constraint
     'JsonSchema\Constraint\PropertiesConstraint',
     'JsonSchema\Constraint\FormatConstraint',
     'JsonSchema\Constraint\ConstantConstraint',
+    'JsonSchema\Constraint\SwitchConstraint',
   ];
   /** All the constraints that are found in the given object. */
   private $childConstraints = [];

@@ -72,6 +72,11 @@ else {
 }
 ```
 
+# Conformance
+We diverge from the spec ina few minor places where it is retarded. Please refer to [CONFORMANCE.md](CONFORMANCE.md)
+
+### additionalItems+additionalProperties
+
 Also see [ValidateFile.php](tests-informal/ValidateFile.php), [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
 
 # TODO
