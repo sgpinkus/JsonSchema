@@ -37,7 +37,8 @@ class EmptyConstraint extends Constraint
     'JsonSchema\Constraint\MaxPropertiesConstraint',
     'JsonSchema\Constraint\RequiredConstraint',
     'JsonSchema\Constraint\PropertiesConstraint',
-    'JsonSchema\Constraint\FormatConstraint'
+    'JsonSchema\Constraint\FormatConstraint',
+    'JsonSchema\Constraint\ConstantConstraint',
   ];
   /** All the constraints that are found in the given object. */
   private $childConstraints = [];
@@ -48,6 +49,14 @@ class EmptyConstraint extends Constraint
    */
   public function __construct(array $childConstraints) {
     $this->childConstraints = $childConstraints;
+  }
+
+  /**
+   * Add a constraint.
+   * @todo make this a little more fail safe.
+   */
+  public static function addConstraint($constraintClass) {
+    self::$childSymbols[] = $constraintClass;
   }
 
   /**
