@@ -6,7 +6,7 @@ use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
  * All three properties related constraints.
- * These three constraints are interelated so cannot be addressed independently - bit of a PITA really.
+ * These three constraints are interelated so cannot be addressed independently.
  * This implementation treats `true` and `{}` as equivalent values of `additionalProperties`.
  * This may or may not deviate from the spec, but is more logical and intuitive than any alternate interpretation.
  * @see http://json-schema.org/latest/json-schema-validation.html#anchor64
@@ -67,8 +67,8 @@ class PropertiesConstraint extends Constraint
         }
       }
       if($valid === true || $this->continueMode()) {
-        foreach($this->patternProperties as $pattern => $constraint) {
-          foreach($arrayDoc as $docKey => $docItem) {
+        foreach($arrayDoc as $docKey => $docItem) {
+          foreach($this->patternProperties as $pattern => $constraint) {
             if(preg_match($pattern, $docKey)) {
               $validation = $constraint->validate($docItem, "{$context}{$docKey}/");
               unset($arrayDoc[$docKey]);

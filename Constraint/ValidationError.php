@@ -60,7 +60,7 @@ class ValidationError implements \IteratorAggregate
       "constraint:" . $this->getName() . "; " .
       "message:" .$this->getMessage() ."\n";
     foreach($this->getIterator() as $error) {
-      $str .= $error->toStringRec(++$depth);
+      $str .= $error->toStringRec($depth+1);
     }
     return $str;
   }
