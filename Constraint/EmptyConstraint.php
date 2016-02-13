@@ -38,6 +38,7 @@ class EmptyConstraint extends Constraint
     'JsonSchema\Constraint\RequiredConstraint',
     'JsonSchema\Constraint\PropertiesConstraint',
     'JsonSchema\Constraint\FormatConstraint',
+    'JsonSchema\Constraint\DependenciesConstraint',
     'JsonSchema\Constraint\ConstantConstraint',
     'JsonSchema\Constraint\SwitchConstraint',
   ];
