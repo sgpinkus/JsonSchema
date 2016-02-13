@@ -6,35 +6,11 @@ Draft v4 compliant JSON Schema validator for PHP.
   * Support for `$refs`, and the `id` keyword, following [this amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that) to the unimplementable spec.
   * Easily extensible with custom constraints.
   * Draft 4 compatible only.
-  * No support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec). Should be easy to add support for this later.
+  * No explicit support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec).
 
-# Implemented Constraints.
+# Implemented Constraints
+All v4 Constraints are implemented. Some constraints were implemented with minor deviations from the spec. Please see [CONFORMANCE.md](docs/CONFORMANCE.md). The `constant`, and `switch` v5 *proposals* have also been implemented.
 
-  * multipleOf
-  * maximum+exclusiveMaximum
-  * minimum+exclusiveMinimum
-  * maxLength
-  * minLength
-  * pattern
-  * items+additionalItems
-  * maxItems
-  * minItems
-  * uniqueItems
-  * maxProperties
-  * minProperties
-  * required
-  * properties+additionalProperties+patternProperties
-  * enum
-  * type
-  * allOf
-  * anyOf
-  * oneOf
-  * not
-  * format
-
-# UnImplemented Constraints
-
-  * dependencies
 
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
@@ -71,11 +47,6 @@ else {
   print $valid;
 }
 ```
-
-# Conformance
-We diverge from the spec ina few minor places where it is retarded. Please refer to [CONFORMANCE.md](CONFORMANCE.md)
-
-### additionalItems+additionalProperties
 
 Also see [ValidateFile.php](tests-informal/ValidateFile.php), [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
 
