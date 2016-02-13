@@ -8,33 +8,14 @@ Draft v4 compliant JSON Schema validator for PHP.
   * Draft 4 compatible only.
   * No support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec). Should be easy to add support for this later.
 
-# Implemented Constraints.
+# Implemented Constraints
+All v4 Constraints are implemented. Some constraints were implemented with minor deviations from the spec. Please see [CONFORMANCE.md](CONFORMANCE.md). Some additional v5 proposals have also been implemented.
 
-  * multipleOf
-  * maximum+exclusiveMaximum
-  * minimum+exclusiveMinimum
-  * maxLength
-  * minLength
-  * pattern
-  * items+additionalItems
-  * maxItems
-  * minItems
-  * uniqueItems
-  * maxProperties
-  * minProperties
-  * required
-  * properties+additionalProperties+patternProperties
-  * enum
-  * type
-  * allOf
-  * anyOf
-  * oneOf
-  * not
-  * format
 
-# UnImplemented Constraints
+## Implemented v5 Proposal Constraints
 
-  * dependencies
+  * constant
+  * switch
 
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
@@ -72,12 +53,10 @@ else {
 }
 ```
 
-# Conformance
-We diverge from the spec ina few minor places where it is retarded. Please refer to [CONFORMANCE.md](CONFORMANCE.md)
-
-### additionalItems+additionalProperties
-
 Also see [ValidateFile.php](tests-informal/ValidateFile.php), [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
+
+# Conformance
+We diverge from the spec in a few minor places either because its ambiguous or unimplementable. Please refer to [CONFORMANCE.md](CONFORMANCE.md)
 
 # TODO
 See [TODO](docs/TODO.md)
