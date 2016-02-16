@@ -51,10 +51,11 @@ class PropertiesConstraint extends Constraint
     $valid = true;
     if(is_object($doc)) {
       $arrayDoc = (array)$doc;
+      $seenKeys = [];
       foreach($this->properties as $i => $constraint) {
         if(isset($arrayDoc[$i])) {
           $validation = $constraint->validate($arrayDoc[$i], "{$context}{$i}/");
-          unset($arrayDoc[$i]);
+          $seenKeys[$i] = true; //unset($arrayDoc[$i]);
           if($validation instanceof ValidationError) {
             if($valid === true) {
               $valid = new ValidationError($this, "One or more properties failed to validate.", $context);
@@ -70,8 +71,8 @@ class PropertiesConstraint extends Constraint
         foreach($arrayDoc as $docKey => $docItem) {
           foreach($this->patternProperties as $pattern => $constraint) {
             if(preg_match($pattern, $docKey)) {
+              $seenKeys[$docKey] = true; // unset($arrayDoc[$docKey]);
               $validation = $constraint->validate($docItem, "{$context}{$docKey}/");
-              unset($arrayDoc[$docKey]);
               if($validation instanceof ValidationError) {
                 if($valid === true) {
                   $valid = new ValidationError($this, "One or more pattern properties failed to validate.", $context);
@@ -85,6 +86,8 @@ class PropertiesConstraint extends Constraint
           }
         }
       }
+      // Remove seen keys
+      $arrayDoc = array_diff_key($arrayDoc, $seenKeys);
       if($valid === true || $this->continueMode()) {
         if(is_object($this->additionalProperties)) {
           foreach($arrayDoc as $i => $value) {
