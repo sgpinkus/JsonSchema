@@ -1,4 +1,4 @@
-# Overview
+# Overview [![Build Status](https://api.travis-ci.org/sam-at-github/PhpJsonSchema.png)](https://travis-ci.org/sam-at-github/PhpJsonSchema)
 Draft v4 compliant JSON Schema validator for PHP.
 
   * Simple design. In particular, the separation of code concerned with loading JSON, and JSON Reference, and code concerned with validation.
