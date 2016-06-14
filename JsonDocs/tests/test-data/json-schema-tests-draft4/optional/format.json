@@ -22,6 +22,7 @@
     },
     {
         "description": "validation of URIs",
+        "comment": "These test are wrong. We interpret uri as an absolute uri. See https://github.com/json-schema-org/JSON-Schema-Test-Suite/issues/77",
         "schema": {"format": "uri"},
         "tests": [
             {
@@ -31,8 +32,9 @@
             },
             {
                 "description": "a valid protocol-relative URI",
+                "comment": "modified. If the last test is invalid then this should also be invalid",
                 "data": "//foo.bar/?baz=qux#quux",
-                "valid": true
+                "valid": false
             },
             {
                 "description": "an invalid URI",
