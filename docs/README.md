@@ -2,15 +2,11 @@
 Draft v4 compliant JSON Schema validator for PHP.
 
   * Simple design. In particular, the separation of code concerned with loading JSON, and JSON Reference, and code concerned with validation.
-  * Simple interface for validation - doesn't expose the user to more than a couple of classes for the main use case - validation.
+  * Simple interface for validation - doesn't expose the user to more than a couple of classes for the main use case -- validation.
   * Support for `$refs`, and the `id` keyword, following [this amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that) to the unimplementable spec.
   * Easily extensible with custom constraints.
   * Draft 4 compatible only.
   * No explicit support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec).
-
-# Implemented Constraints
-All v4 Constraints are implemented. Some constraints were implemented with minor deviations from the spec. Please see [CONFORMANCE.md](docs/CONFORMANCE.md). The `constant`, and `switch` v5 *proposals* have also been implemented.
-
 
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
@@ -48,7 +44,11 @@ else {
 }
 ```
 
-Also see [ValidateFile.php](tests-informal/ValidateFile.php), [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php)
+Also see [ValidateFile.php](tests-informal/ValidateFile.php), [JsonSchemaTest.php](tests-informal/JsonSchemaTest.php) for more examples.
+
+# Implemented Constraints
+All v4 Constraints are implemented. Some constraints were implemented with minor deviations from the spec. Please see [CONFORMANCE.md](docs/CONFORMANCE.md). The `constant`, and `switch` v5 *proposals* have also been implemented.
+
 
 # TODO
 See [TODO](docs/TODO.md)

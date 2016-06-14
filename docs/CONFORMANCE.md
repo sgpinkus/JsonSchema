@@ -1,5 +1,5 @@
 # Overview
-There are two main places we deviate from the spec. `$ref`, `id`, and the meaning of `addtionalProperties` and `additionalItems`
+There are two main places we deviate from the spec. `$ref` and `id`, and the meaning of `addtionalProperties` and `additionalItems`
 
 ## The `id` Keyword Does Not Establish a Base URI
 JSON Schema defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a $ref object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the "id" field is used to establish the base URI of all descendent objects for which the given id is the closest ancestor id. However, the spec is ambiguous and attempting to follow it or something like leads to issues, well covered in [this proposed amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that). In summary:
@@ -22,7 +22,7 @@ Example of inline dereferencing with `id`:
       }
     }
 
-The value of `bah is replaced entirely by the object `id: "#foo"` is contained in.
+The value of bah is replaced entirely by the object `id: "#foo"` is contained in.
 
 ## Limitations to $ref
 The way $ref is intended in Json Schema is more or less like a UNIX symlink. However the spec does not address how to handle certain situations that can arise (like loops). In this implementation $refs are completely replaced by native PHP references. This is done in a preprocessing step by a submodule `JsonDocs`. The limitations to $refs are discussed in [JsonDocs/README.md](JsonDocs/README.md). Basically $refs to $refs (including but not limited to loops) are not allowed.
@@ -47,6 +47,5 @@ It states the analogous rule for additionalProperties. This implies if adddtiona
 ## format
 JSON Schema requires the formats it defines match specific existing RFCs or specifications. For example `regex` must be a ECMA regex. We use the closest approximation we could find in the native PHP (>=5.4) libs. Currently:
 
-  * `date-time` seems to be less strict than required by the JSON Schema spec.
   * `uri` === parse_url() or fail.
   * `regex` === compile with preg_match() or fail.

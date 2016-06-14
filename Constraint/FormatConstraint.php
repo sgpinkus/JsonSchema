@@ -40,7 +40,8 @@ class FormatConstraint extends Constraint
     $valid = true;
     switch($this->format) {
       case 'date-time': {
-        $valid = (bool)strtotime($doc); // @todo spec requires RFC3339. strtotime() probably a superset.
+        $valid = (bool)\DateTime::createFromFormat(\DateTime::RFC3339, $doc) ||
+          (bool)\DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $doc);
         break;
       }
       case 'email': {
