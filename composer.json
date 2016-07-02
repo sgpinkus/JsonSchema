@@ -5,10 +5,19 @@
   "require": {
     "php": ">=5.3"
   },
+  "require-dev": {
+      "phpunit/phpunit" : "4.*",
+      "ext-xdebug": "*"
+  },
   "autoload": {
     "psr-4": {
       "JsonSchema\\": "",
       "JsonDocs\\": "JsonDocs"
     }
+  },
+  "scripts": {
+      "test": "phpunit --configuration=./tests/phpunit.xml tests/",
+      "coverage": "phpunit --coverage-text --coverage-clover=coverage.clover --configuration=./tests/phpunit.xml tests/",
+      "cs": "phpcs --standard=psr2 ."
   }
 }

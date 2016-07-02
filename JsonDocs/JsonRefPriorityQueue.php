@@ -6,7 +6,7 @@ namespace JsonDocs;
  */
 class JsonRefPriorityQueue extends \SplPriorityQueue
 {
-  public function compare(JsonRef $a, JsonRef $b) {
+  public function compare($a, $b) {
     return $a->compare($b);
   }
 }
