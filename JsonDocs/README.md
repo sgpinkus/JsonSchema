@@ -7,11 +7,11 @@ PHP wrapper over the plain old data structure returned by `json_decode()` to imp
     use JsonDocs\JsonLoader;
     use JsonDocs\Uri;
     $jsonDocs = new JsonDocs(new JsonLoader());
-    $doc = $jsonDocs->get(new Uri('file://' . realpath('./tests/test-data/basic-refs.json')));
+    $doc = $jsonDocs->loadUri(new Uri('file://' . realpath('./tests/test-data/basic-refs.json')));
     var_dump($doc);
     # Or if the doc is already decoded.
     $unDoc = json_decode(file_get_contents(realpath('./tests/test-data/basic-refs.json')));
-    $doc = $jsonDocs->get(new Uri('file:///tmp/still/need/some/baseuri'), $unDoc);
+    $doc = $jsonDocs->getDoc($unDoc, new Uri('file:///tmp/still/need/some/baseuri'));
     var_dump($doc);
 
 # Class Design

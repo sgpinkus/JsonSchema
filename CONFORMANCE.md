@@ -2,7 +2,9 @@
 There are two main places we deviate from the spec. `$ref` and `id`, and the meaning of `addtionalProperties` and `additionalItems`
 
 ## The `id` Keyword Does Not Establish a Base URI
-JSON Schema defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a $ref object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the "id" field is used to establish the base URI of all descendent objects for which the given id is the closest ancestor id. However, the spec is ambiguous and attempting to follow it or something like leads to issues, well covered in [this proposed amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that). In summary:
+JSON Schema defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a `$ref` object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the `id` field is used to establish the base URI of all descendent objects for which the given id is the closest ancestor id.
+
+However, the spec is ambiguous and attempting to follow it or something like leads to issues, well covered in [this proposed amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that). In summary:
 
   * `id` at the root level if present shall establish a base URI for the document. It SHOULD be a valid URI.
   * Non root `id` fields shall *not* establish a new Base URI. The base URI concept is *deprecated*.

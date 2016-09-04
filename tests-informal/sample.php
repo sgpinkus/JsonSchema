@@ -30,10 +30,8 @@ $schema = new JsonSchema\JsonSchema(json_decode('{
 }'));
 foreach(['/users/0', '/users/1', '/'] as $ptr) {
   $valid = $schema->validate(JsonDocs\JsonDocs::getPointer($json, $ptr));
-  if($valid === true) {
+  if($valid === true)
     print "OK\n";
-  }
-  else {
+  else
     print $valid;
-  }
 }

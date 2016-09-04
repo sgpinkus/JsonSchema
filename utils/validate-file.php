@@ -10,7 +10,7 @@ function main($argc, $argv) {
   (sizeof($argv) == 3 or sizeof($argv) == 4) or die(usage());
   $jsonDocs = new JsonDocs(new JsonLoader());
   list($schemaFile, $schemaPointer) = makePath($argv[1]) or die("Invalid schema file\n");
-  $schemaDoc = $jsonDocs->get(new Uri($schemaFile));
+  $schemaDoc = $jsonDocs->loadUri(new Uri($schemaFile));
   $schema = new JsonSchema($schemaDoc);
   print "Schema created from $schemaFile\n";
   $target = json_decode(file_get_contents($argv[2])) or die("Invalid JSON file\n");

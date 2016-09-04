@@ -52,8 +52,8 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testJsonDocs() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic.json'));
-    $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-refs.json'));
+    $cache->loadUri(new Uri('file://' . getenv('DATADIR') . '/basic.json'));
+    $cache->loadUri(new Uri('file://' . getenv('DATADIR') . '/basic-refs.json'));
   }
 
 
@@ -65,7 +65,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
     $jsonDocs = new JsonDocs();
     $docUri = "file://" . getenv('DATADIR') . '/schema.json';
     $doc = file_get_contents($docUri);
-    $schemaDoc = $jsonDocs->get(new Uri($docUri), $doc);
+    $schemaDoc = $jsonDocs->loadDoc($doc, new Uri($docUri));
   }
 
   /**
@@ -121,7 +121,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
   public function testPointer() {
     $cache = new JsonDocs(new JsonLoader());
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
-    $cache->get($uri);
+    $cache->loadUri($uri);
     $uri->fragment = "/C/Value";
     $ref =& $cache->pointer($uri);
     $this->assertEquals($ref, "C-Value");
@@ -136,7 +136,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
   public function testNonPointer() {
     $cache = new JsonDocs(new JsonLoader());
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
-    $cache->get($uri);
+    $cache->loadUri($uri);
     $uri->fragment = "/C/0";
     $ref =& $cache->pointer($uri);
   }
@@ -147,7 +147,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testGetLoading() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-external-ref.json'));
+    $cache->loadUri(new Uri('file://' . getenv('DATADIR') . '/basic-external-ref.json'));
     $this->assertEquals($cache->count(), 2);
     $this->assertEquals($cache->pointer(new Uri('file://' . getenv('DATADIR') . '/user-schema.json#/definitions/_id/minimum')), 0);
   }
@@ -158,7 +158,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testJsonDocsRefChain() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->get(new Uri('file://' . getenv('DATADIR') . '/basic-ref-to-ref.json'));
+    $cache->loadUri(new Uri('file://' . getenv('DATADIR') . '/basic-ref-to-ref.json'));
   }
 
   /**
@@ -167,7 +167,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testUseOfId() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->get(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json'));
+    $cache->loadUri(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json'));
     $cache->pointer(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json#fooey'));
   }
 
@@ -176,11 +176,11 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromString() {
     $cache = new JsonDocs(new JsonLoader());
-    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey0'), "{}"), json_decode("{}"));
-    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey1'), "[]"), []);
-    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey2'), "0"), 0);
-    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey3'), "\"string\""), "string");
-    $this->assertEquals($cache->get(new Uri('file:///tmp/fooey4'), "true"), true);
+    $this->assertEquals($cache->loadDoc("{}", new Uri('file:///tmp/fooey0')), json_decode("{}"));
+    $this->assertEquals($cache->loadDoc("[]", new Uri('file:///tmp/fooey1')), []);
+    $this->assertEquals($cache->loadDoc("0", new Uri('file:///tmp/fooey2')), 0);
+    $this->assertEquals($cache->loadDoc("\"string\"", new Uri('file:///tmp/fooey3')), "string");
+    $this->assertEquals($cache->loadDoc("true", new Uri('file:///tmp/fooey4')), true);
   }
 
   /**
@@ -189,7 +189,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromNotAString() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->get(new Uri('file:///tmp/fooey0'), json_decode("{}"));
+    $cache->loadDoc(json_decode("{}"), new Uri('file:///tmp/fooey0'));
   }
 
   /**
@@ -198,7 +198,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromInvalidString() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->get(new Uri('file:///tmp/fooey0'), "{x}");
+    $cache->loadDoc("{x}", new Uri('file:///tmp/fooey0'));
   }
 
   /**
@@ -206,12 +206,12 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testgetSrc() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->get(new Uri('file:///tmp/fooey0'), "{}");
+    $cache->loadDoc("{}", new Uri('file:///tmp/fooey0'));
     $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0')), "{}");
     $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0#/some/subschema')), "{}", "Fragment part is ignored");
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $target = file_get_contents($uri);
-    $cache->get($uri);
+    $cache->loadUri($uri);
     $this->assertEquals($cache->getSrc($uri), json_encode(json_decode($target)));
     $uri->fragment = "fooey";
     $this->assertEquals($cache->getSrc($uri), json_encode(json_decode($target)), "Fragment part is ignored");
