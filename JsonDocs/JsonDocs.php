@@ -141,10 +141,12 @@ class JsonDocs implements \IteratorAggregate
     if(isset($this->cache[$keyUri.''])) {
       return $this->cache[$keyUri.'']['doc'];
     }
-    if($strDoc === null) {
-      $strDoc = $this->loader->load($keyUri);
+    if(is_string($strDoc) || $strDoc === null) {
+      if($strDoc === null) {
+        $strDoc = $this->loader->load($keyUri);
+      }
+      $doc = json_decode($strDoc);
     }
-    $doc = json_decode($strDoc);
     if($doc === null) {
       throw new JsonDecodeException(json_last_error());
     }
