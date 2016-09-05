@@ -194,7 +194,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
 
   /**
    * Test load from junk string.
-   * @expectedException \InvalidArgumentException
+   * @expectedException \JsonDocs\Exception\JsonDecodeException
    */
   public function testLoadFromInvalidString() {
     $cache = new JsonDocs(new JsonLoader());
@@ -212,8 +212,8 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $target = file_get_contents($uri);
     $cache->loadUri($uri);
-    $this->assertEquals($cache->getSrc($uri), json_encode(json_decode($target)));
+    $this->assertEquals(json_decode($cache->getSrc($uri)), json_decode($target));
     $uri->fragment = "fooey";
-    $this->assertEquals($cache->getSrc($uri), json_encode(json_decode($target)), "Fragment part is ignored");
+    $this->assertEquals(json_decode($cache->getSrc($uri)), json_decode($target), "Fragment part is ignored");
   }
 }

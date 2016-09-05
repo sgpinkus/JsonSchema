@@ -36,14 +36,9 @@ class JsonDocs implements \IteratorAggregate
   }
 
   /**
-   * Load and return a reference to a deserialized, dereferenced JSON document data structure.
-   * JsonDocs is a collection of whole resources. Thus the fragment part of $uri is stripped and ignored.
-   * Use the optional $doc parameter to override loading of the document via the JsonLoader.
-   * The $doc param is required to be a serialized JSON doc *string*. This avoids possibility of passing in an already derefd doc, and makes deep clone easier.
-   * The $doc param can decode to any type.
-   * Its possible the desired URI of the document is stored in the top level id field. If no Uri is explicitly passed we try and use that.
+   * Attempt to load then decode, deref and store a JSON docs from $uri.
+   * The document is cached with a key equal to the name of the URI.
    * @input $uri Uri an absolute URI.
-   * @input $doc string optional JSON document structure.
    * @returns mixed reference to the loaded JSON object data structure.
    * @throws JsonLoaderException, JsonDecodeException, JsonCacheException
    */
@@ -54,46 +49,29 @@ class JsonDocs implements \IteratorAggregate
       $doc = $this->cache[$keyUri.'']['doc'];
     }
     else {
-      $doc = $this->_load($uri, new JsonRefPriorityQueue(), false, $doc);
+      $doc = $this->_load($uri, new JsonRefPriorityQueue());
     }
     return $doc;
   }
 
   /**
-   * Load a JSON document froma string, taking care of refs and storing in the cache.
-   * @see loadUri()
+   * Decode, deref and store a JSON docs from string $doc
+   * A URI is required to identify the document and for resolving relative refs.
+   * The document is cached with a key equal to the name of the URI.
+   * JSON Schema in particular uses `id` at root of doc to *identify* schema.
+   * Uri may or may not be the same as that, but we pay no special consideration to `id`.
    * @returns mixed reference to the loaded JSON object data structure.
    */
-  public function loadDoc($doc, Uri $uri = null) {
+  public function loadDoc($doc, Uri $uri) {
     if(isset($doc) && !is_string($doc)) {
       throw new \InvalidArgumentException("Expected string, got " . gettype($doc));
-    }
-    try {
-      $doc = json_decode($doc);
-      if($doc === null) {
-        throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
-      }
-    }
-    catch(ErrorException $e) {  # @todo enable ErrorExceptions.
-      throw new \InvalidArgumentException("Invalid argument. Failed to decode provided JSON document");
-    }
-    if(!isset($uri)) {  # Now we have to decode the doc we can try find a URI if required.
-      if(!isset($doc->id)) {
-        throw new \InvalidArgumentException("No URI for document found. Cannot load document.");
-      }
-      try {
-        $uri = new Uri($doc->id);
-      }
-      catch(Exception $e) {
-        throw new \InvalidArgumentException("No URI for document found. Cannot load document.");
-      }
     }
     $keyUri = self::normalizeKeyUri($uri);
     if(isset($this->cache[$keyUri.''])) {
       $doc = $this->cache[$keyUri.'']['doc'];
     }
     else {
-      $doc = $this->_load($uri, new JsonRefPriorityQueue(), false, $doc);
+      $doc = $this->_load($uri, new JsonRefPriorityQueue(), $doc);
     }
     return $doc;
   }
@@ -149,41 +127,35 @@ class JsonDocs implements \IteratorAggregate
   }
 
   /**
-   * Fully load un-dereferenced JSON Documents at given URI.
-   * Collect all refs that need to to be resolved into a priority queue.
+   * Fully load string encoded JSON Documents at given URI.
+   * the algorithm collects all refs that need to to be resolved into a priority queue.
    * Before we begin dereferencing we make sure all JSON doc resources that are refered to are loaded by calling this method recursively.
    * This method should only be called by load(), and itself.
    * @input $uri of the resource to load. Must be fully qualified.
    * @input $refQueue a collection in which to store the refs we find.
-   * @input $replaceId bool whether to replace the `id` field with the normalized URI the resource is loaded from.
-   * @see load()
    */
-  private function _load(Uri $uri, \SplPriorityQueue $refQueue, $replaceId = false, $doc = null) {
+  private function _load(Uri $uri, \SplPriorityQueue $refQueue, $strDoc = null) {
     $tempRefs = [];
     $keyUri = self::normalizeKeyUri($uri);
 
     if(isset($this->cache[$keyUri.''])) {
       return $this->cache[$keyUri.'']['doc'];
     }
-
+    if($strDoc === null) {
+      $strDoc = $this->loader->load($keyUri);
+    }
+    $doc = json_decode($strDoc);
     if($doc === null) {
-      $doc = $this->loader->load($keyUri);
-      $doc = json_decode($doc);
-      if($doc === null) {
-        throw new JsonDecodeException(json_last_error());
-      }
+      throw new JsonDecodeException(json_last_error());
     }
-    if(isset($doc->id) && $replaceId) {
-      $doc->id = $keyUri.'';
-    }
+
     $identities = [];
     $refUris = [];
-    $srcDoc = json_encode($doc); // Maintain source so it can be recovered.
     self::parseDoc($doc, $refQueue, $refUris, $identities, $keyUri);
-    $this->cache[$keyUri.''] = ['doc' => $doc, 'ids' => $identities, 'src' => $srcDoc];
+    $this->cache[$keyUri.''] = ['doc' => $doc, 'ids' => $identities, 'src' => $strDoc];
 
     foreach($refUris as $uri) {
-      $this->_load($uri, $refQueue, false);
+      $this->_load($uri, $refQueue);
     }
 
     $this->_deRef($refQueue);
