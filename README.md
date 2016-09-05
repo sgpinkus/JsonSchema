@@ -88,7 +88,7 @@ $schema = '{
 }';
 // JsonDocs does the dereferencing, and acts as a cache of JSON docs.
 $jsonDocs = new JsonDocs(new JsonLoader());
-$schema = new JsonSchema($jsonDocs->loadDoc($schema));  // Use JsonDocs::loadUri() to load direct from URI.
+$schema = new JsonSchema($jsonDocs->loadDocStr($schema));  // Use JsonDocs::loadUri() to load direct from URI.
 $valid = $schema->validate($json);
 if($valid === true)
   print "OK\n";
