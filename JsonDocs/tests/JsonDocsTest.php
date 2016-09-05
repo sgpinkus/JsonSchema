@@ -65,7 +65,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
     $jsonDocs = new JsonDocs();
     $docUri = "file://" . getenv('DATADIR') . '/schema.json';
     $doc = file_get_contents($docUri);
-    $schemaDoc = $jsonDocs->loadDoc($doc, new Uri($docUri));
+    $schemaDoc = $jsonDocs->loadDocStr($doc, new Uri($docUri));
   }
 
   /**
@@ -176,11 +176,20 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromString() {
     $cache = new JsonDocs(new JsonLoader());
-    $this->assertEquals($cache->loadDoc("{}", new Uri('file:///tmp/fooey0')), json_decode("{}"));
-    $this->assertEquals($cache->loadDoc("[]", new Uri('file:///tmp/fooey1')), []);
-    $this->assertEquals($cache->loadDoc("0", new Uri('file:///tmp/fooey2')), 0);
-    $this->assertEquals($cache->loadDoc("\"string\"", new Uri('file:///tmp/fooey3')), "string");
-    $this->assertEquals($cache->loadDoc("true", new Uri('file:///tmp/fooey4')), true);
+    $this->assertEquals($cache->loadDocStr("{}", new Uri('file:///tmp/fooey0')), json_decode("{}"));
+    $this->assertEquals($cache->loadDocStr("[]", new Uri('file:///tmp/fooey1')), []);
+    $this->assertEquals($cache->loadDocStr("0", new Uri('file:///tmp/fooey2')), 0);
+    $this->assertEquals($cache->loadDocStr("\"string\"", new Uri('file:///tmp/fooey3')), "string");
+    $this->assertEquals($cache->loadDocStr("true", new Uri('file:///tmp/fooey4')), true);
+  }
+
+  /**
+   * Test load object.
+   */
+  public function testLoadFromObject() {
+    $cache = new JsonDocs(new JsonLoader());
+    $o = json_decode("{}");
+    $this->assertEquals($o, $cache->loadDocObj($o, new Uri('file:///tmp/fooey0')));
   }
 
   /**
@@ -189,8 +198,18 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromNotAString() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->loadDoc(json_decode("{}"), new Uri('file:///tmp/fooey0'));
+    $cache->loadDocStr(json_decode("{}"), new Uri('file:///tmp/fooey0'));
   }
+
+  /**
+   * Test load from not a object which is not allowed.
+   * @expectedException \InvalidArgumentException
+   */
+  public function testLoadFromNotAObject() {
+    $cache = new JsonDocs(new JsonLoader());
+    $cache->loadDocObj("{}", new Uri('file:///tmp/fooey0'));
+  }
+
 
   /**
    * Test load from junk string.
@@ -198,7 +217,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromInvalidString() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->loadDoc("{x}", new Uri('file:///tmp/fooey0'));
+    $cache->loadDocStr("{x}", new Uri('file:///tmp/fooey0'));
   }
 
   /**
@@ -206,7 +225,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testgetSrc() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->loadDoc("{}", new Uri('file:///tmp/fooey0'));
+    $cache->loadDocStr("{}", new Uri('file:///tmp/fooey0'));
     $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0')), "{}");
     $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0#/some/subschema')), "{}", "Fragment part is ignored");
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');

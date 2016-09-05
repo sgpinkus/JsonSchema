@@ -9,13 +9,11 @@ use JsonDocs\Exception\ResourceNotFoundException;
 use JsonDocs\Exception\JsonReferenceException;
 
 /**
- * Instances of this class dereference and then provide access to a cache of dereferenced JSON documents.
- * Basically its a cache of deserialized, dereferenced JSON docs keyed by the absolute URI (scheme+domain+path part only) of the document.
- * The key URI may be provided by the client. If the client does not provide it, we use the top `id` field if its present and is an absolute URI.
- * Loading JSON that contains JSON refs and dereferencing it are closely coupled. So this class has both loading and deref responsibilities.
- * Json References are literally replaced with PHP references to other loaded documents in the internal cache.
+ * Maintain a cache of decoded, dereferenced JSON docs. Cachce is keyed by an absolute URI provide for each doc.
+ * Loading JSON that contains JSON refs and dereferencing are closely coupled. So this class has both loading and deref responsibilities.
+ * Json References are literally replaced with PHP references to other loaded documents in the internal cache (Yep the cache is potentially a big graph).
  * Supports retrieving part of a doc by JSON Pointer. Note however, when loading a document the fragment part of a URIs is ignored.
- * Actually loading raw data from remote (or local) sources pointed at by URIs is delegated to JsonLoader.
+ * Actually loading raw data from remote (or local) sources pointed at by URIs is delegated to a JsonLoader.
  * For notes on the Json Reference specification see the following.
  * @see http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
  * @see http://json-schema.org/latest/json-schema-core.html#anchor25
@@ -62,9 +60,27 @@ class JsonDocs implements \IteratorAggregate
    * Uri may or may not be the same as that, but we pay no special consideration to `id`.
    * @returns mixed reference to the loaded JSON object data structure.
    */
-  public function loadDoc($doc, Uri $uri) {
-    if(isset($doc) && !is_string($doc)) {
+  public function loadDocStr($doc, Uri $uri) {
+    if(!is_string($doc)) {
       throw new \InvalidArgumentException("Expected string, got " . gettype($doc));
+    }
+    $keyUri = self::normalizeKeyUri($uri);
+    if(isset($this->cache[$keyUri.''])) {
+      $doc = $this->cache[$keyUri.'']['doc'];
+    }
+    else {
+      $doc = $this->_load($uri, new JsonRefPriorityQueue(), $doc);
+    }
+    return $doc;
+  }
+
+  /**
+   * Decode, deref and store a JSON docs from object $doc.
+   * @returns mixed reference to the loaded JSON object data structure.
+   */
+  public function loadDocObj($doc, Uri $uri) {
+    if(!is_object($doc)) {
+      throw new \InvalidArgumentException("Expected object, got " . gettype($doc));
     }
     $keyUri = self::normalizeKeyUri($uri);
     if(isset($this->cache[$keyUri.''])) {
@@ -133,6 +149,7 @@ class JsonDocs implements \IteratorAggregate
    * This method should only be called by load(), and itself.
    * @input $uri of the resource to load. Must be fully qualified.
    * @input $refQueue a collection in which to store the refs we find.
+   * @input $strDoc Mixed. If Null try to load from Uri. If string try to decode. Else assume its an object.
    */
   private function _load(Uri $uri, \SplPriorityQueue $refQueue, $strDoc = null) {
     $tempRefs = [];
@@ -146,9 +163,13 @@ class JsonDocs implements \IteratorAggregate
         $strDoc = $this->loader->load($keyUri);
       }
       $doc = json_decode($strDoc);
+      if($doc === null) {
+        throw new JsonDecodeException(json_last_error());
+      }
     }
-    if($doc === null) {
-      throw new JsonDecodeException(json_last_error());
+    else {
+      $doc = $strDoc;
+      $strDoc = json_encode($strDoc);
     }
 
     $identities = [];
@@ -159,7 +180,6 @@ class JsonDocs implements \IteratorAggregate
     foreach($refUris as $uri) {
       $this->_load($uri, $refQueue);
     }
-
     $this->_deRef($refQueue);
     return $doc;
   }
