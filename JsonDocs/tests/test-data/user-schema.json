@@ -1,4 +1,5 @@
 {
+  "name": "user",
   "type": "object",
   "definitions" : {
     "_id" : {

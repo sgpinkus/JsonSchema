@@ -118,6 +118,10 @@ class JsonDocs implements \IteratorAggregate
     return count($this->cache);
   }
 
+  public function clear() {
+    $this->cache = [];
+  }
+
   /**
    * Return a part of a document pointed to by $uri.
    * @input $uri absolute URI, with optional fragment part.

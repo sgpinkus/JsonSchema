@@ -168,7 +168,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
   public function testUseOfId() {
     $cache = new JsonDocs(new JsonLoader());
     $cache->loadUri(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json'));
-    $cache->pointer(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json#fooey'));
+    $cache->pointer(new Uri('file://' . getenv('DATADIR') . '/no-keyword-id.json#foo'));
   }
 
   /**
@@ -176,11 +176,11 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromString() {
     $cache = new JsonDocs(new JsonLoader());
-    $this->assertEquals($cache->loadDocStr("{}", new Uri('file:///tmp/fooey0')), json_decode("{}"));
-    $this->assertEquals($cache->loadDocStr("[]", new Uri('file:///tmp/fooey1')), []);
-    $this->assertEquals($cache->loadDocStr("0", new Uri('file:///tmp/fooey2')), 0);
-    $this->assertEquals($cache->loadDocStr("\"string\"", new Uri('file:///tmp/fooey3')), "string");
-    $this->assertEquals($cache->loadDocStr("true", new Uri('file:///tmp/fooey4')), true);
+    $this->assertEquals($cache->loadDocStr("{}", new Uri('file:///tmp/foo')), json_decode("{}"));
+    $this->assertEquals($cache->loadDocStr("[]", new Uri('file:///tmp/foo1')), []);
+    $this->assertEquals($cache->loadDocStr("0", new Uri('file:///tmp/foo2')), 0);
+    $this->assertEquals($cache->loadDocStr("\"string\"", new Uri('file:///tmp/foo3')), "string");
+    $this->assertEquals($cache->loadDocStr("true", new Uri('file:///tmp/foo4')), true);
   }
 
   /**
@@ -189,7 +189,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
   public function testLoadFromObject() {
     $cache = new JsonDocs(new JsonLoader());
     $o = json_decode("{}");
-    $this->assertEquals($o, $cache->loadDocObj($o, new Uri('file:///tmp/fooey0')));
+    $this->assertEquals($o, $cache->loadDocObj($o, new Uri('file:///tmp/foo')));
   }
 
   /**
@@ -198,7 +198,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromNotAString() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->loadDocStr(json_decode("{}"), new Uri('file:///tmp/fooey0'));
+    $cache->loadDocStr(json_decode("{}"), new Uri('file:///tmp/foo'));
   }
 
   /**
@@ -207,7 +207,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromNotAObject() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->loadDocObj("{}", new Uri('file:///tmp/fooey0'));
+    $cache->loadDocObj("{}", new Uri('file:///tmp/foo'));
   }
 
 
@@ -217,7 +217,7 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testLoadFromInvalidString() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->loadDocStr("{x}", new Uri('file:///tmp/fooey0'));
+    $cache->loadDocStr("{x}", new Uri('file:///tmp/foo'));
   }
 
   /**
@@ -225,14 +225,22 @@ class JsonDocsTest extends PHPUnit_Framework_TestCase
    */
   public function testgetSrc() {
     $cache = new JsonDocs(new JsonLoader());
-    $cache->loadDocStr("{}", new Uri('file:///tmp/fooey0'));
-    $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0')), "{}");
-    $this->assertEquals($cache->getSrc(new Uri('file:///tmp/fooey0#/some/subschema')), "{}", "Fragment part is ignored");
+    $cache->loadDocStr("{}", new Uri('file:///tmp/foo'));
+    $this->assertEquals($cache->getSrc(new Uri('file:///tmp/foo')), "{}");
+    $this->assertEquals($cache->getSrc(new Uri('file:///tmp/foo#/some/subschema')), "{}", "Fragment part is ignored");
     $uri = new Uri('file://' . getenv('DATADIR') . '/basic-refs.json');
     $target = file_get_contents($uri);
     $cache->loadUri($uri);
     $this->assertEquals(json_decode($cache->getSrc($uri)), json_decode($target));
-    $uri->fragment = "fooey";
+    $uri->fragment = "foo";
     $this->assertEquals(json_decode($cache->getSrc($uri)), json_decode($target), "Fragment part is ignored");
+  }
+
+  public function testClear() {
+    $cache = new JsonDocs(new JsonLoader());
+    $cache->loadDocStr("{}", new Uri('file:///tmp/foo'));
+    $this->assertEquals($cache->count(), 1);
+    $cache->clear();
+    $this->assertEquals($cache->count(), 0);
   }
 }
