@@ -1,9 +1,10 @@
 {
-  "name": "sam-at-github/phpjsonschema",
+  "name": "sam-at-github/jsonschema",
   "description": "A PHP JSON Schema validator",
   "license": "GPL-3.0",
   "require": {
-    "php": ">=5.3"
+    "php": ">=5.3",
+    "sam-at-github/jsondoc": "dev-master"
   },
   "require-dev": {
       "phpunit/phpunit" : "4.*",
@@ -11,10 +12,15 @@
   },
   "autoload": {
     "psr-4": {
-      "JsonSchema\\": "",
-      "JsonDocs\\": "JsonDocs"
+      "JsonSchema\\": ""
     }
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/sam-at-github/jsondoc"
+    }
+  ],
   "scripts": {
       "test": "phpunit --configuration=./tests/phpunit.xml tests/",
       "coverage": "phpunit --coverage-text --coverage-clover=coverage.clover --configuration=./tests/phpunit.xml tests/",

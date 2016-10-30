@@ -1,8 +1,8 @@
 <?php
 use JsonSchema\JsonSchema;
-use JsonDocs\JsonDocs;
-use \JsonDocs\JsonLoader;
-use JsonDocs\Uri;
+use JsonDoc\JsonDocs;
+use JsonDoc\JsonLoader;
+use JsonDoc\Uri;
 
 /**
  * Basic tests.

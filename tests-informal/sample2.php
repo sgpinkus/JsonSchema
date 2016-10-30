@@ -1,8 +1,8 @@
 <?php
 require_once './vendor/autoload.php';
-use JsonDocs\JsonDocs;
-use JsonDocs\JsonLoader;
-use JsonDocs\Uri;
+use JsonDoc\JsonDocs;
+use JsonDoc\JsonLoader;
+use JsonDoc\Uri;
 use JsonSchema\JsonSchema;
 $json = '{}';
 $schema = '{}';
