@@ -30,7 +30,6 @@ class MyLoader
 
 $myPath = dirname(realpath(__FILE__));
 $myLoader = new MyLoader([
-  "JsonSchema" => $myPath,
-  "JsonDocs" => "$myPath/JsonDocs"]
+  "JsonSchema" => $myPath]
 );
 spl_autoload_register([$myLoader, "load"]);

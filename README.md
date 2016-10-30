@@ -47,7 +47,7 @@ $schema = new JsonSchema\JsonSchema(json_decode('{
   "required": ["firstName", "lastName", "email", "_id"]
 }'));
 foreach(['/users/0', '/users/1', '/'] as $ptr) {
-  $valid = $schema->validate(JsonDocs\JsonDocs::getPointer($json, $ptr));
+  $valid = $schema->validate(JsonDoc\JsonDocs::getPointer($json, $ptr));
   if($valid === true)
     print "OK\n";
   else
