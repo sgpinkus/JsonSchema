@@ -22,8 +22,9 @@
     }
   ],
   "scripts": {
-      "test": "phpunit --configuration=./tests/phpunit.xml tests/",
-      "coverage": "phpunit --coverage-text --coverage-clover=coverage.clover --configuration=./tests/phpunit.xml tests/",
-      "cs": "phpcs --standard=psr2 ."
+    "test": "phpunit --configuration=./tests/phpunit.xml tests/",
+    "coverage": "phpunit --coverage-text --coverage-clover=coverage.clover --configuration=./tests/phpunit.xml tests/",
+    "cs": "phpcs --standard=psr2 .",
+    "post-install-cmd": "ln -sr vendor utils/"
   }
 }

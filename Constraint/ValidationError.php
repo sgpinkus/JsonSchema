@@ -16,6 +16,7 @@ class ValidationError implements \IteratorAggregate
   private $message;
   private $constraintName;
   private $context;
+  const NO_PRINT_CONSTRAINTS = ['{}'];
 
   /**
    * Init.
@@ -55,12 +56,16 @@ class ValidationError implements \IteratorAggregate
   }
 
   private function toStringRec($depth = 0) {
-    $str = str_repeat("  ", $depth) .
-      "path:" . $this->getContext() . "; " .
-      "constraint:" . $this->getName() . "; " .
-      "message:" .$this->getMessage() ."\n";
+    $str = "";
+    if(!in_array($this->getName(), ValidationError::NO_PRINT_CONSTRAINTS)) {
+      $str = str_repeat("  ", $depth) .
+        "doc_path:" . $this->getContext() . "; " .
+        "constraint:" . $this->getName() . "; " .
+        "message:" .$this->getMessage() ."\n";
+      $depth++;
+    }
     foreach($this->getIterator() as $error) {
-      $str .= $error->toStringRec($depth+1);
+      $str .= $error->toStringRec($depth);
     }
     return $str;
   }

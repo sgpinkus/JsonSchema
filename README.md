@@ -12,6 +12,11 @@ Draft v4 compliant JSON Schema validator for PHP.
   * Draft 4 compatible only.
   * No explicit support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec).
 
+# Installation
+
+    git clone ... && cd JsonSchema/
+    composer update --no-dev --ignore-platform-reqs
+
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
 

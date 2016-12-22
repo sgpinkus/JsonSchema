@@ -1,5 +1,6 @@
+#!/usr/bin/env php
 <?php
-require_once 'loader.php';
+require_once 'vendor/autoload.php';
 use JsonDoc\JsonDocs;
 use JsonDoc\JsonLoader;
 use JsonDoc\Uri;
