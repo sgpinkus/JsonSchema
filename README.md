@@ -3,11 +3,7 @@ Draft v4 compliant JSON Schema validator for PHP.
 
   * Simple design. In particular, the separation of code concerned with loading JSON, and JSON Reference, and code concerned with validation.
   * Simple interface for validation - doesn't expose the user to more than a couple of classes for the main use case -- validation.
-  * Full support for `$refs`.
-  * Support for `id` keyword, following [this amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that) to the ambiguous spec. Basically:
-    - `id` at root identifies the document. It may be absolute or relative. If it is relative how it is resolved to an absolute URI is undefined.
-    - `id` at non root identifies the given object in a document. Document `$refs` can ref it. It must be a non empty fragment URI, and unique within the document. Just like a HTML anchor.
-    - `id` does NOT establish a new base URI for relative URI resolution.
+  * Json Refence dereferencing is handled by a an external PHP library [JsonDoc](https://github.com/sam-at-github/JsonDoc). You can easily replace it with a different one.
   * Easily extensible with custom constraints.
   * Draft 4 compatible only.
   * No explicit support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec).
@@ -93,7 +89,7 @@ $schema = '{
 }';
 // JsonDocs does the dereferencing, and acts as a cache of JSON docs.
 $jsonDocs = new JsonDocs(new JsonLoader());
-$schema = new JsonSchema($jsonDocs->loadDocStr($schema));  // Use JsonDocs::loadUri() to load direct from URI.
+$schema = new JsonSchema($jsonDocs->loadDocStr($schema, new Uri('file:///tmp/some-unique-name')));
 $valid = $schema->validate($json);
 if($valid === true)
   print "OK\n";
@@ -105,7 +101,6 @@ Also see [validate-file.php](utils/validate-file.php) for example code.
 
 # Implemented Constraints
 All v4 Constraints are implemented. Some constraints were implemented with minor deviations from the spec. Please see [CONFORMANCE.md](CONFORMANCE.md). The `constant`, and `switch` v5 *proposals* have also been implemented.
-
 
 # TODO
 See [TODO](TODO.md)
