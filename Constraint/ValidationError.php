@@ -59,9 +59,9 @@ class ValidationError implements \IteratorAggregate
     $str = "";
     if(!in_array($this->getName(), ValidationError::NO_PRINT_CONSTRAINTS)) {
       $str = str_repeat("  ", $depth) .
-        "doc_path:" . $this->getContext() . "; " .
-        "constraint:" . $this->getName() . "; " .
-        "message:" .$this->getMessage() ."\n";
+        "doc_path=" . $this->getContext() . "; " .
+        "constraint=" . $this->getName() . "; " .
+        "message=" .$this->getMessage() ."\n";
       $depth++;
     }
     foreach($this->getIterator() as $error) {

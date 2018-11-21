@@ -1,9 +1,9 @@
 # Overview [![Build Status](https://api.travis-ci.org/sam-at-github/PhpJsonSchema.png)](https://travis-ci.org/sam-at-github/PhpJsonSchema)
 Draft v4 compliant JSON Schema validator for PHP.
 
-  * Simple design. In particular, the separation of code concerned with loading JSON, and JSON Reference, and code concerned with validation.
+  * Modular design. In particular, separation of code concerned with loading JSON, JSON (de)referencing, and validation.
   * Simple interface for validation - doesn't expose the user to more than a couple of classes for the main use case -- validation.
-  * Json Refence dereferencing is handled by a an external PHP library [JsonDoc](https://github.com/sam-at-github/JsonDoc). You can easily replace it with a different one.
+  * JsonRef dereferencing is handled by an external PHP library [JsonDoc](https://github.com/sam-at-github/JsonDoc). You can easily replace it with a different one.
   * Easily extensible with custom constraints.
   * Draft 4 compatible only.
   * No explicit support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec).
@@ -19,6 +19,9 @@ In the simplest case, where you have a standalone JSON schema with no `$refs`:
 ```php
 <?php
 require_once './vendor/autoload.php';
+use JsonDoc\JsonDocs;
+use JsonSchema\JsonSchema;
+
 $json = json_decode('{
   "users": [
     {
@@ -37,7 +40,7 @@ $json = json_decode('{
     }
   ]
 }');
-$schema = new JsonSchema\JsonSchema(json_decode('{
+$schema = '{
   "type": "object",
   "properties": {
     "firstName": { "type": "string", "minLength": 2 },
@@ -46,9 +49,11 @@ $schema = new JsonSchema\JsonSchema(json_decode('{
     "_id": { "type": "integer" }
   },
   "required": ["firstName", "lastName", "email", "_id"]
-}'));
+}';
+
+$schema = new JsonSchema($schema);
 foreach(['/users/0', '/users/1', '/'] as $ptr) {
-  $valid = $schema->validate(JsonDoc\JsonDocs::getPointer($json, $ptr));
+  $valid = $schema->validate(JsonDocs::getPointer($json, $ptr));
   if($valid === true)
     print "OK\n";
   else
@@ -65,13 +70,14 @@ use JsonDoc\JsonDocs;
 use JsonDoc\JsonLoader;
 use JsonDoc\Uri;
 use JsonSchema\JsonSchema;
-$json = json_decode('{
+
+$json = '{
   "comment": "valid",
   "firstName": "John",
   "lastName": "Doe",
   "email": "john.doe@nowhere.com",
   "_id": 1
-}');
+}';
 $schema = '{
   "id": "file:///tmp/jsonschema/user",
   "type": "object",
@@ -87,7 +93,7 @@ $schema = '{
   },
   "required": ["firstName", "lastName", "email", "_id"]
 }';
-// JsonDocs does the dereferencing, and acts as a cache of JSON docs.
+// JsonDocs does the dereferencing, and acts as a cache of loaded JSON docs.
 $jsonDocs = new JsonDocs(new JsonLoader());
 $schema = new JsonSchema($jsonDocs->loadDocStr($schema, new Uri('file:///tmp/some-unique-name')));
 $valid = $schema->validate($json);

@@ -4,6 +4,7 @@
   "license": "GPL-3.0",
   "require": {
     "php": ">=5.3",
+    "ext-mbstring": "*",
     "sam-at-github/jsondoc": "dev-master"
   },
   "require-dev": {

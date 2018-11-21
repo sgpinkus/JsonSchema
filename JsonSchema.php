@@ -16,9 +16,9 @@ class JsonSchema
    * Construct a validator from a JSON document data structure.
    * Note the $doc structure underlying the JsonDocs is mutated to aid in stuff.
    */
-  public function __construct(\StdClass $doc) {
-    $this->doc = $doc;
-    $this->rootSymbol = EmptyConstraint::build($doc);
+  public function __construct($doc) {
+    $this->doc = $this->parseDoc($doc);
+    $this->rootSymbol = EmptyConstraint::build($this->doc);
   }
 
   /**
@@ -28,6 +28,7 @@ class JsonSchema
    */
   public function validate($doc, $pointer = "/") {
     $code = '$code';
+    $doc = $this->parseDoc($doc);
     $schema = $this->rootSymbol;
     if($pointer !== "/") {
       $schema = JsonDocs::getPointer($this->doc, $pointer);
@@ -37,5 +38,18 @@ class JsonSchema
       $schema = $schema->$code;
     }
     return $schema->validate($doc, "/");
+  }
+
+  /**
+   * Helper to parse input str|object to a decoded JSON object used internally.
+   */
+  private function parseDoc($doc) {
+    if(is_string($doc)) {
+      $doc = json_decode($doc);
+    }
+    if(!($doc instanceof \StdClass)) {
+      throw new \InvalidArgumentException("Could not pass doc. Must be valid JSON string or object.");
+    }
+    return $doc;
   }
 }
