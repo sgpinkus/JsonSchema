@@ -44,12 +44,6 @@ class JsonSchema
    * Helper to parse input str|object to a decoded JSON object used internally.
    */
   private function parseDoc($doc) {
-    if(is_string($doc)) {
-      $doc = json_decode($doc);
-    }
-    if(!($doc instanceof \StdClass)) {
-      throw new \InvalidArgumentException("Could not pass doc. Must be valid JSON string or object.");
-    }
     return $doc;
   }
 }

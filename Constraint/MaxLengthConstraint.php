@@ -28,7 +28,7 @@ class MaxLengthConstraint extends Constraint
   public function validate($doc, $context) {
     $valid = true;
     if(is_string($doc)) {
-      if(mb_strlen($doc, "UTF-8") > $this->maxLength) {
+      if(strlen(utf8_decode($doc)) > $this->maxLength) {
         $valid = new ValidationError($this, "strlen($doc) > {$this->maxLength}", $context);
       }
     }

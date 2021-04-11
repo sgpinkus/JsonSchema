@@ -4,11 +4,13 @@ use JsonSchema\JsonSchema;
 use JsonDoc\JsonDocs;
 use JsonDoc\JsonLoader;
 use JsonDoc\Uri;
+use PHPUnit\Framework\TestCase;
+
 
 /**
  * Run over the official JSON Schema tests.
  */
-class JsonSchemaTestSuiteTest extends PHPUnit_Framework_TestCase
+class JsonSchemaTestSuiteTest extends TestCase
 {
   /** Skip these. */
   public static $SKIP_FILES = [
@@ -43,12 +45,12 @@ class JsonSchemaTestSuiteTest extends PHPUnit_Framework_TestCase
       $schemaDoc = $jsonDocs->loadDocStr(json_encode($tests->schema), new Uri("file:///test-{$k}.json"));
       $schema = new JsonSchema($schemaDoc);
       foreach($tests->tests as $test) {
-        $valid = $schema->validate($test->data);
+        $result = $schema->validate($test->data);
         if($test->valid) {
-          $this->assertEquals(true, $valid, $test->description);
+          $this->assertEquals(true, $result, $test->description);
         }
         else {
-          $this->assertInstanceOf('\JsonSchema\Constraint\ValidationError', $valid, $test->description);
+          $this->assertInstanceOf('\JsonSchema\Constraint\ValidationError', $result, $test->description);
         }
       }
     }

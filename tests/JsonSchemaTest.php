@@ -1,13 +1,15 @@
 <?php
+
 use JsonSchema\JsonSchema;
 use JsonDoc\JsonDocs;
 use JsonDoc\JsonLoader;
 use JsonDoc\Uri;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Basic tests.
  */
-class JsonSchemaTest extends PHPUnit_Framework_TestCase
+class JsonSchemaTest extends TestCase
 {
   /**
    * Basic test. Whether the user object is valid is listed in the loaded JSON doc.

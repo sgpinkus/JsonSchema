@@ -28,7 +28,7 @@ class MinLengthConstraint extends Constraint
   public function validate($doc, $context) {
     $valid = true;
     if(is_string($doc)) {
-      if(mb_strlen($doc, "UTF-8") < $this->minLength) {
+      if(strlen(utf8_decode($doc)) < $this->minLength) {
         $valid = new ValidationError($this, "strlen($doc) < {$this->minLength}", $context);
       }
     }

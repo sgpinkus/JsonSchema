@@ -1,15 +1,14 @@
 {
-  "name": "sam-at-github/jsonschema",
+  "name": "sgpinkus/jsonschema",
   "description": "A PHP JSON Schema validator",
   "license": "GPL-3.0",
   "require": {
     "php": ">=5.3",
-    "ext-mbstring": "*",
-    "sam-at-github/jsondoc": "dev-master"
+    "sgpinkus/jsondoc": "dev-master"
   },
   "require-dev": {
-      "phpunit/phpunit" : "4.*",
-      "ext-xdebug": "*"
+      "php": ">=7.1",
+      "phpunit/phpunit" : "^7.5.0"
   },
   "autoload": {
     "psr-4": {
@@ -19,13 +18,12 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/sam-at-github/jsondoc"
+      "url": "https://github.com/sgpinkus/jsondoc"
     }
   ],
   "scripts": {
     "test": "phpunit --configuration=./tests/phpunit.xml tests/",
     "coverage": "phpunit --coverage-text --coverage-clover=coverage.clover --configuration=./tests/phpunit.xml tests/",
-    "cs": "phpcs --standard=psr2 .",
-    "post-install-cmd": "ln -sr vendor utils/"
+    "cs": "phpcs --standard=psr2 ."
   }
 }

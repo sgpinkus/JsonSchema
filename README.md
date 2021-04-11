@@ -1,12 +1,12 @@
 # Overview [![Build Status](https://api.travis-ci.org/sam-at-github/PhpJsonSchema.png)](https://travis-ci.org/sam-at-github/PhpJsonSchema)
-Draft v4 compliant JSON Schema validator for PHP.
+Draft v4 compliant JSON Schema validator for PHP:
 
-  * Modular design. In particular, separation of code concerned with loading JSON, JSON (de)referencing, and validation.
-  * Simple interface for validation - doesn't expose the user to more than a couple of classes for the main use case -- validation.
+  * Modular design.
+  * Simple interface for validation.
   * JsonRef dereferencing is handled by an external PHP library [JsonDoc](https://github.com/sam-at-github/JsonDoc). You can easily replace it with a different one.
   * Easily extensible with custom constraints.
-  * Draft 4 compatible only.
-  * No explicit support for the hypermedia validation / semantic validation (the 3rd part of the v4 spec).
+  * Draft v4 compatible.
+  * No explicit support for the hypermedia validation / semantic validation specification addendum.
 
 # Installation
 
@@ -103,7 +103,7 @@ else
   print $valid;
 ```
 
-Also see [validate-file.php](utils/validate-file.php) for example code.
+Also see [cli-validator.php](cli-validator.php) for example code.
 
 # Implemented Constraints
 All v4 Constraints are implemented. Some constraints were implemented with minor deviations from the spec. Please see [CONFORMANCE.md](CONFORMANCE.md). The `constant`, and `switch` v5 *proposals* have also been implemented.

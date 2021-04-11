@@ -3,11 +3,13 @@
 use \JsonSchema\Constraint\EmptyConstraint;
 use \JsonSchema\Constraint\Exception\ConstraintParseException;
 use \JsonSchema\Constraint\ValidationError;
+use PHPUnit\Framework\TestCase;
+
 
 /**
  * Basic tests.
  */
-abstract class ConstraintTest extends PHPUnit_Framework_TestCase
+abstract class ConstraintTest extends TestCase
 {
   /**
    * Constraints to test. Must be wrapped in an object / EmptyConstraint.
