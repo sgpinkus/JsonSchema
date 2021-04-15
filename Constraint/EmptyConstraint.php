@@ -92,17 +92,16 @@ class EmptyConstraint extends Constraint
    */
   public static function build($doc) {
     $propertyHit = false;
-    $codeKey = '$code';
     $constraint = new EmptyConstraint([]);
 
     if(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
     }
-    if(isset($doc->$codeKey)) {
-      $constraint = $doc->$codeKey;
+    if(isset($doc->{'$code'})) {
+      $constraint = $doc->{'$code'};
     }
     else {
-      $doc->$codeKey = $constraint;
+      $doc->{'$code'} = $constraint;
       $childConstraints = [];
       $remainingKeys = array_keys((array)$doc); // init collection of keys not handled by a symbol.
       foreach(self::$childSymbols as $symbol) {
