@@ -35,6 +35,7 @@ class EmptyConstraint extends Constraint
     'JsonSchema\Constraint\UniqueItemsConstraint',
     'JsonSchema\Constraint\MinPropertiesConstraint',
     'JsonSchema\Constraint\MaxPropertiesConstraint',
+    'JsonSchema\Constraint\PropertyNamesConstraint',
     'JsonSchema\Constraint\RequiredConstraint',
     'JsonSchema\Constraint\PropertiesConstraint',
     'JsonSchema\Constraint\FormatConstraint',

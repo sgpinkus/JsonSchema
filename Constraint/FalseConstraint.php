@@ -16,7 +16,11 @@ class FalseConstraint extends Constraint
    * @override
    */
   public static function getName() {
-  	return '';
+    return 'false';
+  }
+
+  public static function getKeys() {
+    return [];
   }
 
   /**
