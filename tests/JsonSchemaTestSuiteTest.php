@@ -49,7 +49,7 @@ class JsonSchemaTestSuiteTest extends TestCase
     $files = glob("{$filePath}*.json");
     // $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) use ($skip) { return [$f, $skip];}, $files);
-    $files = [["$filePath/propertyNames.json"]];
+    // $files = [["$filePath/dependencies.json"]];
     return $files;
   }
 
@@ -60,6 +60,7 @@ class JsonSchemaTestSuiteTest extends TestCase
   public function testJsonSchema($file, $skip = []) {
     if(in_array(basename($file), $skip)) {
       $this->markTestSkipped("Skipping {basename($file)}");
+      return;
     }
     $testGroup = json_decode(file_get_contents($file), false);
     $jsonDocs = new JsonDocs();
