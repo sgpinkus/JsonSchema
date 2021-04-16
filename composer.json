@@ -4,7 +4,8 @@
   "license": "GPL-3.0",
   "require": {
     "php": ">=5.3",
-    "sgpinkus/jsondoc": "dev-master"
+    "sgpinkus/jsondoc": "dev-master",
+    "sgpinkus/simplelogger": "dev-master"
   },
   "require-dev": {
     "php": ">=7.1",
@@ -19,6 +20,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/sgpinkus/jsondoc"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/sgpinkus/simplelogger"
     }
   ],
   "scripts": {

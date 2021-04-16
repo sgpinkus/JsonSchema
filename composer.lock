@@ -4,27 +4,75 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae8f2d049b0c21305891235093b37460",
+    "content-hash": "43766e8e6750d182d001d8da0fcf4b2b",
     "packages": [
+        {
+            "name": "psr/log",
+            "version": "1.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
+                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2020-03-23T09:12:05+00:00"
+        },
         {
             "name": "sgpinkus/jsondoc",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sgpinkus/JsonDoc.git",
-                "reference": "699598729672860977b3d6ead4485c63ead7eb0e"
+                "reference": "524e7dfd1a42f67bcca0891e4ba5205b40b50e74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sgpinkus/JsonDoc/zipball/699598729672860977b3d6ead4485c63ead7eb0e",
-                "reference": "699598729672860977b3d6ead4485c63ead7eb0e",
+                "url": "https://api.github.com/repos/sgpinkus/JsonDoc/zipball/524e7dfd1a42f67bcca0891e4ba5205b40b50e74",
+                "reference": "524e7dfd1a42f67bcca0891e4ba5205b40b50e74",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3"
+                "php": ">=5.3",
+                "sgpinkus/simplelogger": "dev-master"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.*"
+                "phpunit/phpunit": "7.*"
             },
             "type": "library",
             "autoload": {
@@ -46,12 +94,48 @@
             "license": [
                 "GPL-3.0"
             ],
-            "description": "A PHP JSON Schema validator",
+            "description": "A PHP JSON Reference dereferencer",
             "support": {
                 "source": "https://github.com/sgpinkus/JsonDoc/tree/master",
                 "issues": "https://github.com/sgpinkus/JsonDoc/issues"
             },
-            "time": "2021-04-11T13:21:02+00:00"
+            "time": "2021-04-16T03:59:50+00:00"
+        },
+        {
+            "name": "sgpinkus/simplelogger",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sgpinkus/SimpleLogger.git",
+                "reference": "1c33f720226249c776c415dda89129b128b639b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sgpinkus/SimpleLogger/zipball/1c33f720226249c776c415dda89129b128b639b3",
+                "reference": "1c33f720226249c776c415dda89129b128b639b3",
+                "shasum": ""
+            },
+            "require": {
+                "psr/log": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SimpleLogger\\": ""
+                }
+            },
+            "authors": [
+                {
+                    "name": "Sam Pinkus",
+                    "email": "sgpinkus@gmail.com"
+                }
+            ],
+            "description": "Very simple one class PSR-3 PHP logger that just logs to error_log()",
+            "support": {
+                "source": "https://github.com/sgpinkus/SimpleLogger/tree/master",
+                "issues": "https://github.com/sgpinkus/SimpleLogger/issues"
+            },
+            "time": "2021-04-12T11:56:26+00:00"
         }
     ],
     "packages-dev": [
@@ -1528,7 +1612,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "sgpinkus/jsondoc": 20
+        "sgpinkus/jsondoc": 20,
+        "sgpinkus/simplelogger": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
