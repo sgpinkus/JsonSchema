@@ -14,10 +14,10 @@ class JsonSchemaTestSuiteTest extends TestCase
 {
   /** Skip these. */
   public static $SKIP_FILES = [
-    'refRemote.json',     // refs
-    'ref.json',           // refs
-    'definitions.json',   // refs
     'bignum.json',        // optional not implemented
+    'definitions.json',   // refs
+    'ref.json',           // refs
+    'refRemote.json',     // refs
     'zeroTerminatedFloats.json', // optional not implemented
   ];
 
@@ -29,7 +29,7 @@ class JsonSchemaTestSuiteTest extends TestCase
     $files = glob("{$filePath}*.json");
     $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) { return [$f];}, $files);
-    # $files = [["$filePath/...json"]];
+    # $files = [["$filePath/ecmascript-regex.json"]];
     return $files;
   }
 
