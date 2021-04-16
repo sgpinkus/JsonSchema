@@ -14,10 +14,13 @@ class JsonSchemaTestSuiteTest extends TestCase
 {
   /** Skip these. */
   public static $SKIP_FILES = [
-    'bignum.json',        // optional not implemented
     'definitions.json',   // refs
     'ref.json',           // refs
     'refRemote.json',     // refs
+    'id.json',            // "id" keyword not supported here. Underspecified in v04.
+    'bignum.json',        // optional not implemented
+    'ecmascript-regex.json', // optional too hard to support ECMA regex via PCRE based impl!
+    'non-bmp-regex.json', // optional
     'zeroTerminatedFloats.json', // optional not implemented
   ];
 
@@ -29,7 +32,7 @@ class JsonSchemaTestSuiteTest extends TestCase
     $files = glob("{$filePath}*.json");
     $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) { return [$f];}, $files);
-    # $files = [["$filePath/ecmascript-regex.json"]];
+    # $files = [["$filePath/id.json"]];
     return $files;
   }
 

@@ -60,11 +60,11 @@ class PatternConstraint extends Constraint
 
   /**
    * According to spec patterns are of the 'ECMA 262 regular expression dialect'.
-   * According to spec example such patterns have no delimiter.
+   * According to spec example such patterns have no delimiter. Try to add id not present (imperfect).
    */
   public static function fixPreg($preg) {
-    if(substr($preg, 0, 1) != substr($preg, -1, 1)) {
-      $preg = "/{$preg}/";
+    if(!preg_match('/^([\/#]).*\1u?$/', $preg)) {
+      $preg = "/{$preg}/u";
     }
     return $preg;
   }
