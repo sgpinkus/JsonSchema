@@ -49,7 +49,7 @@ class EmptyConstraint extends Constraint
    * Construct the empty constraint.
    * @input $childConstraints Result of this constraint is results of these constraints ANDed together.
    */
-  public function __construct(array $childConstraints) {
+  public function __construct(array $childConstraints = []) {
     $this->childConstraints = $childConstraints;
   }
 
@@ -83,6 +83,10 @@ class EmptyConstraint extends Constraint
     return $valid;
   }
 
+  public static function wants($doc, $docKeys) {
+    return $doc === true;
+  }
+
   /**
    * Build empty constraint recursively.
    * Any keys not caught by loaded symbols are also built if they are valid JSON Schema.
@@ -94,10 +98,16 @@ class EmptyConstraint extends Constraint
     $propertyHit = false;
     $constraint = new EmptyConstraint([]);
 
-    if(!($doc instanceof \StdClass)) {
+    if($doc === false) {
+      $constraint = new FalseConstraint();
+    }
+    elseif ($doc === true) {
+      $constraint = new EmptyConstraint();
+    }
+    elseif(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
     }
-    if(isset($doc->{'$code'})) {
+    elseif(isset($doc->{'$code'})) {
       $constraint = $doc->{'$code'};
     }
     else {

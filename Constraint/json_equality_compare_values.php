@@ -10,9 +10,11 @@ function json_equality_compare_values($a, $b): bool {
     return false;
   }
   if($typeA === 'object') {
+    [$a, $b] = count((array)$a) >= count((array)$b) ? [$a, $b] : [$b, $a];
     return traverse_object($a, $b);
   }
   if($typeA === 'array') {
+    [$a, $b] = count((array)$a) >= count((array)$b) ? [$a, $b] : [$b, $a];
     return traverse_array($a, $b);
   }
   return $a === $b;

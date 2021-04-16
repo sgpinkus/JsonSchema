@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 class JsonSchemaTestSuiteTest extends TestCase
 {
   public function fileProviderDraft4() {
-    /** Skip these. */
     $skip = [
       'definitions.json',   // refs
       'ref.json',           // refs
@@ -36,18 +35,27 @@ class JsonSchemaTestSuiteTest extends TestCase
    *
    */
   public function fileProviderDraft6() {
-    /** Skip these. */
-    $skip = [];
+    $skip = [
+      'definitions.json',   // refs
+      'ref.json',           // refs
+      'refRemote.json',     // refs
+      'id.json',            // "id" keyword not supported and underspecified in v04.
+      'bignum.json',        // optional not implemented
+      'ecmascript-regex.json', // optional too hard to support ECMA regex via PCRE based impl!
+      'non-bmp-regex.json', // optional
+      'zeroTerminatedFloats.json', // optional not implemented
+    ];
     $filePath = getenv('DATADIR') . "/JSON-Schema-Test-Suite/tests/draft6/";
     $files = glob("{$filePath}*.json");
     $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) use ($skip) { return [$f, $skip];}, $files);
-    $files = [["$filePath/allOf.json"]];
+    $files = [["$filePath/const.json"]];
     return $files;
   }
 
   /**
    * @dataProvider fileProviderDraft4
+   * @dataProvider fileProviderDraft6
    */
   public function testJsonSchema($file, $skip = []) {
     if(in_array(basename($file), $skip)) {
