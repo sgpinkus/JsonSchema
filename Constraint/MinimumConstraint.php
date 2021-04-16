@@ -5,11 +5,11 @@ use JsonSchema\Constraint\Constraint;
 use JsonSchema\Constraint\Exception\ConstraintParseException;
 
 /**
+ * The minimum constraint.
  */
 class MinimumConstraint extends Constraint
 {
   private $minimum;
-  private $exclusive;
 
   public function __construct($minimum, $exclusive = false) {
     $this->minimum = $minimum;
@@ -20,7 +20,11 @@ class MinimumConstraint extends Constraint
    * @override
    */
   public static function getName() {
-  	return 'minimum';
+    return "['minimum', 'exclusiveMinimum']";
+  }
+
+  public static function getKeys() {
+    return ['minimum', 'exclusiveMinimum'];
   }
 
   /**
@@ -40,16 +44,27 @@ class MinimumConstraint extends Constraint
   }
 
   /**
+   * v06 made incompatible change to exclusiveMinimum: must now be a number. But BWC is still very
+   * possible so we do that ...
    * @override
    */
   public static function build($context) {
-    $doc = $context->minimum;
-    if(!(is_int($doc) || is_float($doc))) {
-      throw new ConstraintParseException('The value of "minimum" MUST be a JSON number.');
+    $minimum = isset($context->minimum) ? $context->minimum : null;
+    $exclusiveMinimum = isset($context->exclusiveMinimum) ? $context->exclusiveMinimum : null;
+    if(isset($minimum)) {
+      if(!(is_int($minimum) || is_float($minimum))) {
+        throw new ConstraintParseException('The value of "minimum" MUST be a JSON number.');
+      }
+      if(isset($exclusiveMinimum) && !is_bool($exclusiveMinimum)) {
+        throw new ConstraintParseException('The value of "exclusiveMinimum" MUST be a boolean when "minimum" also set.');
+      }
+      return new static($minimum, $exclusiveMinimum);
     }
-    if(isset($context->exclusiveMinimum) && !is_bool($context->exclusiveMinimum)) {
-      throw new ConstraintParseException('The value of "exclusiveMinimum" MUST be a boolean.');
+    elseif(is_int($exclusiveMinimum) || is_float($exclusiveMinimum)) {
+      return new static($exclusiveMinimum, true);
     }
-    return new static($doc, !empty($context->exclusiveMinimum));
+    else {
+      throw new ConstraintParseException('The value of "exclusiveMinimum" MUST be a JSON number when "minimum" is not also set.');
+    }
   }
 }

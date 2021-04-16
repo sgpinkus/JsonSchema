@@ -10,7 +10,6 @@ use JsonSchema\Constraint\Exception\ConstraintParseException;
 class MaximumConstraint extends Constraint
 {
   private $maximum;
-  private $exclusive;
 
   public function __construct($maximum, $exclusive = false) {
     $this->maximum = $maximum;
@@ -21,7 +20,11 @@ class MaximumConstraint extends Constraint
    * @override
    */
   public static function getName() {
-  	return 'maximum';
+    return "['maximum', 'exclusiveMaximum']";
+  }
+
+  public static function getKeys() {
+    return ['maximum', 'exclusiveMaximum'];
   }
 
   /**
@@ -41,16 +44,27 @@ class MaximumConstraint extends Constraint
   }
 
   /**
+   * v06 made incompatible change to exclusiveMaximum: must now be a number. But BWC is still very
+   * possible so we do that ...
    * @override
    */
   public static function build($context) {
-    $doc = $context->maximum;
-    if(!(is_int($doc) || is_float($doc))) {
-      throw new ConstraintParseException('The value of "maximum" MUST be a JSON number.');
+    $maximum = isset($context->maximum) ? $context->maximum : null;
+    $exclusiveMaximum = isset($context->exclusiveMaximum) ? $context->exclusiveMaximum : null;
+    if(isset($maximum)) {
+      if(!(is_int($maximum) || is_float($maximum))) {
+        throw new ConstraintParseException('The value of "maximum" MUST be a JSON number.');
+      }
+      if(isset($exclusiveMaximum) && !is_bool($exclusiveMaximum)) {
+        throw new ConstraintParseException('The value of "exclusiveMaximum" MUST be a boolean when "maximum" also set.');
+      }
+      return new static($maximum, $exclusiveMaximum);
     }
-    if(isset($context->exclusiveMaximum) && !is_bool($context->exclusiveMaximum)) {
-      throw new ConstraintParseException('The value of "exclusiveMaximum" MUST be a boolean.');
+    elseif(is_int($exclusiveMaximum) || is_float($exclusiveMaximum)) {
+      return new static($exclusiveMaximum, true);
     }
-    return new static($doc, !empty($context->exclusiveMaximum));
+    else {
+      throw new ConstraintParseException('The value of "exclusiveMaximum" MUST be a JSON number when "maximum" is not also set.');
+    }
   }
 }

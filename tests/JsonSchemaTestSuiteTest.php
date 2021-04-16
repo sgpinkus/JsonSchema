@@ -49,7 +49,7 @@ class JsonSchemaTestSuiteTest extends TestCase
     $files = glob("{$filePath}*.json");
     $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) use ($skip) { return [$f, $skip];}, $files);
-    $files = [["$filePath/const.json"]];
+    $files = [["$filePath/exclusiveMinimum.json"]];
     return $files;
   }
 
