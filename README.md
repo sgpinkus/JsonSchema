@@ -1,4 +1,4 @@
-# Overview [![Build Status](https://api.travis-ci.org/sam-at-github/PhpJsonSchema.png)](https://travis-ci.org/sam-at-github/PhpJsonSchema)
+# Overview [![Build Status](https://api.travis-ci.org/sgpinkus/JsonSchema.png)](https://travis-ci.org/sgpinkus/JsonSchema)
 Draft v4 compliant JSON Schema validator for PHP:
 
   * Modular design.
@@ -12,6 +12,12 @@ Draft v4 compliant JSON Schema validator for PHP:
 
     git clone ... && cd JsonSchema/
     composer update --no-dev --ignore-platform-reqs
+
+# Test
+
+    git submodule update --init
+    git clone ... && cd JsonSchema/
+    composer test
 
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
