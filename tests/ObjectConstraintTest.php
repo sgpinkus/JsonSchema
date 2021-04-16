@@ -37,7 +37,7 @@ class ObjectConstraintTest extends ConstraintTest
   public function invalidConstraintDataProvider() {
     return [
       ['{"required": 0}'],
-      ['{"required": []}'],
+      // ['{"required": []}'],
       ['{"maxProperties": -1}'],
       ['{"minProperties": -1}'],
       ['{"properties": 0}'],

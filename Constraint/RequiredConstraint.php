@@ -56,9 +56,6 @@ class RequiredConstraint extends Constraint
     if(!is_array($doc)) {
       throw new ConstraintParseException('This keyword\'s value MUST be an array');
     }
-    if(sizeof($doc) < 1) {
-      throw new ConstraintParseException('This keyword\'s value MUST be an array.  This array MUST have at least one element.');
-    }
     return new static($doc);
   }
 }

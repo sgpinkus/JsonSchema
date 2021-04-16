@@ -25,7 +25,7 @@ abstract class SomeOfConstraint extends Constraint
     $childConstraints = [];
     $name = static::getName();
     $doc = $context->$name;
-    
+
     if(!is_array($doc)) {
       throw new ConstraintParseException('This keyword\'s value MUST be an array');
     }

@@ -28,7 +28,7 @@ class TypeConstraintTest extends ConstraintTest
       ['{"type": "integer"}', "true", false],
       ['{"type": "integer"}', "integer", false],
       ['{"type": "integer"}', "1", true],
-      ['{"type": "integer"}', "1.0", false],
+      ['{"type": "integer"}', "1.0", true], // Changed v04 -> v06
       ['{"type": "integer"}', "\"1\"", false],
       ['{"type": "integer"}', "[]", false],
       ['{"type": "integer"}', "{}", false],

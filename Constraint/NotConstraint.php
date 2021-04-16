@@ -8,7 +8,7 @@ class NotConstraint extends Constraint
 {
   private $innerConstraint;
 
-  public function __construct(EmptyConstraint $innerConstraint) {
+  public function __construct(Constraint $innerConstraint) {
     $this->innerConstraint = $innerConstraint;
   }
 

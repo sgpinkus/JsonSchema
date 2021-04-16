@@ -27,7 +27,7 @@ class JsonSchemaTestSuiteTest extends TestCase
     $files = glob("{$filePath}*.json");
     $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) use ($skip) { return [$f, $skip];}, $files);
-    # $files = [["$filePath/id.json"]];
+    # $files = [["$filePath/...json"]];
     return $files;
   }
 
@@ -41,15 +41,15 @@ class JsonSchemaTestSuiteTest extends TestCase
       'refRemote.json',     // refs
       'id.json',            // "id" keyword not supported and underspecified in v04.
       'bignum.json',        // optional not implemented
+      'format.json',        // optional
       'ecmascript-regex.json', // optional too hard to support ECMA regex via PCRE based impl!
       'non-bmp-regex.json', // optional
-      'zeroTerminatedFloats.json', // optional not implemented
     ];
     $filePath = getenv('DATADIR') . "/JSON-Schema-Test-Suite/tests/draft6/";
     $files = glob("{$filePath}*.json");
     // $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) use ($skip) { return [$f, $skip];}, $files);
-    // $files = [["$filePath/dependencies.json"]];
+    // $files = [["$filePath/...json"]];
     return $files;
   }
 

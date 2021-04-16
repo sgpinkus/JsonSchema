@@ -1,33 +1,32 @@
 # Overview
-There are two main places we deviate from the spec. `$ref` and `id`, and the meaning of `addtionalProperties` and `additionalItems`
+There are these main places we may deviate from the spec:
 
-## The `id` Keyword Does Not Establish a Base URI
-JSON Schema defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a `$ref` object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the `id` field is used to establish the base URI of all descendent objects for which the given id is the closest ancestor id.
+  - `id` or `$id` keywords.
+  - The precise meaning of `additionalProperties` and `additionalItems`.
+  - Some `format` formatters.
 
-However, the spec is ambiguous and attempting to follow it or something like leads to issues, well covered in [this proposed amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that). In summary:
+## `$id` not `id`
+`id` is not a keyword (as in v4). `$id` is (as in (v6+). However, we don't implement relative URI rebasing as it's confusing and *never* actually used in the wild. See next section.
 
-  * `id` at the root level if present shall establish a base URI for the document. It SHOULD be a valid URI.
-  * Non root `id` fields shall *not* establish a new Base URI. The base URI concept is *deprecated*.
-  * Non root `id` fields establish targets for linking to via $refs (similar to `id` in XSD, except they can occur at any level). This is what the v4 spec means by "inline dereferencing mode" - as far as we can tell.
-  * Non root `id` fields must be unique and must not start with "/".
+## The `$id` or  Keyword Does Not Establish a Base URI
+JSON Schema defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a `$ref` object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the `$id` field is used to establish the base URI of all descendant objects for which the given id is the closest ancestor id.
 
-Example of inline dereferencing with `id`:
+However, the spec is ambiguous and attempting to follow it or something like leads to issues, well covered in [this proposed amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that). In summary, this implementation use [JsonDoc](https://github.com/sgpinkus/JsonDoc) which use json references v0.4.0.
+
+Example of inline dereferencing with `$id`:
 
     {
       {
-        id: "#foo",
+        "$id": "#foo",
         ...
       }
       {
-        bah: { $ref: "#foo" }
+        "bah": { "$ref": "#foo" }
         ...
       }
     }
 
 The value of bah is replaced entirely by the object `id: "#foo"` is contained in.
-
-## Limitations to $ref
-The way $ref is intended in Json Schema is more or less like a UNIX symlink. However the spec does not address how to handle certain situations that can arise (like loops). In this implementation $refs are completely replaced by native PHP references. This is done in a preprocessing step by a submodule `JsonDocs`. The limitations to $refs are discussed in [JsonDocs/README.md](JsonDocs/README.md). Basically $refs to $refs (including but not limited to loops) are not allowed.
 
 ## addtionalItems, additionalProperties
 (Note we pass all the official tests on these properties, so need to reconfirm we are actually deviant).

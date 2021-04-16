@@ -51,7 +51,7 @@ class ConstantConstraint extends Constraint
    * @override
    */
   public static function build($context) {
-    $doc = isset($context->constant) ? $context->constant : $context->const;
+    $doc = isset($context->constant) ? $context->constant : @$context->const;
     return new static($doc);
   }
 }

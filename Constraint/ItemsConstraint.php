@@ -103,7 +103,7 @@ class ItemsConstraint extends Constraint
     $constraints = null;
     $doc = $context->items;
 
-    if(!(is_array($doc) || is_object($doc))) {
+    if(!(is_array($doc) || is_object($doc) || is_bool($doc))) {
       throw new ConstraintParseException("The value of 'items' MUST be either an object or an array.");
     }
     if(isset($context->additionalItems) && !(is_bool($context->additionalItems) || is_object($context->additionalItems))) {

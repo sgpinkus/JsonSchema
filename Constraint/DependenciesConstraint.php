@@ -78,7 +78,7 @@ class DependenciesConstraint extends Constraint
       throw new ConstraintParseException('The value of "dependencies" MUST be an object.');
     }
     foreach($doc as  $key => $value) {
-      if(is_object($value)) {
+      if(is_object($value) || is_bool($value)) {
         $dependencies[$key] = EmptyConstraint::build($value);
       }
       elseif(is_array($value)) {
