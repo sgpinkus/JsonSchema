@@ -12,35 +12,45 @@ use PHPUnit\Framework\TestCase;
  */
 class JsonSchemaTestSuiteTest extends TestCase
 {
-  /** Skip these. */
-  public static $SKIP_FILES = [
-    'definitions.json',   // refs
-    'ref.json',           // refs
-    'refRemote.json',     // refs
-    'id.json',            // "id" keyword not supported here. Underspecified in v04.
-    'bignum.json',        // optional not implemented
-    'ecmascript-regex.json', // optional too hard to support ECMA regex via PCRE based impl!
-    'non-bmp-regex.json', // optional
-    'zeroTerminatedFloats.json', // optional not implemented
-  ];
-
-  /**
-   *
-   */
-  public function fileProvider() {
+  public function fileProviderDraft4() {
+    /** Skip these. */
+    $skip = [
+      'definitions.json',   // refs
+      'ref.json',           // refs
+      'refRemote.json',     // refs
+      'id.json',            // "id" keyword not supported and underspecified in v04.
+      'bignum.json',        // optional not implemented
+      'ecmascript-regex.json', // optional too hard to support ECMA regex via PCRE based impl!
+      'non-bmp-regex.json', // optional
+      'zeroTerminatedFloats.json', // optional not implemented
+    ];
     $filePath = getenv('DATADIR') . "/JSON-Schema-Test-Suite/tests/draft4/";
     $files = glob("{$filePath}*.json");
     $files = array_merge($files, glob("{$filePath}/optional/*.json"));
-    $files = array_map(function($f) { return [$f];}, $files);
+    $files = array_map(function($f) use ($skip) { return [$f, $skip];}, $files);
     # $files = [["$filePath/id.json"]];
     return $files;
   }
 
   /**
-   * @dataProvider fileProvider
+   *
    */
-  public function testJsonSchema($file) {
-    if(in_array(basename($file), self::$SKIP_FILES)) {
+  public function fileProviderDraft6() {
+    /** Skip these. */
+    $skip = [];
+    $filePath = getenv('DATADIR') . "/JSON-Schema-Test-Suite/tests/draft6/";
+    $files = glob("{$filePath}*.json");
+    $files = array_merge($files, glob("{$filePath}/optional/*.json"));
+    $files = array_map(function($f) use ($skip) { return [$f, $skip];}, $files);
+    $files = [["$filePath/allOf.json"]];
+    return $files;
+  }
+
+  /**
+   * @dataProvider fileProviderDraft4
+   */
+  public function testJsonSchema($file, $skip = []) {
+    if(in_array(basename($file), $skip)) {
       $this->markTestSkipped("Skipping {basename($file)}");
     }
     $testGroup = json_decode(file_get_contents($file), false);
