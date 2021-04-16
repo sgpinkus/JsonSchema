@@ -39,8 +39,8 @@ class TypeConstraint extends Constraint
         $valid = is_bool($doc) ? true : new ValidationError($this, "not a boolean", $context);
         break;
       }
-      case 'integer': {
-        $valid = is_int($doc) ? true : new ValidationError($this, "not an integer", $context);
+      case 'integer': { // v06 says 1.000 is actually an integer. Passes v04 tests too.
+        $valid = is_int($doc) || (is_float($doc) && ((int)($doc) == $doc)) ? true : new ValidationError($this, "not an integer", $context);
         break;
       }
       case 'number': {
