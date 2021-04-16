@@ -25,10 +25,11 @@ class JsonSchemaTestSuiteTest extends TestCase
    *
    */
   public function fileProvider() {
-    $filePath = getenv('DATADIR') . "/json-schema-tests-draft4/";
+    $filePath = getenv('DATADIR') . "/JSON-Schema-Test-Suite/tests/draft4/";
     $files = glob("{$filePath}*.json");
     $files = array_merge($files, glob("{$filePath}/optional/*.json"));
     $files = array_map(function($f) { return [$f];}, $files);
+    # $files = [["$filePath/...json"]];
     return $files;
   }
 
@@ -39,7 +40,7 @@ class JsonSchemaTestSuiteTest extends TestCase
     if(in_array(basename($file), self::$SKIP_FILES)) {
       $this->markTestSkipped("Skipping {basename($file)}");
     }
-    $testGroup = json_decode(file_get_contents($file));
+    $testGroup = json_decode(file_get_contents($file), false);
     $jsonDocs = new JsonDocs();
     foreach($testGroup as $k => $tests) {
       $schemaDoc = $jsonDocs->loadDocStr(json_encode($tests->schema), new Uri("file:///test-{$k}.json"));
@@ -47,10 +48,10 @@ class JsonSchemaTestSuiteTest extends TestCase
       foreach($tests->tests as $test) {
         $result = $schema->validate($test->data);
         if($test->valid) {
-          $this->assertEquals(true, $result, $test->description);
+          $this->assertEquals(true, $result, "'{$tests->description} :: {$test->description}' in $file");
         }
         else {
-          $this->assertInstanceOf('\JsonSchema\Constraint\ValidationError', $result, $test->description);
+          $this->assertInstanceOf('\JsonSchema\Constraint\ValidationError', $result, "'{$tests->description} :: {$test->description}' in $file");
         }
       }
     }

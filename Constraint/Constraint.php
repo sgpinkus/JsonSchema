@@ -1,5 +1,6 @@
 <?php
 namespace JsonSchema\Constraint;
+require_once('json_equality_compare_values.php');
 
 /**
  * Abstract base class for all JSON Schema constraints.
@@ -58,6 +59,15 @@ abstract class Constraint
       }
     }
     return $wants;
+  }
+
+  /**
+   * Deal with inconsisencies between PHP and JSON equality:
+   * PHP's json_decode decodes number that look like ints to ints even though JSON has no int type.
+   * PHP will do by reference comparision on objects.
+   */
+  public static function jsonTypeEquality($a, $b) {
+    return json_equality_compare_values($a, $b);
   }
 
   /**

@@ -27,7 +27,7 @@ class JsonSchema
    * @input $pointer A JSON Pointer pointing into the schema.
    */
   public function validate($doc, $pointer = "/") {
-    $doc = $this->tryDecode($doc);
+    // $doc = $this->tryDecode($doc);
     $schema = $this->rootSymbol;
     if($pointer !== "/") {
       $schema = JsonDocs::getPointer($this->doc, $pointer);

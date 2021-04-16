@@ -29,19 +29,18 @@ class UniqueItemsConstraint extends Constraint
    * @override
    */
   public function validate($doc, $context) {
-    $valid = true;
     if(is_array($doc) && $this->unique) {
-      $h = [];
-      foreach($doc as $v) {
-        $sv = serialize($v);
-        if(isset($h[$sv])) {
-           $valid = new ValidationError($this, "Non unique item $sv found.", $context);
-           break;
+      $seen = [];
+      foreach($doc as $i => $a) {
+        foreach($seen as $j => $b) {
+          if(Constraint::jsonTypeEquality($a, $b)) {
+            return new ValidationError($this, "Non unique item found: item $j matches $i.", $context);
+          }
         }
-        $h[$sv] = true;
+        $seen[] = $a;
       }
     }
-    return $valid;
+    return true;
   }
 
   /**

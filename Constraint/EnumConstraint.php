@@ -28,7 +28,7 @@ class EnumConstraint extends Constraint
   public function validate($doc, $context) {
     $valid = false;
     foreach($this->values as $value) {
-      if($doc === $value) {
+      if(static::jsonTypeEquality($doc, $value)) {
         $valid = true;
         break;
       }
