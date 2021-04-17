@@ -59,12 +59,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sgpinkus/JsonDoc.git",
-                "reference": "524e7dfd1a42f67bcca0891e4ba5205b40b50e74"
+                "reference": "2bbfcc17e14ee54ba889a8c7a41b9746f42d3227"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sgpinkus/JsonDoc/zipball/524e7dfd1a42f67bcca0891e4ba5205b40b50e74",
-                "reference": "524e7dfd1a42f67bcca0891e4ba5205b40b50e74",
+                "url": "https://api.github.com/repos/sgpinkus/JsonDoc/zipball/2bbfcc17e14ee54ba889a8c7a41b9746f42d3227",
+                "reference": "2bbfcc17e14ee54ba889a8c7a41b9746f42d3227",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "source": "https://github.com/sgpinkus/JsonDoc/tree/master",
                 "issues": "https://github.com/sgpinkus/JsonDoc/issues"
             },
-            "time": "2021-04-16T03:59:50+00:00"
+            "time": "2021-04-16T05:26:27+00:00"
         },
         {
             "name": "sgpinkus/simplelogger",

@@ -33,7 +33,7 @@ class FalseConstraint extends Constraint
   /**
    * @override
    */
-  public static function wants($doc, $docKeys) {
+  public static function wants($doc, array $docKeys) {
     return $doc === false;
   }
 

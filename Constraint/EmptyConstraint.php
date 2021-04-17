@@ -85,7 +85,7 @@ class EmptyConstraint extends Constraint
     return $valid;
   }
 
-  public static function wants($doc, $docKeys) {
+  public static function wants($doc, array $docKeys) {
     return $doc === true;
   }
 

@@ -9,19 +9,19 @@ Draft v6 compliant JSON Schema validator for PHP:
 
 # Installation
 
-    git clone ... && cd JsonSchema/
+    git clone ... && cd JsonSchema
     composer update --no-dev --ignore-platform-reqs
 
 # Test
 
+    git clone ... && cd JsonSchema
     git submodule update --init
-    git clone ... && cd JsonSchema/
     composer test
 
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
 
-```php
+```
 <?php
 require_once './vendor/autoload.php';
 use JsonDoc\JsonDocs;
@@ -111,4 +111,7 @@ else
 Also see [cli-validator.php](cli-validator.php) for example code.
 
 # TODO
-See [TODO](TODO.md)
+See [TODO](TODO.md).
+
+# CONFORMANCE
+See [conformance notes](CONFORMANCE.md).

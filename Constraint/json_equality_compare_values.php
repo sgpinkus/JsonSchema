@@ -20,7 +20,7 @@ function json_equality_compare_values($a, $b): bool {
   return $a === $b;
 }
 
-function traverse_object(object $a, object $b) {
+function traverse_object(stdClass $a, stdClass $b) {
   foreach ($a as $k => $v) {
     if(isset($b->$k) && json_equality_compare_values($v, $b->$k)) {
       continue;
