@@ -8,13 +8,6 @@ use JsonSchema\Constraint\Exception\ConstraintParseException;
  */
 class EmptyConstraint extends Constraint
 {
-  /**
-   * @override
-   */
-  public static function getName() {
-    return '{}';
-  }
-
   /** Map of valid empty constraint properties to symbols/constraint class names. */
   private static $childSymbols = [
     'JsonSchema\Constraint\AllOfConstraint',
@@ -46,13 +39,22 @@ class EmptyConstraint extends Constraint
   ];
   /** All the constraints that are found in the given object. */
   private $childConstraints = [];
+  /** Randomly gend prop name to set on object for loop detection to stash work. */
+  private static $codeProp;
 
   /**
    * Construct the empty constraint.
    * @input $childConstraints Result of this constraint is results of these constraints ANDed together.
    */
-  public function __construct(array $childConstraints = []) {
+  private function __construct(array $childConstraints = []) {
     $this->childConstraints = $childConstraints;
+  }
+
+  /**
+   * @override
+   */
+  public static function getName() {
+    return '{}';
   }
 
   /**
@@ -97,6 +99,7 @@ class EmptyConstraint extends Constraint
    * @override
    */
   public static function build($doc) {
+    $codeProp = self::getCodeProp();
     $propertyHit = false;
     $constraint = new EmptyConstraint([]);
 
@@ -109,11 +112,11 @@ class EmptyConstraint extends Constraint
     elseif(!($doc instanceof \StdClass)) {
       throw new ConstraintParseException();
     }
-    elseif(isset($doc->{'$code'})) {
-      $constraint = $doc->{'$code'};
+    elseif(isset($doc->$codeProp)) {
+      $constraint = $doc->$codeProp;
     }
     else {
-      $doc->{'$code'} = $constraint;
+      $doc->$codeProp = $constraint;
       $childConstraints = [];
       $remainingKeys = array_keys((array)$doc); // init collection of keys not handled by a symbol.
       foreach(self::$childSymbols as $symbol) {
@@ -162,5 +165,15 @@ class EmptyConstraint extends Constraint
    */
   public static function skipProperty($name) {
     return (strpos($name, '$') === 0);
+  }
+
+  /**
+   * Gen random prop name to stash stuff on. Was just using $code but v low prob of collision so ...
+   */
+  public static function getCodeProp() {
+    if(!self::$codeProp) {
+      self::$codeProp = "\$code." . uniqid();
+    }
+    return self::$codeProp;
   }
 }

@@ -29,12 +29,13 @@ class JsonSchema
   public function validate($doc, $pointer = "/") {
     // $doc = $this->tryDecode($doc);
     $schema = $this->rootSymbol;
+    $codeProp = EmptyConstraint::getCodeProp();
     if($pointer !== "/") {
       $schema = JsonDocs::getPointer($this->doc, $pointer);
-      if(!isset($schema->{'$code'})) {
+      if(!isset($schema->$codeProp)) {
         throw new \InvalidArgumentException("Could not resolve pointer $pointer");
       }
-      $schema = $schema->{'$code'};
+      $schema = $schema->$codeProp;
     }
     return $schema->validate($doc, "/");
   }
