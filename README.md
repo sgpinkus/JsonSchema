@@ -24,8 +24,8 @@ In the simplest case, where you have a standalone JSON schema with no `$refs`:
 ```
 <?php
 require_once './vendor/autoload.php';
-use JsonDoc\JsonDocs;
 use JsonSchema\JsonSchema;
+use JsonDoc\JsonDocs;
 
 $json = '{
   "users": [
@@ -57,23 +57,29 @@ $schema = '{
 }';
 
 $schema = new JsonSchema($schema);
-foreach(['/users/0', '/users/1', '/'] as $ptr) {
-  $valid = $schema->validate(JsonDocs::getPointer($json, $ptr));
-  if($valid === true)
-    print "OK\n";
-  else
-    print $valid;
-}
+$doc = json_decode($json);
+
+// Validate whole doc.
+$valid = $schema->validate($doc);
+if($valid === true)
+  print "OK\n";
+else
+  print $valid;
+
+// Use JsonDocs::getPointer() to get a sub doc then validate it.
+$valid = $schema->validate(JsonDocs::getPointer($doc, '/users/1'));
+if($valid === true)
+  print "OK\n";
+else
+  print "$valid";
 ```
 
-If you have any `$refs` in your JSON schema, you need to use the `JsonDocs` wrapper class to load and deref the JSON schema documents:
+If you have any `$refs` in your JSON schema, you need to use the `JsonDocs` wrapper class to load and dereference the JSON schema documents:
 
-```php
+```
 <?php
 require_once './vendor/autoload.php';
 use JsonDoc\JsonDocs;
-use JsonDoc\JsonLoader;
-use JsonDoc\Uri;
 use JsonSchema\JsonSchema;
 
 $json = '{
@@ -99,9 +105,61 @@ $schema = '{
   "required": ["firstName", "lastName", "email", "_id"]
 }';
 // JsonDocs does the dereferencing, and acts as a cache of loaded JSON docs.
-$jsonDocs = new JsonDocs(new JsonLoader());
-$schema = new JsonSchema($jsonDocs->loadDocStr($schema, new Uri('file:///tmp/some-unique-name')));
-$valid = $schema->validate($json);
+$jsonDocs = new JsonDocs();
+$schema = new JsonSchema($jsonDocs->loadDocStr($schema, 'file:///tmp/some-unique-fake-uri'));
+$valid = $schema->validate(json_decode($json));
+if($valid === true)
+  print "OK\n";
+else
+  print $valid;
+```
+
+To implement custom constraints extend the `Constraint` class and implement abstract methods, then
+register the constraint when creating the `JsonSchema` instance:
+
+```
+<?php
+require_once './vendor/autoload.php';
+use JsonSchema\JsonSchema;
+use JsonSchema\Constraint\Constraint;
+use JsonSchema\Constraint\Exception\ConstraintParseException;
+use JsonSchema\Constraint\ValidationError;
+
+class ModuloConstraint extends Constraint
+{
+  private $modulo;
+
+  private function __construct(int $modulo) {
+    $this->modulo = $modulo;
+  }
+
+  public static function getName() {
+    return 'modulo';
+  }
+
+  public function validate($doc, $context) {
+    if(is_int($doc) && $doc % $this->modulo !== 0) {
+      return new ValidationError($this, "$doc is not modulo {$this->modulo}", $context);
+    }
+    return true;
+  }
+
+  public static function build($context) {
+    if(!is_int($context->modulo)) {
+      throw new ConstraintParseException("The value of 'modulo' MUST be an integer.");
+    }
+
+    return new static($context->modulo);
+  }
+}
+
+$doc = 7;
+$schema = '{
+  "type": "integer",
+  "modulo": 2
+}';
+$schema = new JsonSchema($schema, ['ModuloConstraint']);
+$valid = $schema->validate($doc);
 if($valid === true)
   print "OK\n";
 else

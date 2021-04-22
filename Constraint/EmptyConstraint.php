@@ -61,8 +61,20 @@ class EmptyConstraint extends Constraint
    * Add a constraint.
    * @todo make this a little more fail safe.
    */
-  public static function addConstraint($constraintClass) {
-    self::$childSymbols[] = $constraintClass;
+  public static function addConstraint($constraint) {
+    $constraint::wants('', []); // Fail fast.
+    self::$childSymbols[] = $constraint;
+  }
+
+  /**
+   * Add a constraint.
+   * @todo make this a little more fail safe.
+   */
+  public static function addConstraints(array $constraints = []) {
+    foreach($constraints as $constraint) {
+      $constraint::wants('', []);
+      self::$childSymbols[] = $constraint;
+    }
   }
 
   /**

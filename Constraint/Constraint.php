@@ -22,10 +22,14 @@ abstract class Constraint
 
   /**
    * Parse the docs into a symbols.
-   * Note the $doc input may be mutated/marked up in process of building. All mutations are additive and shall be stored in properties named "^\$.*"
-   * $context is needed since some constraints are dependent on other constraints occuring in same level. Example minimum, minimumExclusive.
-   * @input $context Mixed the context the targe was found in.
+   * Note the $doc input may be mutated/marked up in process of building. All mutations are additive
+   * and shall be stored in properties named "^\$.*"
+   * $context is needed since some constraints are dependent on other constraints occuring in same
+   * level - example minimum, minimumExclusive.
+   * trow a ConstraintParseException if can't parse the constraint.
+   * @input $context Mixed the context the target was found in.
    * @returns Constraint.
+   * @throws ConstraintParseException
    */
   public static abstract function build($context);
 
