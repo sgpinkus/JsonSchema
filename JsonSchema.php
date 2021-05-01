@@ -1,6 +1,6 @@
 <?php
 namespace JsonSchema;
-use JsonDoc\JsonDocs;
+use JsonRef\JsonDocs;
 use JsonSchema\Constraint\EmptyConstraint;
 
 /**

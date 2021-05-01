@@ -11,7 +11,7 @@ There are these main places we may deviate from the spec:
 ## The `$id` or  Keyword Does Not Establish a Base URI
 JSON Schema defines a way to [establish a base URI](http://json-schema.org/latest/json-schema-core.html#anchor27), for resolution of relative URIs in a `$ref` object (JSON Schema calls this "defining a new resolution scope"). Specifically, JSON Schema says the `$id` field is used to establish the base URI of all descendant objects for which the given id is the closest ancestor id.
 
-However, the spec is ambiguous and attempting to follow it or something like leads to issues, well covered in [this proposed amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that). In summary, this implementation use [JsonDoc](https://github.com/sgpinkus/JsonDoc) which use json references v0.4.0.
+However, the spec is ambiguous and attempting to follow it or something like leads to issues, well covered in [this proposed amendment](https://github.com/json-schema/json-schema/wiki/The-%22id%22-conundrum#how-to-fix-that). In summary, this implementation uses [JsonRef](https://github.com/sgpinkus/JsonRef) which uses json reference v0.4.0.
 
 Example of inline dereferencing with `$id`:
 

@@ -3,7 +3,7 @@ Draft v6 compliant JSON Schema validator for PHP:
 
   * Modular design.
   * Simple interface for validation.
-  * JsonRef dereferencing is handled by an external PHP library [JsonDoc](https://github.com/sam-at-github/JsonDoc). You can easily replace it with a different one.
+  * JsonRef dereferencing is handled by an external PHP library [JsonRef](https://github.com/sam-at-github/JsonRef). You can easily replace it with a different one.
   * Easily extensible with custom constraints.
   * Draft v4 compatible.
 
@@ -25,7 +25,7 @@ In the simplest case, where you have a standalone JSON schema with no `$refs`:
 <?php
 require_once './vendor/autoload.php';
 use JsonSchema\JsonSchema;
-use JsonDoc\JsonDocs;
+use JsonRef\JsonDocs;
 
 $json = '{
   "users": [
@@ -66,7 +66,7 @@ if($valid === true)
 else
   print $valid;
 
-// Use JsonDocs::getPointer() to get a sub doc then validate it.
+// Addendum: use JsonDocs::getPointer() to get a sub doc then validate it.
 $valid = $schema->validate(JsonDocs::getPointer($doc, '/users/1'));
 if($valid === true)
   print "OK\n";
@@ -74,12 +74,12 @@ else
   print "$valid";
 ```
 
-If you have any `$refs` in your JSON schema, you need to use the `JsonDocs` wrapper class to load and dereference the JSON schema documents:
+If you have any `$refs` in your JSON schema, you need to use the `JsonRef` wrapper class to load and dereference the JSON schema documents:
 
 ```
 <?php
 require_once './vendor/autoload.php';
-use JsonDoc\JsonDocs;
+use JsonRef\JsonDocs;
 use JsonSchema\JsonSchema;
 
 $json = '{
@@ -104,7 +104,9 @@ $schema = '{
   },
   "required": ["firstName", "lastName", "email", "_id"]
 }';
-// JsonDocs does the dereferencing, and acts as a cache of loaded JSON docs.
+
+// JsonDocs does the dereferencing, and also caches any loaded JSON docs. Without a loader it wont
+// try to loader external resources though.
 $jsonDocs = new JsonDocs();
 $schema = new JsonSchema($jsonDocs->loadDocStr($schema, 'file:///tmp/some-unique-fake-uri'));
 $valid = $schema->validate(json_decode($json));

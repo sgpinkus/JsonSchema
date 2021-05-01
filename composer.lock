@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43766e8e6750d182d001d8da0fcf4b2b",
+    "content-hash": "43bd55a3ae8798d6d1f6390c01c7248c",
     "packages": [
         {
             "name": "psr/log",
@@ -54,17 +54,17 @@
             "time": "2020-03-23T09:12:05+00:00"
         },
         {
-            "name": "sgpinkus/jsondoc",
+            "name": "sgpinkus/jsonref",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sgpinkus/JsonDoc.git",
-                "reference": "2bbfcc17e14ee54ba889a8c7a41b9746f42d3227"
+                "url": "https://github.com/sgpinkus/JsonRef.git",
+                "reference": "753839802b20d6be347c9f117e76960226eb9f21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sgpinkus/JsonDoc/zipball/2bbfcc17e14ee54ba889a8c7a41b9746f42d3227",
-                "reference": "2bbfcc17e14ee54ba889a8c7a41b9746f42d3227",
+                "url": "https://api.github.com/repos/sgpinkus/JsonRef/zipball/753839802b20d6be347c9f117e76960226eb9f21",
+                "reference": "753839802b20d6be347c9f117e76960226eb9f21",
                 "shasum": ""
             },
             "require": {
@@ -77,7 +77,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "JsonDoc\\": ""
+                    "JsonRef\\": ""
                 }
             },
             "scripts": {
@@ -96,10 +96,10 @@
             ],
             "description": "A PHP JSON Reference dereferencer",
             "support": {
-                "source": "https://github.com/sgpinkus/JsonDoc/tree/master",
-                "issues": "https://github.com/sgpinkus/JsonDoc/issues"
+                "source": "https://github.com/sgpinkus/JsonRef/tree/master",
+                "issues": "https://github.com/sgpinkus/JsonRef/issues"
             },
-            "time": "2021-04-16T05:26:27+00:00"
+            "time": "2021-05-01T08:09:29+00:00"
         },
         {
             "name": "sgpinkus/simplelogger",
@@ -1612,13 +1612,13 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "sgpinkus/jsondoc": 20,
+        "sgpinkus/jsonref": 20,
         "sgpinkus/simplelogger": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.3"
+        "php": ">=7.1"
     },
     "platform-dev": {
         "php": ">=7.1"

@@ -4,7 +4,7 @@
   "license": "GPL-3.0",
   "require": {
     "php": ">=7.1",
-    "sgpinkus/jsondoc": "dev-master",
+    "sgpinkus/jsonref": "dev-master",
     "sgpinkus/simplelogger": "dev-master"
   },
   "require-dev": {

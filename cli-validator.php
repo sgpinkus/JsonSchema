@@ -1,9 +1,9 @@
 #!/usr/bin/env php
 <?php
 require_once './vendor/autoload.php';
-use JsonDoc\JsonDocs;
-use JsonDoc\JsonLoader;
-use JsonDoc\Uri;
+use JsonRef\JsonDocs;
+use JsonRef\JsonLoader;
+use JsonRef\Uri;
 use JsonSchema\JsonSchema;
 
 if($argc != 3) {

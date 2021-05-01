@@ -1,9 +1,9 @@
 <?php
 
 use JsonSchema\JsonSchema;
-use JsonDoc\JsonDocs;
-use JsonDoc\JsonLoader;
-use JsonDoc\Uri;
+use JsonRef\JsonDocs;
+use JsonRef\JsonLoader;
+use JsonRef\Uri;
 use PHPUnit\Framework\TestCase;
 
 

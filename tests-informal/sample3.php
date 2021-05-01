@@ -1,8 +1,8 @@
 <?php
 require_once './vendor/autoload.php';
-use JsonDoc\JsonDocs;
-use JsonDoc\JsonLoader;
-use JsonDoc\Uri;
+use JsonRef\JsonDocs;
+use JsonRef\JsonLoader;
+use JsonRef\Uri;
 use JsonSchema\JsonSchema;
 $json = json_decode('{
   "comment": "valid",
