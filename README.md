@@ -3,14 +3,13 @@ Draft v6 compliant JSON Schema validator for PHP:
 
   * Modular design.
   * Simple interface for validation.
-  * JsonRef dereferencing is handled by an external PHP library [JsonRef](https://github.com/sam-at-github/JsonRef). You can easily replace it with a different one.
+  * JsonRef dereferencing is handled by an external PHP library [JsonRef](http://jsonref.org). You can easily replace it with a different one.
   * Easily extensible with custom constraints.
   * Draft v4 compatible.
 
 # Installation
 
-    git clone ... && cd JsonSchema
-    composer update --no-dev --ignore-platform-reqs
+    composer install sgpinkus/jsonschema
 
 # Test
 
