@@ -20,7 +20,7 @@ Draft v6 compliant JSON Schema validator for PHP:
 # Usage
 In the simplest case, where you have a standalone JSON schema with no `$refs`:
 
-```
+```php
 <?php
 require_once './vendor/autoload.php';
 use JsonSchema\JsonSchema;
@@ -75,7 +75,7 @@ else
 
 If you have any `$refs` in your JSON schema, you need to use the `JsonRef` wrapper class to load and dereference the JSON schema documents:
 
-```
+```php
 <?php
 require_once './vendor/autoload.php';
 use JsonRef\JsonDocs;
@@ -118,7 +118,7 @@ else
 To implement custom constraints extend the `Constraint` class and implement abstract methods, then
 register the constraint when creating the `JsonSchema` instance:
 
-```
+```php
 <?php
 require_once './vendor/autoload.php';
 use JsonSchema\JsonSchema;
